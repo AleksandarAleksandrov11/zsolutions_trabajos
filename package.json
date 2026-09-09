@@ -16,6 +16,7 @@
     "fotos": "node scripts/procesar-fotos.mjs && node scripts/generar-variantes.mjs",
     "variantes": "node scripts/generar-variantes.mjs",
     "iconos": "node scripts/generar-iconos.mjs",
+    "og": "node scripts/generar-og.mjs",
     "imagenes:instalar": "pnpm add -D sharp",
     "auditar:contenido": "node scripts/auditar-contenido.mjs",
     "auditar:web": "node scripts/auditar-web.mjs",

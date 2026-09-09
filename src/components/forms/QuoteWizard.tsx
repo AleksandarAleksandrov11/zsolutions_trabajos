@@ -274,13 +274,13 @@ export function QuoteWizard() {
   if (estado.estado === "ok") {
     return (
       <div
-        className="relative overflow-hidden rounded-[2px] border border-brand-blue/45 bg-brand-blue-deep/30 p-8 sm:p-12"
+        className="relative overflow-hidden rounded-2xl border border-brand-blue/35 bg-brand-blue-deep/30 p-8 sm:p-12"
         role="status"
         aria-live="polite"
       >
-        <div className="grid-plano absolute inset-0 opacity-50" aria-hidden="true" />
+        <div className="plano absolute inset-0 opacity-50" aria-hidden="true" />
         <div className="relative">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-[2px] border border-brand-blue bg-brand-blue text-white">
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-white">
             <Check className="h-7 w-7" aria-hidden="true" />
           </span>
           <h2 className="mt-7 text-4xl">Gracias.</h2>
@@ -301,7 +301,7 @@ export function QuoteWizard() {
   return (
     <form
       onSubmit={enviar}
-      className="rounded-[2px] border border-white/10 bg-surface/40 p-6 sm:p-8 md:p-10"
+      className="tarjeta p-6 sm:p-8 md:p-10"
       noValidate
     >
       {/* Honeypot: invisible para personas, irresistible para bots */}
@@ -325,9 +325,6 @@ export function QuoteWizard() {
         className="mt-8 text-3xl focus:outline-none"
         aria-live="polite"
       >
-        <span className="num-seccion mr-3">
-          {String(paso + 1).padStart(2, "0")}
-        </span>
         {TITULOS[paso]}
       </h2>
 
@@ -566,14 +563,14 @@ export function QuoteWizard() {
       {/* Error global del servidor */}
       <div aria-live="assertive">
         {estado.estado === "error" ? (
-          <p className="mt-8 rounded-[2px] border border-brand-orange/50 bg-brand-orange/10 p-4 text-sm text-brand-orange">
+          <p className="mt-8 rounded-xl border border-brand-orange/45 bg-brand-orange/10 p-4 text-sm text-brand-orange">
             {estado.mensaje}
           </p>
         ) : null}
       </div>
 
       {/* Navegación */}
-      <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+      <div className="hairline-t mt-10 flex flex-col gap-3 pt-8 sm:flex-row sm:items-center sm:justify-between">
         <span className={paso === 0 ? "hidden sm:block sm:invisible" : ""}>
           <Button
             type="button"

@@ -5,7 +5,6 @@ import RevealItem from "@/components/ui/RevealItem.astro";
 import type { PasoProceso } from "@/content/servicios";
 
 type Props = { pasos: PasoProceso[]; numero?: string; titulo?: string };
-
 const { pasos, numero = "03", titulo = "Cómo trabajo" } = Astro.props;
 ---
 
@@ -21,17 +20,13 @@ const { pasos, numero = "03", titulo = "Cómo trabajo" } = Astro.props;
 
     <RevealGroup
       as="ol"
-      class="mt-14 grid gap-px overflow-hidden rounded-[2px] border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4"
-      stagger={0.08}
+      class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+      stagger={0.06}
     >
       {
         pasos.map((paso) => (
-          <RevealItem as="li" class="relative flex flex-col gap-4 bg-bg p-7">
-            <span
-              class="rayas-z absolute right-0 top-0 h-1 w-16 opacity-60"
-              aria-hidden="true"
-            />
-            <span class="font-display text-4xl text-brand-blue">{paso.paso}</span>
+          <RevealItem as="li" class="tarjeta flex flex-col gap-3 p-6">
+            <span class="num-seccion">{paso.paso}</span>
             <h3 class="text-xl">{paso.titulo}</h3>
             <p class="text-sm text-fg-muted">{paso.detalle}</p>
           </RevealItem>

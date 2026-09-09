@@ -11,7 +11,6 @@ type Props = {
   descripcion?: string;
   class?: string;
   alineacion?: "izquierda" | "centro";
-  /** Nivel semántico real del encabezado. */
   como?: "h2" | "h3";
 };
 
@@ -27,23 +26,20 @@ const {
 } = Astro.props;
 ---
 
-<div
-  class={cn("max-w-3xl", alineacion === "centro" && "mx-auto text-center", clase)}
->
+<div class={cn("max-w-2xl", alineacion === "centro" && "mx-auto text-center", clase)}>
   {
     numero || eyebrow ? (
-      <div
+      <p
         class={cn(
-          "mb-5 flex items-center gap-3",
+          "mb-4 flex items-center gap-2.5",
           alineacion === "centro" && "justify-center",
         )}
       >
-        {numero ? <span class="num-seccion">{numero}.</span> : null}
-        {eyebrow ? <span class="text-eyebrow text-fg-muted/60">{eyebrow}</span> : null}
-        <span class="rayas-z h-3 max-w-24 flex-1 opacity-70" aria-hidden="true" />
-      </div>
+        {numero ? <span class="num-seccion">{numero}</span> : null}
+        {eyebrow ? <span class="text-eyebrow text-fg-dim">{eyebrow}</span> : null}
+      </p>
     ) : null
   }
   <Como class="text-4xl" id={tituloId}>{titulo}</Como>
-  {descripcion ? <div class="mt-5 text-lg text-fg-muted">{descripcion}</div> : null}
+  {descripcion ? <p class="mt-4 text-lg text-fg-muted">{descripcion}</p> : null}
 </div>

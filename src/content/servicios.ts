@@ -28,12 +28,8 @@ export type Servicio = {
   /** slugs de servicios relacionados */
   relacionados: string[];
   palabrasClave: string[];
-  /**
-   * Foto real del servicio. Si falta, la página muestra el hueco con la cota
-   * de lo que hay que aportar en lugar de una imagen de stock.
-   * TODO (Alex): faltan las de fontanería, climatización, aerotermia y lampistería.
-   */
-  foto?: { nombre: NombreFoto; alt: string; posicion?: string };
+  /** Fotografía del servicio. */
+  foto: { nombre: NombreFoto; alt: string; posicion?: string };
 };
 
 export const servicios: Servicio[] = [
@@ -188,9 +184,8 @@ export const servicios: Servicio[] = [
       "instalador autorizado baja tensión",
     ],
     foto: {
-      nombre: "alex-retrato-obra",
-      alt: "Alex Zsurzs con ropa de trabajo de ZSURZS Instalaciones en una obra, con el metro en el cinturón",
-      posicion: "50% 20%",
+      nombre: "obra-electricidad",
+      alt: "Manos montando un mecanismo eléctrico empotrado en la pared",
     },
   },
 
@@ -343,6 +338,10 @@ export const servicios: Servicio[] = [
       "reforma de baño Barcelona",
       "fontanería comunidad de vecinos",
     ],
+    foto: {
+      nombre: "obra-fontaneria",
+      alt: "Manos apretando con llave inglesa el racor de una tubería de cobre",
+    },
   },
 
   /* ================================================================
@@ -494,6 +493,10 @@ export const servicios: Servicio[] = [
       "instalador F-Gas Barcelona",
       "conductos aire acondicionado Barcelona",
     ],
+    foto: {
+      nombre: "obra-climatizacion",
+      alt: "Unidad interior de aire acondicionado instalada en la pared de una vivienda",
+    },
   },
 
   /* ================================================================
@@ -645,6 +648,10 @@ export const servicios: Servicio[] = [
       "bomba de calor Barcelona",
       "asesor energético Barcelona",
     ],
+    foto: {
+      nombre: "obra-aerotermia",
+      alt: "Dos unidades exteriores de bomba de calor montadas sobre bastidor en un patio",
+    },
   },
 
   /* ================================================================
@@ -806,9 +813,8 @@ export const servicios: Servicio[] = [
       "trabajos en altura Barcelona",
     ],
     foto: {
-      nombre: "alex-espacio-confinado",
-      alt: "Alex Zsurzs y otro técnico trabajando suspendidos por cuerda dentro de un depósito de hormigón, montando instrumentación",
-      posicion: "55% 45%",
+      nombre: "obra-verticales",
+      alt: "Técnico descolgado por cuerda trabajando en la fachada de ladrillo de un edificio",
     },
   },
 
@@ -960,6 +966,10 @@ export const servicios: Servicio[] = [
       "mantenimiento comunidad de vecinos Barcelona",
       "reparaciones vivienda Barcelona",
     ],
+    foto: {
+      nombre: "obra-lampisteria",
+      alt: "Manos con guantes ajustando el circulador y el cuadro de mandos de una caldera",
+    },
   },
 ];
 

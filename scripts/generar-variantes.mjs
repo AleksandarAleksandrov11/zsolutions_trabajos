@@ -15,8 +15,10 @@ import { readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const CARPETA = "public/images";
-const ANCHOS = [390, 640, 900, 1200, 1600];
-const CALIDAD = { avif: 55, webp: 72 };
+const ANCHOS = [420, 720, 1080, 1600];
+const CALIDAD = { avif: 52, webp: 70 };
+/* Ancho máximo del JPEG de respaldo: por encima no se aprecia y pesa el doble. */
+const ANCHO_MAXIMO = 1600;
 
 const originales = (await readdir(CARPETA))
   .filter((f) => f.endsWith(".jpg"))
@@ -32,8 +34,21 @@ const manifiesto = [];
 for (const fichero of originales) {
   const nombre = path.basename(fichero, ".jpg");
   const ruta = path.join(CARPETA, fichero);
-  const base = sharp(ruta);
-  const meta = await base.metadata();
+  let base = sharp(ruta);
+  let meta = await base.metadata();
+
+  /* El original se normaliza a `ANCHO_MAXIMO`: es el respaldo que solo usan
+     los navegadores sin AVIF ni WebP, no hace falta que sea enorme. */
+  if ((meta.width ?? 0) > ANCHO_MAXIMO) {
+    const reducido = await sharp(ruta)
+      .resize({ width: ANCHO_MAXIMO })
+      .jpeg({ quality: 82, mozjpeg: true, progressive: true })
+      .toBuffer();
+    await writeFile(ruta, reducido);
+    base = sharp(ruta);
+    meta = await base.metadata();
+  }
+
   const ancho = meta.width ?? 0;
   const alto = meta.height ?? 0;
 

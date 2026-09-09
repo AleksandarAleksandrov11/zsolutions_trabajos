@@ -6,8 +6,16 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/presupuesto", "destination": "/contacto", "permanent": true },
-    { "source": "/sobre-mi", "destination": "/sobre-alex", "permanent": true },
+    {
+      "source": "/presupuesto",
+      "destination": "/contacto",
+      "permanent": true
+    },
+    {
+      "source": "/sobre-mi",
+      "destination": "/sobre-alex",
+      "permanent": true
+    },
     {
       "source": "/servicios/lampista",
       "destination": "/servicios/lampisteria",
@@ -24,8 +32,18 @@
       "permanent": true
     },
     {
-      "source": "/zonas/hospitalet",
-      "destination": "/zonas/hospitalet-de-llobregat",
+      "source": "/proyectos",
+      "destination": "/#trabajos",
+      "permanent": true
+    },
+    {
+      "source": "/formacion",
+      "destination": "/sobre-alex",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/:ciudad",
+      "destination": "/zonas",
       "permanent": true
     }
   ],
@@ -33,9 +51,18 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
         {
           "key": "Permissions-Policy",
           "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
@@ -45,13 +72,19 @@
     {
       "source": "/images/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
-      "source": "/fonts/(.*)",
+      "source": "/(fonts|logo)/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ]

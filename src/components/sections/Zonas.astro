@@ -1,0 +1,58 @@
+---
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/ui/Reveal.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import { zonas, zonasPorComarca } from "@/content/zonas";
+
+type Props = { numero?: string; conEnlace?: boolean };
+const { numero = "06", conEnlace = false } = Astro.props;
+
+/* Aquí solo va el listado. El mapa está en `/zonas`, que es donde tiene
+   sitio para leerse; repetirlo en la portada solo alargaba la página. */
+
+const porComarca = zonasPorComarca();
+---
+
+<section class="py-section" aria-labelledby="titulo-zonas">
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow="Dónde trabajo"
+      tituloId="titulo-zonas"
+      titulo="Barcelona, área metropolitana y Cataluña"
+      descripcion={`${zonas.length} municipios con salida habitual. Si el tuyo no está, pregúntame igualmente: lo que no hago es cobrarte un desplazamiento que no te aporta nada.`}
+    />
+
+    <div class="mt-12">
+      <RevealGroup class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          porComarca.map((grupo) => (
+            <RevealItem>
+              <h3 class="text-eyebrow mb-3 text-fg-dim">{grupo.comarca}</h3>
+              <ul class="flex flex-wrap gap-2">
+                {grupo.zonas.map((zona) => (
+                  <li class="hairline inline-flex min-h-9 items-center rounded-full px-3.5 text-sm text-fg-muted">
+                    {zona.ciudad}
+                  </li>
+                ))}
+              </ul>
+            </RevealItem>
+          ))
+        }
+
+      </RevealGroup>
+
+      {
+        conEnlace ? (
+          <Reveal class="mt-10">
+            <EnlaceBoton href="/zonas" variante="secundario">
+              Ver el mapa y todas las zonas
+            </EnlaceBoton>
+          </Reveal>
+        ) : null
+      }
+    </div>
+  </div>
+</section>

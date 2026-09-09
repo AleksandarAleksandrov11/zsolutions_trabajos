@@ -1,0 +1,79 @@
+---
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import Reveal from "@/components/ui/Reveal.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import MapaZonas from "@/components/sections/MapaZonas.astro";
+import CTASection from "@/components/sections/CTASection.astro";
+import { schemaMigas } from "@/lib/schema";
+import { crearMetadata } from "@/lib/seo";
+import { zonas, zonasPorComarca } from "@/content/zonas";
+import { site } from "@/content/site";
+
+const migas = [{ label: "Zonas", href: "/zonas" }];
+const porComarca = zonasPorComarca();
+
+const meta = crearMetadata({
+  title: "Zonas de actuación en Barcelona y Cataluña | ZSolutions",
+  description:
+    "Instalaciones en Barcelona, área metropolitana, Vallès, Baix Llobregat, Maresme, Garraf, Bages y Gironès. Presupuesto en menos de 24 horas.",
+  path: "/zonas",
+});
+---
+
+<Base meta={meta} schema={schemaMigas(migas)}>
+  <header class="pt-32 pb-12 sm:pt-40">
+    <div class="container-brand">
+      <Breadcrumbs migas={migas} />
+      <h1 class="mt-7 max-w-3xl text-5xl">Dónde trabajo</h1>
+      <p class="mt-5 max-w-2xl text-lg text-fg-muted">
+        Base en {site.nap.ciudad} y salida habitual a {zonas.length} municipios del área
+        metropolitana y del resto de Cataluña. Si el tuyo no aparece, pregúntame
+        igualmente: para un aviso corto muy lejos te diré con franqueza si te conviene
+        alguien más cercano.
+      </p>
+    </div>
+  </header>
+
+  <section class="pb-section" aria-label="Mapa y listado de zonas">
+    <div class="container-brand">
+      <div class="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:items-start lg:gap-16">
+        <Reveal class="tarjeta p-5 sm:p-7 lg:sticky lg:top-28">
+          <MapaZonas />
+          <p class="mt-4 text-xs text-fg-dim">
+            Contorno real de Cataluña. Cada punto está en las coordenadas del municipio.
+          </p>
+        </Reveal>
+
+        <RevealGroup class="flex flex-col gap-10">
+          {
+            porComarca.map((grupo) => (
+              <RevealItem>
+                <h2 class="text-eyebrow hairline-b mb-4 flex items-baseline justify-between gap-4 pb-2 text-fg-dim">
+                  {grupo.comarca}
+                  <span class="font-display text-brand-blue-soft">
+                    {String(grupo.zonas.length).padStart(2, "0")}
+                  </span>
+                </h2>
+                <ul class="flex flex-col gap-3">
+                  {grupo.zonas.map((zona) => (
+                    <li class="tarjeta p-5">
+                      <h3 class="text-lg font-bold">{zona.nombreLargo}</h3>
+                      <p class="mt-1.5 text-sm text-fg-muted">{zona.claim}</p>
+                    </li>
+                  ))}
+                </ul>
+              </RevealItem>
+            ))
+          }
+        </RevealGroup>
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    titulo="¿Trabajas o vives en alguna de estas zonas?"
+    descripcion={`Cuéntame qué necesitas y respondo en ${site.respuesta} con una primera valoración, sin coste y sin compromiso.`}
+  />
+</Base>

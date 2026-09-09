@@ -32,6 +32,6 @@ export const faqHome: ParFaq[] = [
   },
   {
     p: "¿Das formación a otros instaladores?",
-    r: "Sí. Desde 2024 comparto lo que he aprendido en obra con profesionales que quieren elevar su nivel y trabajar de forma más profesional. Es un proyecto distinto del servicio de instalación, y tiene su propio espacio dentro de la web.",
+    r: "Sí. Desde 2024 comparto lo que he aprendido en obra con profesionales que quieren elevar su nivel. Es un proyecto aparte del servicio de instalación y se organiza desde alexzsurzs.com; si te interesa, escríbeme y te cuento.",
   },
 ];

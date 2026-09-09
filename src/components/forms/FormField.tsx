@@ -11,7 +11,7 @@ type BaseProps = {
 };
 
 const claseControl =
-  "min-h-12 w-full rounded-[2px] border bg-white/[0.03] px-4 py-3 text-base text-fg placeholder:text-fg-muted/40 transition-colors focus:outline-none focus-visible:border-brand-blue";
+  "min-h-12 w-full rounded-xl border bg-white/[0.03] px-4 py-3 text-base text-fg placeholder:text-fg-dim/70 transition-colors focus:outline-none focus-visible:border-brand-blue";
 
 function Mensajes({
   error,
@@ -27,7 +27,7 @@ function Mensajes({
   return (
     <>
       {ayuda ? (
-        <p id={idAyuda} className="mt-2 text-xs text-fg-muted/60">
+        <p id={idAyuda} className="mt-2 text-xs text-fg-dim">
           {ayuda}
         </p>
       ) : null}
@@ -78,7 +78,7 @@ export function CampoTexto({
             *
           </span>
         ) : (
-          <span className="ml-2 text-xs font-normal text-fg-muted/50">Opcional</span>
+          <span className="ml-2 text-xs font-normal text-fg-dim">Opcional</span>
         )}
       </label>
       <input
@@ -94,7 +94,7 @@ export function CampoTexto({
         aria-invalid={Boolean(error)}
         aria-describedby={`${id}-error ${ayuda ? `${id}-ayuda` : ""}`.trim()}
         onChange={(e) => onChange(e.target.value)}
-        className={cn(claseControl, error ? "border-brand-orange" : "border-white/15")}
+        className={cn(claseControl, error ? "border-brand-orange" : "border-line")}
       />
       <Mensajes error={error} ayuda={ayuda} idError={`${id}-error`} idAyuda={`${id}-ayuda`} />
     </div>
@@ -137,7 +137,7 @@ export function CampoArea({
           ) : null}
         </label>
         {maximo ? (
-          <span className="text-xs text-fg-muted/50" aria-hidden="true">
+          <span className="text-xs text-fg-dim" aria-hidden="true">
             {valor.length} / {maximo}
           </span>
         ) : null}
@@ -157,7 +157,7 @@ export function CampoArea({
         className={cn(
           claseControl,
           "resize-y leading-relaxed",
-          error ? "border-brand-orange" : "border-white/15",
+          error ? "border-brand-orange" : "border-line",
         )}
       />
       <Mensajes error={error} ayuda={ayuda} idError={`${id}-error`} idAyuda={`${id}-ayuda`} />
@@ -188,10 +188,10 @@ export function OpcionRadio({
   return (
     <label
       className={cn(
-        "group flex min-h-16 cursor-pointer items-start gap-4 rounded-[2px] border p-4 transition-colors",
+        "group flex min-h-16 cursor-pointer items-start gap-4 rounded-xl border p-4 transition-colors",
         seleccionado
           ? "border-brand-blue bg-brand-blue/12"
-          : "border-white/12 bg-white/[0.02] hover:border-white/35",
+          : "border-line bg-white/[0.02] hover:border-white/30",
       )}
     >
       <input
@@ -204,10 +204,10 @@ export function OpcionRadio({
       />
       <span
         className={cn(
-          "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[2px] border transition-colors",
+          "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition-colors",
           seleccionado
             ? "border-brand-blue bg-brand-blue text-white"
-            : "border-white/25 text-fg-muted/70",
+            : "border-line text-fg-dim",
         )}
         aria-hidden="true"
       >

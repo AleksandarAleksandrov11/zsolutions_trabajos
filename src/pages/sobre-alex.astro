@@ -11,64 +11,62 @@ import CTASection from "@/components/sections/CTASection.astro";
 import { schemaMigas, schemaPersona } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { bioAlex } from "@/content/trayectoria";
-import { site } from "@/content/site";
+import { barraConfianza, site } from "@/content/site";
 
 const migas = [{ label: "Sobre Alex", href: "/sobre-alex" }];
 
 const meta = crearMetadata({
   title: "Alex Zsurzs · Instalador certificado en Barcelona",
   description:
-    "De peón de obra en 2012 a instalador certificado con REBT, RITE, F-Gas e IRATA Nivel 3. Trayectoria, certificaciones y forma de trabajar.",
+    "De peón de obra en 2012 a instalador certificado con REBT, RITE, F-Gas e IRATA Nivel 3. Trayectoria, acreditaciones y forma de trabajar.",
   path: "/sobre-alex",
 });
 ---
 
 <Base meta={meta} schema={[schemaPersona(), schemaMigas(migas)]}>
-  <header class="relative overflow-hidden pt-36 pb-16 md:pt-44 md:pb-20">
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="grid-plano absolute inset-0 opacity-70"></div>
-      <div
-        class="absolute inset-0"
-        style="background:radial-gradient(60% 55% at 85% 5%, rgba(35,54,111,.6) 0%, transparent 62%)"
-      >
-      </div>
-    </div>
-
+  <header class="pt-32 pb-12 sm:pt-40 sm:pb-16">
     <div class="container-brand">
       <Breadcrumbs migas={migas} />
 
-      <div class="mt-8 grid items-end gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.62fr)] lg:gap-16">
+      <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)] lg:items-end lg:gap-16">
         <div>
-          <p class="text-eyebrow mb-5 text-brand-orange">Quién está detrás</p>
-          <h1 class="text-7xl">{site.fundador}</h1>
-          <p class="mt-7 max-w-2xl text-xl text-fg-muted">{bioAlex}</p>
+          <p class="text-eyebrow text-brand-blue-soft">Quién está detrás</p>
+          <h1 class="mt-5 text-6xl">{site.fundador}</h1>
+          <p class="mt-6 max-w-xl text-lg text-fg-muted">{bioAlex}</p>
 
-          <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+          <ul class="hairline-t mt-9 flex flex-wrap gap-x-5 gap-y-2 pt-5">
+            {
+              barraConfianza.map((item) => (
+                <li class="text-eyebrow flex items-center gap-2 text-fg-dim">
+                  <span class="h-1 w-1 rounded-full bg-brand-blue-soft" aria-hidden="true" />
+                  {item}
+                </li>
+              ))
+            }
+          </ul>
+
+          <div class="mt-9">
             <EnlaceBoton href="/contacto" tamano="lg">Solicitar presupuesto</EnlaceBoton>
-            <EnlaceBoton href="/formacion" variante="secundario" tamano="lg">
-              Formación para instaladores
-            </EnlaceBoton>
           </div>
         </div>
 
         <Reveal>
           <Foto
             nombre="alex-cubierta-barcelona"
-            alt="Alex Zsurzs sentado en el pretil de una cubierta de Barcelona con el arnés y el casco de trabajos verticales, al atardecer"
+            alt="Alex Zsurzs con arnés y casco en el pretil de una cubierta de Barcelona, al atardecer"
             ratio="4 / 5"
-            sizes="(max-width: 1024px) 62vw, 440px"
-            objectPosition="50% 30%"
-            class="rounded-[2px] border border-white/10"
+            sizes="(max-width: 1024px) 90vw, 400px"
+            objectPosition="55% 30%"
+            class="rounded-2xl"
           />
         </Reveal>
       </div>
     </div>
   </header>
 
-  {/* Cómo trabaja */}
   <section class="py-section" aria-labelledby="titulo-metodo">
     <div class="container-brand">
-      <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.62fr)] lg:gap-16">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.55fr)] lg:gap-16">
         <Reveal>
           <SectionHeading
             numero="01"
@@ -82,22 +80,20 @@ const meta = crearMetadata({
               Empecé en 2012 como peón de obra. No es una frase de currículum: es la
               razón por la que sé lo que pasa cuando un plano se convierte en una pared
               real, cuando el hueco previsto no existe y cuando alguien decide resolverlo
-              rápido en lugar de resolverlo bien. He estado en las dos posiciones y he
-              aprendido a distinguirlas.
+              rápido en lugar de resolverlo bien.
             </p>
             <p>
               Durante años vi la misma escena repetida: instalaciones ejecutadas por
               gente sin habilitación, cuadros sin etiquetar, cargas de refrigerante
               hechas sin carnet y trabajos en altura sin plan de rescate. Nada de eso se
               nota el día de la entrega. Se nota tres años después, cuando el cliente
-              paga por segunda vez el mismo trabajo, o el día que alguien se hace daño.
+              paga por segunda vez el mismo trabajo.
             </p>
             <p>
               Por eso me saqué las habilitaciones y por eso las mantengo al día:
               electricista especialista en baja tensión, instalador RITE, gases
               fluorados, asesor energético, y en trabajo en altura IRATA e ITRA Nivel 3
-              con especialización en espacios confinados. No son adornos del presupuesto:
-              son lo que permite ejecutar, firmar y legalizar.
+              con especialización en espacios confinados.
             </p>
             <p>
               Mi forma de trabajar cabe en tres reglas.{" "}
@@ -111,35 +107,32 @@ const meta = crearMetadata({
             </p>
             <p>
               Y hay una cuarta que no es técnica: si un trabajo no me corresponde, lo
-              digo. Prefiero perder un encargo a hacerlo regular o a cobrar un
-              desplazamiento que no te aporta nada.
+              digo. Prefiero perder un encargo a hacerlo regular.
             </p>
           </div>
         </Reveal>
 
-        <Reveal delay={0.1} class="flex flex-col gap-6">
+        <Reveal delay={0.1} class="flex flex-col gap-4">
           <figure>
             <Foto
               nombre="alex-premio-sector-oficios"
-              alt="Alex Zsurzs sosteniendo el galardón de los Premios Sector Oficios en la categoría de instalaciones"
+              alt="Alex Zsurzs sosteniendo el galardón de los Premios Sector Oficios"
               ratio="3 / 4"
-              sizes="(max-width: 1024px) 90vw, 420px"
-              class="rounded-[2px] border border-white/10"
+              sizes="(max-width: 1024px) 90vw, 380px"
+              class="rounded-2xl"
             />
-            <figcaption class="mt-3 text-sm text-fg-muted/70">
+            <figcaption class="mt-3 text-sm text-fg-dim">
               Galardón de los Premios Sector Oficios, categoría de instalaciones.
-              {/* TODO (Alex): confirma la denominación y el año exactos del premio
-                  antes de publicar, para poder citarlo con precisión. */}
             </figcaption>
           </figure>
 
           <Foto
-            nombre="alex-retrato-taller"
-            alt="Alex Zsurzs en un momento de descanso durante una jornada de trabajo"
+            nombre="alex-espacio-confinado"
+            alt="Dos técnicos trabajando suspendidos por cuerda dentro de un depósito"
             ratio="4 / 5"
-            sizes="(max-width: 1024px) 90vw, 420px"
-            objectPosition="50% 25%"
-            class="rounded-[2px] border border-white/10"
+            sizes="(max-width: 1024px) 90vw, 380px"
+            objectPosition="55% 40%"
+            class="rounded-2xl"
           />
         </Reveal>
       </div>
@@ -152,7 +145,7 @@ const meta = crearMetadata({
     numero="03"
     detallado
     titulo="Certificaciones y formación profesional"
-    descripcion="Más de diez años formándome en el sector para ofrecer soluciones reales y seguras en obra. Cada acreditación con lo que realmente habilita a hacer."
+    descripcion="Más de diez años formándome en el sector. Cada acreditación con lo que realmente habilita a hacer."
   />
 
   <CTASection
