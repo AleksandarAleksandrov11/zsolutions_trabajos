@@ -1,0 +1,71 @@
+---
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import { numeroSeccion } from "@/lib/utils";
+
+type Props = { numero?: string };
+const { numero = "02" } = Astro.props;
+
+const argumentos = [
+  {
+    titulo: "Instalador certificado, no intermediario",
+    detalle:
+      "Quien te visita, quien presupuesta y quien firma la instalación es la misma persona. Carnet REBT, RITE y F-Gas, más IRATA e ITRA Nivel 3 para trabajo en altura. Nada se vende para colocárselo después a un tercero.",
+  },
+  {
+    titulo: "Presupuesto en menos de 24 horas",
+    detalle:
+      "Respondo con una primera valoración en menos de un día, y si hace falta visita, la concreto en esa misma respuesta. Sin coste y sin compromiso. Si el trabajo no me corresponde, te lo digo en lugar de hacerte perder una semana.",
+  },
+  {
+    titulo: "Trabajo documentado y certificado",
+    detalle:
+      "Certificado de instalación eléctrica, esquema unifilar, documentación RITE, registro de carga de refrigerante o reportaje fotográfico en altura, según el trabajo. Documentar forma parte del precio, no es un extra.",
+  },
+  {
+    titulo: "Te atiende Alex, directamente",
+    detalle:
+      "Un único interlocutor de principio a fin. Sin centralita, sin comerciales y sin que nadie te explique por teléfono algo que no ha visto. Si algo se desvía de lo previsto, te lo cuento antes de ejecutarlo.",
+  },
+];
+---
+
+<section class="relative overflow-hidden py-section" aria-labelledby="titulo-porque">
+  <div
+    class="pointer-events-none absolute inset-0 -z-10"
+    style="background:linear-gradient(180deg, transparent, rgba(35,54,111,.22) 45%, transparent)"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow="Por qué ZSolutions"
+      tituloId="titulo-porque"
+      titulo="La diferencia no está en el precio, está en quién sube"
+    />
+
+    <RevealGroup as="ul" class="mt-14 grid gap-x-10 gap-y-12 md:grid-cols-2" stagger={0.09}>
+      {
+        argumentos.map((argumento, i) => (
+          <RevealItem as="li" class="relative pl-14">
+            <span
+              class="absolute left-0 top-0 font-display text-3xl text-brand-blue"
+              aria-hidden="true"
+            >
+              {numeroSeccion(i)}
+            </span>
+            <span
+              class="absolute left-3 top-12 bottom-1 w-px bg-linear-to-b from-brand-blue/50 to-transparent"
+              aria-hidden="true"
+            />
+            <h3 class="text-2xl">{argumento.titulo}</h3>
+            <p class="mt-3 text-fg-muted">{argumento.detalle}</p>
+          </RevealItem>
+        ))
+      }
+    </RevealGroup>
+  </div>
+</section>

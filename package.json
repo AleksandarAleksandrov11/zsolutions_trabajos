@@ -1,51 +1,54 @@
 {
   "name": "zsolutions-web",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit",
-    "fotos": "node scripts/procesar-fotos.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --port 4321",
+    "astro": "astro",
+    "typecheck": "astro check",
+    "fotos": "node scripts/procesar-fotos.mjs && node scripts/generar-variantes.mjs",
+    "variantes": "node scripts/generar-variantes.mjs",
     "iconos": "node scripts/generar-iconos.mjs",
-    "auditar:contenido": "node --experimental-strip-types scripts/auditar-contenido.mjs",
+    "imagenes:instalar": "pnpm add -D sharp",
+    "auditar:contenido": "node scripts/auditar-contenido.mjs",
     "auditar:web": "node scripts/auditar-web.mjs",
     "auditar:teclado": "node scripts/probar-teclado.mjs",
     "auditar:formulario": "node scripts/probar-formulario.mjs",
     "auditar:lighthouse": "node scripts/lighthouse.mjs",
-    "auditar": "pnpm typecheck && pnpm lint && pnpm auditar:contenido",
     "auditar:instalar": "pnpm add -D playwright lighthouse chrome-launcher",
-    "fuente:og": "node scripts/generar-fuente-og.mjs"
+    "auditar": "pnpm typecheck && pnpm auditar:contenido"
   },
   "dependencies": {
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0",
+    "@astrojs/react": "^6.0.5",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.2",
     "lucide-react": "^1.43.0",
-    "motion": "^13.2.0",
-    "next": "15.5.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "resend": "^6.26.0",
+    "tailwindcss": "^4.3.3",
     "zod": "^4.5.4"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.4",
-    "sharp": "^0.35.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vercel/node": "^12.0.2",
+    "typescript": "^5.9.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "sharp",
-      "unrs-resolver"
+      "@tailwindcss/oxide",
+      "esbuild",
+      "sharp"
     ]
   }
 }

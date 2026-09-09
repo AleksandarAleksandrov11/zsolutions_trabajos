@@ -1,0 +1,36 @@
+---
+import Base from "@/layouts/Base.astro";
+import DocumentoLegal from "@/components/sections/DocumentoLegal.astro";
+import type { Miga } from "@/components/ui/Breadcrumbs.astro";
+import type { SeccionLegal } from "@/content/legal";
+import type { Metadatos } from "@/lib/seo";
+import type { JsonLdObjeto } from "@/lib/schema";
+
+type Props = {
+  meta: Metadatos;
+  schema?: JsonLdObjeto | JsonLdObjeto[];
+  titulo: string;
+  entradilla: string;
+  actualizado: string;
+  secciones: SeccionLegal[];
+  migas: Miga[];
+  conFichaTitular?: boolean;
+  conEncargados?: boolean;
+};
+
+const { meta, schema, ...documento } = Astro.props;
+---
+
+<Base meta={meta} schema={schema}>
+  <div class="relative">
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96"
+      style="background:radial-gradient(60% 100% at 50% 0%, rgba(35,54,111,.45) 0%, transparent 70%)"
+      aria-hidden="true"
+    >
+    </div>
+    <DocumentoLegal {...documento}>
+      <slot />
+    </DocumentoLegal>
+  </div>
+</Base>

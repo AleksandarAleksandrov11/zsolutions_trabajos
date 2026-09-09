@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 
-const BASE = process.argv[2] ?? "http://127.0.0.1:3210";
+const BASE = process.argv[2] ?? "http://127.0.0.1:4321";
 const DESTINO = process.argv[3] ?? "/tmp/capturas";
 await mkdir(DESTINO, { recursive: true });
 

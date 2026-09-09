@@ -1,0 +1,27 @@
+---
+import { cn } from "@/lib/utils";
+
+type Props = { class?: string };
+
+const { class: clase } = Astro.props;
+
+/**
+ * Enlace permanente para volver a abrir el panel de cookies.
+ *
+ * No lleva manejador propio: se marca con `data-abrir-cookies` y el banner
+ * (`CookieBanner.astro`) escucha el clic de forma delegada. Así puede
+ * aparecer en el pie y en la política de cookies sin que ninguna de las dos
+ * páginas tenga que cargar nada extra.
+ */
+---
+
+<button
+  type="button"
+  data-abrir-cookies
+  class={cn(
+    "flex min-h-11 items-center text-left text-fg-muted transition-colors hover:text-fg",
+    clase,
+  )}
+>
+  Configuración de cookies
+</button>

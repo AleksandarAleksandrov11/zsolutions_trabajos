@@ -1,0 +1,42 @@
+---
+import Base from "@/layouts/Base.astro";
+import Hero from "@/components/sections/Hero.astro";
+import ServicesGrid from "@/components/sections/ServicesGrid.astro";
+import WhyUs from "@/components/sections/WhyUs.astro";
+import ZonesMap from "@/components/sections/ZonesMap.astro";
+import ProjectsSection from "@/components/sections/ProjectsSection.astro";
+import AboutTeaser from "@/components/sections/AboutTeaser.astro";
+import Certifications from "@/components/sections/Certifications.astro";
+import FAQ from "@/components/sections/FAQ.astro";
+import CTASection from "@/components/sections/CTASection.astro";
+import { schemaFaq } from "@/lib/schema";
+import { crearMetadata } from "@/lib/seo";
+import { faqHome } from "@/content/faq";
+
+const meta = crearMetadata({
+  title: "Electricista y lampista en Barcelona | ZSolutions",
+  description:
+    "Instalador certificado en Barcelona: electricidad, fontanería, climatización, aerotermia y trabajos verticales. Presupuesto en menos de 24 horas.",
+  path: "/",
+});
+---
+
+<Base meta={meta} schema={schemaFaq(faqHome)}>
+  <Hero
+    completo
+    conBarraConfianza
+    eyebrow="Instalador certificado · Barcelona y Cataluña"
+    lineas={["Instalaciones", "certificadas", "en Barcelona"]}
+    descripcion="Electricidad, fontanería, climatización, aerotermia y trabajos verticales. Ejecutado y firmado por un instalador con carnet, no vendido por un intermediario que subcontrata la obra."
+    foto={{ nombre: "alex-cubierta-barcelona", alt: "", posicion: "68% 28%" }}
+  />
+
+  <ServicesGrid numero="01" />
+  <WhyUs numero="02" />
+  <ZonesMap numero="03" />
+  <ProjectsSection numero="04" />
+  <AboutTeaser numero="05" />
+  <Certifications numero="06" />
+  <FAQ preguntas={faqHome} numero="07" />
+  <CTASection />
+</Base>

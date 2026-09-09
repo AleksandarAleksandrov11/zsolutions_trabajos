@@ -1,0 +1,45 @@
+---
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import { trayectoria } from "@/content/trayectoria";
+
+type Props = { numero?: string };
+const { numero = "02" } = Astro.props;
+---
+
+<section class="py-section" aria-labelledby="titulo-trayectoria">
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow="Trayectoria"
+      tituloId="titulo-trayectoria"
+      titulo="De peón de obra a instalador certificado"
+    />
+
+    <RevealGroup as="ol" class="mt-14" stagger={0.09}>
+      {
+        trayectoria.map((hito, i) => (
+          <RevealItem
+            as="li"
+            class="relative grid gap-4 border-t border-white/10 py-8 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-10 sm:py-10"
+          >
+            <div class="flex items-baseline gap-3 sm:flex-col sm:gap-2">
+              <span class="font-display text-3xl text-brand-blue">{hito.anio}</span>
+              <span class="num-seccion">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <div>
+              <h3 class="text-2xl">{hito.titulo}</h3>
+              <p class="mt-3 max-w-2xl text-fg-muted">{hito.detalle}</p>
+            </div>
+            <span
+              class="absolute inset-x-0 top-0 h-px origin-left bg-brand-blue/60"
+              style={`width:${((i + 1) / trayectoria.length) * 100}%`}
+              aria-hidden="true"
+            />
+          </RevealItem>
+        ))
+      }
+    </RevealGroup>
+  </div>
+</section>

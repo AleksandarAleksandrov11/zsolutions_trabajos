@@ -47,6 +47,16 @@ export type Origen = (typeof opcionesOrigen)[number];
 
 const telefonoRegex = /^[+()\d\s.-]{9,20}$/;
 
+/**
+ * Un campo sin elegir llega como cadena vacía, tanto desde el formulario como
+ * desde un envío en formato formulario. Este ayudante convierte ese vacío en
+ * `undefined` para que los campos opcionales se comporten como tales.
+ */
+function opcional<T extends z.ZodType>(esquema: T) {
+  return z.preprocess((v) => (v === "" ? undefined : v), esquema.optional());
+}
+
+
 export const paso1 = z.object({
   servicio: z.enum(opcionesServicio, {
     message: "Elige con qué necesitas ayuda.",
@@ -102,7 +112,10 @@ export const paso5 = z
       )
       .optional()
       .default(""),
-    origen: z.enum(opcionesOrigen).optional(),
+    /* Es opcional de verdad: sin elegir nada llega "", que no es una opción
+       válida del enumerado. Sin este preproceso el paso no validaba nunca y,
+       como este campo no muestra error, el botón de enviar no hacía nada. */
+    origen: opcional(z.enum(opcionesOrigen)),
     privacidad: z.literal(true, {
       message: "Necesito que aceptes la política de privacidad para poder responderte.",
     }),
@@ -111,15 +124,6 @@ export const paso5 = z
     message: "Déjame al menos un teléfono o un correo para poder contestarte.",
     path: ["telefono"],
   });
-
-/**
- * Un `FormData` solo transporta cadenas: los campos sin elegir llegan como
- * "" y las casillas marcadas como "true". Este ayudante convierte el vacío
- * en `undefined` para que los campos opcionales se comporten como tales.
- */
-function opcional<T extends z.ZodType>(esquema: T) {
-  return z.preprocess((v) => (v === "" ? undefined : v), esquema.optional());
-}
 
 /** Esquema completo, el que se valida SIEMPRE en el servidor. */
 export const esquemaPresupuesto = z.object({
@@ -134,8 +138,11 @@ export const esquemaPresupuesto = z.object({
   telefono: z.string().trim().max(20).optional().default(""),
   email: z.string().trim().max(120).optional().default(""),
   origen: opcional(z.enum(opcionesOrigen)),
-  /* La casilla llega como la cadena "true", no como booleano. */
-  privacidad: z.literal("true").transform(() => true as const),
+  /* Se acepta tanto el booleano del formulario como la cadena "true", que es
+     lo que llegaría desde un envío en formato formulario. */
+  privacidad: z
+    .union([z.literal(true), z.literal("true")])
+    .transform(() => true as const),
   /* Honeypot: se valida aparte en la Server Action, no aquí, para que un bot
      no reciba un error de formulario que le indique dónde está la trampa. */
   empresa: z.string().optional().default(""),

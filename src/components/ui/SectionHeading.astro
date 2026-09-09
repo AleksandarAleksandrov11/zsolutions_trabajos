@@ -1,0 +1,49 @@
+---
+import { cn } from "@/lib/utils";
+
+type Props = {
+  /** Numeración de sección del manual: "01", "02"… */
+  numero?: string;
+  eyebrow?: string;
+  titulo: string;
+  /** `id` del titular, para enlazarlo desde `aria-labelledby`. */
+  tituloId?: string;
+  descripcion?: string;
+  class?: string;
+  alineacion?: "izquierda" | "centro";
+  /** Nivel semántico real del encabezado. */
+  como?: "h2" | "h3";
+};
+
+const {
+  numero,
+  eyebrow,
+  titulo,
+  tituloId,
+  descripcion,
+  class: clase,
+  alineacion = "izquierda",
+  como: Como = "h2",
+} = Astro.props;
+---
+
+<div
+  class={cn("max-w-3xl", alineacion === "centro" && "mx-auto text-center", clase)}
+>
+  {
+    numero || eyebrow ? (
+      <div
+        class={cn(
+          "mb-5 flex items-center gap-3",
+          alineacion === "centro" && "justify-center",
+        )}
+      >
+        {numero ? <span class="num-seccion">{numero}.</span> : null}
+        {eyebrow ? <span class="text-eyebrow text-fg-muted/60">{eyebrow}</span> : null}
+        <span class="rayas-z h-3 max-w-24 flex-1 opacity-70" aria-hidden="true" />
+      </div>
+    ) : null
+  }
+  <Como class="text-4xl" id={tituloId}>{titulo}</Como>
+  {descripcion ? <div class="mt-5 text-lg text-fg-muted">{descripcion}</div> : null}
+</div>

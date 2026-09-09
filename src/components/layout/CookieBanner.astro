@@ -1,0 +1,203 @@
+---
+import { Cookie } from "lucide-react";
+import Boton from "@/components/ui/Boton.astro";
+import { categoriasCookies } from "@/content/legal";
+
+/**
+ * Aviso de cookies.
+ *
+ * El marcado se sirve ya construido y oculto; el script decide si mostrarlo
+ * según lo que haya guardado el visitante. Antes esto era un componente de
+ * React que había que hidratar en todas las páginas de la web para, casi
+ * siempre, no pintar nada.
+ *
+ * Las tres opciones (rechazar, configurar y aceptar) tienen el mismo peso
+ * visual, como exige la AEPD.
+ */
+const compacto = "px-2 text-[0.625rem] leading-tight sm:px-5 sm:text-xs";
+---
+
+<div
+  id="banner-cookies"
+  class="banner-cookies fixed inset-x-0 bottom-0 z-90 px-3 pb-3"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="titulo-cookies"
+  hidden
+  style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom))"
+>
+  <div class="container-brand !px-0">
+    <div
+      class="relative overflow-hidden rounded-[2px] border border-white/15 bg-surface/95 shadow-2xl backdrop-blur-lg"
+    >
+      <div class="rayas-z absolute inset-x-0 top-0 h-1 opacity-70" aria-hidden="true"></div>
+
+      <div class="p-4 sm:p-5">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-8">
+          <div class="flex min-w-0 items-start gap-3 lg:flex-1">
+            <Cookie className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" aria-hidden="true" />
+            <div class="min-w-0">
+              <h2 id="titulo-cookies" class="font-sans text-base font-bold">
+                Cookies y privacidad
+              </h2>
+              <p class="mt-1 text-sm text-fg-muted">
+                Solo lo imprescindible para que la web funcione.
+                <span class="hidden sm:inline">
+                  {" "}La analítica actual no instala cookies ni te identifica.
+                </span>{" "}
+                <a
+                  href="/politica-de-cookies"
+                  class="text-fg underline underline-offset-4 hover:text-brand-orange"
+                >
+                  Política de cookies
+                </a>.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid shrink-0 grid-cols-3 gap-2 lg:w-auto">
+            <Boton variante="secundario" class={compacto} data-cookies="rechazar">
+              Rechazar todas
+            </Boton>
+
+            {/* "Configurar" y "Guardar selección" ocupan la misma celda: se
+                intercambian al abrir el panel. La visibilidad la controla el
+                envoltorio, porque el atributo `hidden` sobre el propio botón
+                no gana a su `inline-flex` de base. */}
+            <span data-envoltorio="configurar" class="grid">
+              <Boton variante="secundario" class={`${compacto} w-full`} data-cookies="configurar">
+                Configurar
+              </Boton>
+            </span>
+            <span data-envoltorio="guardar" class="grid" hidden>
+              <Boton variante="secundario" class={`${compacto} w-full`} data-cookies="guardar">
+                Guardar selección
+              </Boton>
+            </span>
+
+            <Boton class={compacto} data-cookies="aceptar">Aceptar todas</Boton>
+          </div>
+        </div>
+
+        <ul
+          data-panel-cookies
+          class="mt-5 flex max-h-[45vh] flex-col gap-3 overflow-y-auto border-t border-white/10 pt-5"
+          hidden
+        >
+          {
+            categoriasCookies.map((categoria) => (
+              <li class="rounded-[2px] border border-white/10 bg-white/[0.02] p-4">
+                <label class="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    data-categoria={categoria.id}
+                    checked={categoria.siempreActiva}
+                    disabled={categoria.siempreActiva}
+                    class="mt-1 h-5 w-5 shrink-0 accent-[#2F4AA0] disabled:opacity-60"
+                  />
+                  <span class="min-w-0">
+                    <span class="block text-sm font-bold text-fg">
+                      {categoria.titulo}
+                      {categoria.siempreActiva ? (
+                        <span class="ml-2 text-2xs font-normal text-fg-muted/60">
+                          Siempre activas
+                        </span>
+                      ) : null}
+                    </span>
+                    <span class="mt-1 block text-xs text-fg-muted">
+                      {categoria.descripcion}
+                    </span>
+                  </span>
+                </label>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import {
+    consentimientoMinimo,
+    consentimientoTodo,
+    guardarConsentimiento,
+    leerConsentimiento,
+    type Categorias,
+  } from "@/lib/cookies";
+
+  const banner = document.getElementById("banner-cookies");
+  if (banner) {
+    const panel = banner.querySelector<HTMLElement>("[data-panel-cookies]");
+    const boton = (accion: string) =>
+      banner.querySelector<HTMLButtonElement>(`[data-cookies="${accion}"]`);
+    const envoltorio = (accion: string) =>
+      banner.querySelector<HTMLElement>(`[data-envoltorio="${accion}"]`);
+
+    const casillas = () =>
+      Array.from(banner.querySelectorAll<HTMLInputElement>("[data-categoria]"));
+
+    const seleccionActual = (): Categorias => {
+      const valores: Categorias = { ...consentimientoMinimo };
+      for (const casilla of casillas()) {
+        const id = casilla.dataset.categoria;
+        if (id === "analiticas" || id === "marketing") valores[id] = casilla.checked;
+      }
+      return valores;
+    };
+
+    const mostrar = () => {
+      banner.hidden = false;
+      /* Un fotograma de margen para que la transición tenga de dónde salir. */
+      requestAnimationFrame(() => banner.setAttribute("data-visible", ""));
+    };
+
+    const ocultar = () => {
+      banner.removeAttribute("data-visible");
+      window.setTimeout(() => {
+        banner.hidden = true;
+      }, 400);
+    };
+
+    const decidir = (categorias: Categorias) => {
+      guardarConsentimiento(categorias);
+      ocultar();
+    };
+
+    const abrirPanel = () => {
+      if (panel) panel.hidden = false;
+      const configurar = envoltorio("configurar");
+      const guardar = envoltorio("guardar");
+      if (configurar) configurar.hidden = true;
+      if (guardar) guardar.hidden = false;
+    };
+
+    /* Estado inicial: si ya hay decisión guardada, el banner no aparece y las
+       casillas reflejan lo que se eligió en su día. */
+    const guardado = leerConsentimiento();
+    if (!guardado) {
+      mostrar();
+    } else {
+      for (const casilla of casillas()) {
+        const id = casilla.dataset.categoria;
+        if (id === "analiticas" || id === "marketing") casilla.checked = guardado[id];
+      }
+    }
+
+    boton("rechazar")?.addEventListener("click", () => decidir(consentimientoMinimo));
+    boton("aceptar")?.addEventListener("click", () => decidir(consentimientoTodo));
+    boton("configurar")?.addEventListener("click", abrirPanel);
+    boton("guardar")?.addEventListener("click", () => decidir(seleccionActual()));
+
+    /* Enlace permanente del pie y de la política de cookies. */
+    document.addEventListener("click", (evento) => {
+      const disparador = (evento.target as HTMLElement | null)?.closest(
+        "[data-abrir-cookies]",
+      );
+      if (!disparador) return;
+      abrirPanel();
+      mostrar();
+    });
+  }
+</script>

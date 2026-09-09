@@ -1,5 +1,3 @@
-"use client";
-
 import { useId, type ReactNode } from "react";
 import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";

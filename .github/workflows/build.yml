@@ -24,8 +24,9 @@ jobs:
 
       - name: Preparar pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
+        # La versión sale de `packageManager` en package.json, que es la misma
+        # que usa Vercel. Fijarla aquí otra vez solo serviría para que un día
+        # dejaran de coincidir.
 
       - name: Preparar Node
         uses: actions/setup-node@v4
@@ -38,9 +39,6 @@ jobs:
 
       - name: Comprobar tipos
         run: pnpm typecheck
-
-      - name: Lint
-        run: pnpm lint
 
       - name: Auditar el contenido
         run: pnpm auditar:contenido

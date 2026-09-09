@@ -1,0 +1,26 @@
+---
+import { clasesBoton, type TamanoBoton, type VarianteBoton } from "@/lib/boton";
+
+type Props = {
+  href: string;
+  variante?: VarianteBoton;
+  tamano?: TamanoBoton;
+  class?: string;
+  [clave: string]: unknown;
+};
+
+const { href, variante = "primario", tamano = "md", class: clase, ...resto } = Astro.props;
+
+/* Los enlaces a otro sitio se abren en pestaña nueva; `tel:` y `mailto:` no. */
+const externo = href.startsWith("http");
+---
+
+<a
+  href={href}
+  class={clasesBoton(variante, tamano, clase)}
+  target={externo ? "_blank" : undefined}
+  rel={externo ? "noopener noreferrer" : undefined}
+  {...resto}
+>
+  <slot />
+</a>

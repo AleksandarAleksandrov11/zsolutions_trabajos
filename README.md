@@ -7,8 +7,12 @@ aerotermia, trabajos verticales y lampistería.
 No es un portfolio: es una máquina de captar solicitudes de presupuesto en
 Barcelona, el área metropolitana y Cataluña.
 
-**Stack:** Next.js 15 (App Router) · TypeScript estricto · Tailwind CSS v4 ·
-Motion · Zod · Resend · Vercel Analytics + Speed Insights.
+**Stack:** Astro 7 en estático · TypeScript estricto · Tailwind CSS v4 · React 19
+solo en las dos islas que lo necesitan · Zod · Resend · Vercel.
+
+La web entera se compila a HTML: 38 páginas que Vercel sirve desde la CDN sin
+ejecutar nada. La única parte dinámica es el envío del formulario, que vive en
+`api/presupuesto.ts` como función independiente, fuera del build del framework.
 
 ---
 
@@ -16,75 +20,69 @@ Motion · Zod · Resend · Vercel Analytics + Speed Insights.
 
 ```bash
 pnpm install
-cp .env.example .env.local     # y rellena las variables (ver §2)
-pnpm dev                       # http://localhost:3000
+cp .env.example .env      # y rellena las variables (ver §2)
+pnpm dev                  # http://localhost:4321
 ```
 
 Otros comandos:
 
 ```bash
-pnpm build              # build de producción
-pnpm start              # sirve el build
-pnpm typecheck          # tsc --noEmit
-pnpm lint               # ESLint
-pnpm auditar            # typecheck + lint + auditoría de contenido
+pnpm build              # build de producción → dist/
+pnpm preview            # sirve dist/ en el puerto 4321
+pnpm typecheck          # astro check
+pnpm auditar            # typecheck + auditoría de contenido
 ```
+
+`pnpm dev` sirve además `/api/presupuesto`, para poder probar el formulario en
+local igual que en producción. `pnpm preview` sirve solo los ficheros estáticos,
+que es exactamente lo que ve la CDN.
 
 ---
 
 ## 2. Variables de entorno
 
-Se configuran en `.env.local` para desarrollo y en **Vercel → Project →
-Settings → Environment Variables** para producción.
+Se configuran en `.env` para desarrollo y en **Vercel → Project → Settings →
+Environment Variables** para producción. Ninguna es obligatoria para compilar y
+desplegar.
 
 | Variable | Para qué sirve | Obligatoria |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Dominio definitivo. **Déjala vacía mientras no lo tengas** | No |
-| `NEXT_PUBLIC_PERMITIR_INDEXACION` | `true` para que Google indexe la URL provisional | No |
+| `PUBLIC_SITE_URL` | Dominio definitivo. **Déjala vacía mientras no lo tengas** | No |
+| `PUBLIC_PERMITIR_INDEXACION` | `true` para que Google indexe la URL provisional | No |
 | `RESEND_API_KEY` | Clave de API de [Resend](https://resend.com/api-keys) | Sí, para que el formulario envíe |
 | `EMAIL_REMITENTE` | Remitente. Sin dominio propio: `ZSolutions <onboarding@resend.dev>` | Sí |
 | `EMAIL_DESTINATARIO` | Dirección de Alex que recibe las solicitudes | Sí |
 
+Los nombres antiguos `NEXT_PUBLIC_SITE_URL` y `NEXT_PUBLIC_PERMITIR_INDEXACION`
+se siguen leyendo, para que un proyecto ya configurado en Vercel no deje de
+funcionar de golpe. Los nuevos tienen prioridad.
+
 ### Todavía no hay dominio
 
 No hace falta para publicar. **No hay ninguna dirección escrita a fuego en el
-código:** la web se autodescribe con la URL en la que esté servida, así que
-funciona entera en el `*.vercel.app` que te dé Vercel, con las canonicals, el
-sitemap, el JSON-LD y las miniaturas al compartir correctas.
+código:** las canonicals, el sitemap, el JSON-LD y las miniaturas sociales se
+resuelven en tiempo de compilación a partir del entorno (`src/lib/seo.ts`).
 
-Mientras `NEXT_PUBLIC_SITE_URL` esté vacía, la web se publica en **`noindex`**
-a propósito. Indexar una dirección provisional sale caro: cuando llegue el
-dominio bueno, Google ya tendría una copia compitiendo con él por las mismas
-búsquedas, y hay que deshacerlo a base de redirecciones y reindexación. Se ve
-perfectamente y se puede compartir el enlace; simplemente no entra en Google.
-
-Si prefieres que entre en Google desde ya, asumiendo eso, defínela:
-`NEXT_PUBLIC_PERMITIR_INDEXACION=true`.
-
-**Efecto en Lighthouse:** con la indexación cerrada, la puntuación de SEO baja a
-unos 69 puntos por el `noindex`. No es un fallo: es exactamente lo que se le ha
-pedido a la web. Con el dominio puesto, o forzando la indexación, vuelve a 100.
-
-El día que tengas el dominio: apúntalo a Vercel, define
-`NEXT_PUBLIC_SITE_URL=https://zsolutions.es` en producción y vuelve a
-desplegar. La web pasa a ser indexable sola y todas las URL cambian con ella.
+Mientras `PUBLIC_SITE_URL` esté vacía, la web se publica en `noindex`. Es
+deliberado: indexar una dirección provisional de Vercel obliga después a
+limpiarla a base de redirecciones cuando llegue el dominio bueno. Con la web en
+`noindex`, Lighthouse baja el apartado de SEO a unos 69 puntos; no es un fallo,
+es exactamente lo que se le ha pedido. Con el dominio puesto vuelve a 100.
 
 ### Probar el formulario hoy, sin dominio
 
-Resend deja enviar desde `onboarding@resend.dev` sin verificar nada, con una
-limitación: solo entrega a la dirección con la que te registraste. Es
-suficiente para probar el envío de punta a punta. La autorespuesta al cliente
-sí fallará mientras tanto; el código lo registra en el log y no invalida la
-solicitud, porque el aviso importante, el tuyo, ya ha salido.
+Resend permite enviar desde `onboarding@resend.dev` sin verificar nada, pero
+solo a la dirección de la cuenta. Sirve de sobra para comprobar que el circuito
+funciona:
 
-**Sin estas tres variables el formulario no falla en silencio:** valida, avisa
-al usuario con un mensaje claro y le ofrece WhatsApp y teléfono como
-alternativa. Ese comportamiento está probado en `scripts/probar-formulario.mjs`.
+```
+RESEND_API_KEY=re_...
+EMAIL_REMITENTE=ZSolutions <onboarding@resend.dev>
+EMAIL_DESTINATARIO=tu-correo-de-la-cuenta-de-resend@ejemplo.com
+```
 
-Para que Resend acepte el envío hay que **verificar el dominio `zsolutions.es`**
-en su panel (registros SPF y DKIM en el DNS). Con una clave inválida o un
-dominio sin verificar, la web registra el error en el log del servidor y muestra
-el aviso de reintento: nunca da por bueno un envío que no ha salido.
+Sin credenciales el formulario no da un envío por bueno: responde con un aviso
+y ofrece WhatsApp y teléfono como alternativa.
 
 ---
 
@@ -104,6 +102,7 @@ en un componente.** Todo vive en `src/content/`, en archivos TypeScript tipados.
 | `faq.ts` | Preguntas frecuentes de la home |
 | `formacion.ts` | Página de formación |
 | `legal.ts` | Datos fiscales y los tres textos legales |
+| `redirecciones.ts` | Direcciones antiguas y adónde llevan |
 | `fotos.ts` | **Generado**, no editar a mano (ver §6) |
 
 Al cambiar cualquiera de ellos, la web se actualiza sola: rutas, sitemap,
@@ -138,24 +137,50 @@ de la página de servicio y de la de zona lo recogen automáticamente.
 Añade un objeto a `servicios.ts` (mínimo 800 palabras de texto útil) y un icono
 nuevo en `src/components/ui/ServiceIcon.tsx`.
 
+### Añadir una redirección
+
+Añádela a `src/content/redirecciones.ts` **y** al array `redirects` de
+`vercel.json`. Son dos sitios porque `vercel.json` es JSON y no puede importar
+nada; `pnpm auditar:contenido` comprueba que las dos listas dicen lo mismo, así
+que si se te olvida una, la auditoría lo dice.
+
 ---
 
 ## 4. Estructura
 
 ```
+api/
+  presupuesto.ts   función de Vercel: valida, filtra bots y envía el correo
 src/
-  app/            rutas, sitemap.ts, robots.ts, manifest.ts, iconos, /api/og
+  pages/           una ruta por fichero, más robots.txt, sitemap.xml y el manifiesto
+  layouts/         Base (cabecera, pie, <head> y el script global) y Legal
   components/
-    layout/       Header, Footer, MobileMenu, CookieBanner, WhatsAppFloat, PageTransition
-    sections/     Hero, ServicesGrid, WhyUs, ZonesMap, Certifications, Timeline, FAQ, CTASection…
-    forms/        QuoteWizard, FormField, ProgressBar
-    ui/           Button, Card, Badge, SectionHeading, Reveal, AnimatedCounter, BrandLogo, ServiceIcon…
-    seo/          JsonLd
-  content/        todos los textos y datos
-  lib/            motion, seo, schema, validation, mail, rate-limit, cookies, utils
-  actions/        Server Action del formulario
-scripts/          generación de imágenes e iconos y auditorías automáticas
+    layout/        Header, Footer, CookieBanner, WhatsAppFloat
+    sections/      Hero, ServicesGrid, WhyUs, ZonesMap, Certifications, Timeline, FAQ…
+    forms/         QuoteWizard, FormField, ProgressBar  (React, se ejecutan en el navegador)
+    ui/            botones, Badge, SectionHeading, Reveal, BrandLogo, ServiceIcon…
+    seo/           JsonLd
+  content/         todos los textos y datos
+  lib/             seo, schema, validation, mail, rate-limit, cookies, boton, utils
+  styles/          global.css: sistema de diseño, utilidades de marca y animaciones
+scripts/           generación de imágenes e iconos y auditorías automáticas
 ```
+
+### Qué se ejecuta en el navegador
+
+Casi nada, y es a propósito:
+
+- **Dos islas React:** el formulario de presupuesto (`/contacto`) y la galería
+  con su visor (`/proyectos`). Solo se cargan en esas dos páginas.
+- **Un script global** de unas ochenta líneas sin dependencias, en `Base.astro`:
+  el revelado al hacer scroll, los contadores y el parallax del hero.
+- **Tres scripts pequeños** de la cabecera, el aviso de cookies y el botón
+  flotante de WhatsApp.
+
+El resto de la web es HTML y CSS. El revelado al hacer scroll parte de
+**contenido visible**: si el JavaScript falla o tarda, la página se lee igual,
+sin bloques en blanco. Y todas las animaciones respetan
+`prefers-reduced-motion`.
 
 ---
 
@@ -171,27 +196,36 @@ cota de lo que hay que aportar, en lugar de con una imagen de banco.
 
 ---
 
-## 6. Imágenes e iconos
+## 6. Imágenes, tipografía e iconos
 
-Las fotos originales se optimizan con un script que además genera el
-placeholder de desenfoque y el manifiesto tipado:
+**No hay optimizador de imágenes en tiempo de petición.** Las variantes AVIF y
+WebP de cada foto se generan una sola vez en local, se suben al repositorio y
+Vercel se limita a servirlas. El navegador elige el formato y el ancho con un
+`srcset` normal. Así el build de producción no necesita `sharp` ni ningún
+binario nativo.
 
-```bash
-pnpm fotos ./ruta/a/las/fotos/originales
-```
-
-Genera `public/images/*.jpg` y reescribe `src/content/fotos.ts`. A partir de
-ahí, `next/image` sirve AVIF y WebP con los tamaños correctos.
-
-El paquete completo de iconos se genera a partir del isotipo:
+Los guiones de imagen sí necesitan `sharp`, que **no está en las dependencias**
+justamente para que no entre en el build. Se instala cuando hace falta:
 
 ```bash
-pnpm iconos
+pnpm imagenes:instalar                        # pnpm add -D sharp
+pnpm fotos ./ruta/a/las/fotos/originales      # JPEG base + variantes + fotos.ts
+pnpm variantes                                # solo variantes, si ya hay JPEG
+pnpm iconos                                   # todo el paquete de iconos
 ```
 
-Produce `favicon.ico` (16/32/48), `icon.svg`, `apple-icon.png` (180),
-`icon-192.png`, `icon-512.png`, `maskable-512.png` y la versión monocroma.
-El manifiesto PWA se genera en `src/app/manifest.ts`.
+`pnpm variantes` reescribe `src/content/fotos.ts` con los anchos, la miniatura
+borrosa en base64 y la lista de variantes. Ese fichero es generado: no se edita
+a mano.
+
+`pnpm iconos` produce `public/favicon.ico` (16/32/48), `public/icons/icon.svg`,
+`apple-icon.png` (180), `icon-192.png`, `icon-512.png`, `maskable-512.png` y la
+versión monocroma para la pestaña anclada de Safari. El manifiesto PWA se genera
+en `src/pages/manifest.webmanifest.ts`.
+
+La tipografía Righteous está **autoalojada** en `public/fonts`. No hay ninguna
+petición a un servidor de fuentes externo: una dependencia menos y una conexión
+menos antes del primer pintado.
 
 ---
 
@@ -216,33 +250,35 @@ El sistema visual sigue el *Manual Básico de Identidad Visual Corporativa*.
 
 ## 8. SEO
 
-- `generateMetadata` en todas las páginas, con `title` y `description` únicos,
-  canonical, Open Graph y Twitter Card.
-- Imágenes OG generadas al vuelo con `next/og` en `/api/og`.
+- `title` y `description` únicos en cada página, con canonical, Open Graph y
+  Twitter Card, generados desde `crearMetadata()` en `src/lib/seo.ts`.
+- Miniatura social: imagen estática de marca en `public/og.png`.
 - JSON-LD: `LocalBusiness` (`Electrician` + `HVACBusiness` + `Plumber`),
   `Person`, `WebSite`, `Service`, `FAQPage` y `BreadcrumbList`.
-- `sitemap.xml` y `robots.txt` dinámicos con las 47 rutas.
-- URLs limpias en español, breadcrumbs visibles y enlazado interno denso.
+- `sitemap.xml` y `robots.txt` generados en la compilación con las 37 rutas
+  indexables.
+- URLs limpias en español, sin barra final, breadcrumbs visibles y enlazado
+  interno denso.
 
 ### Antes de publicar
 
-0. **Definir `NEXT_PUBLIC_SITE_URL`** con el dominio definitivo. Hasta que no
-   lo hagas, la web se publica en `noindex` y Google no la indexará: es
-   deliberado, para no ensuciar el índice con una dirección provisional.
+0. **Definir `PUBLIC_SITE_URL`** con el dominio definitivo. Hasta que no lo
+   hagas, la web se publica en `noindex` y Google no la indexará: es deliberado,
+   para no ensuciar el índice con una dirección provisional.
 1. **Rellenar el NAP** en `src/content/site.ts` y los datos fiscales en
    `src/content/legal.ts`. El schema `LocalBusiness` omite a propósito los
    campos vacíos: es mejor un schema incompleto que uno con datos inventados
    que no coincidan con el Perfil de Empresa de Google.
-2. **Google Search Console:** verificar el dominio y pegar el código en
-   `metadata.verification.google` de `src/app/layout.tsx` (hay un `TODO` en su
-   sitio). Después, enviar `https://zsolutions.es/sitemap.xml`.
+2. **Google Search Console:** verificar el dominio y pegar la etiqueta en
+   `src/layouts/Base.astro` (hay un `TODO` en su sitio). Después, enviar
+   `https://zsolutions.es/sitemap.xml`.
 3. **Perfil de Empresa de Google:** para un negocio local pesa tanto como la
    web. Crearlo o reclamarlo, con el NAP **exactamente igual** que aquí,
    categorías (electricista, fontanero, servicio de climatización), zona de
    servicio, horario y fotos reales de trabajos.
-4. **`contacto.zsolutions.es`:** redirigir con un 301 a `https://zsolutions.es/contacto`
-   para que los dos no compitan por la misma intención de búsqueda. Si prefieres
-   mantenerlo vivo, ponle un `<link rel="canonical">` apuntando a la web nueva.
+4. **`contacto.zsolutions.es`:** redirigir con un 301 a
+   `https://zsolutions.es/contacto` para que los dos no compitan por la misma
+   intención de búsqueda.
 5. Validar el JSON-LD en la
    [prueba de resultados enriquecidos de Google](https://search.google.com/test/rich-results).
 
@@ -258,32 +294,36 @@ Las tres páginas legales están redactadas y enlazadas en el pie.
 El banner de cookies es propio, coherente con el diseño, y ofrece **aceptar,
 rechazar y configurar con el mismo peso visual**, como exige la AEPD. El
 consentimiento se guarda 12 meses en una cookie de primera parte y se puede
-cambiar desde el pie de página en cualquier momento.
+cambiar desde el pie de página o desde la política de cookies en cualquier
+momento.
 
 **Vercel Web Analytics funciona sin cookies**, así que se trata como esencial y
-esa decisión está documentada en la política de cookies. El patrón para scripts
-que sí requieren consentimiento previo (Google Analytics, píxel de Meta) queda
-listo en `src/components/layout/ConsentGate.tsx`: nada se carga antes de que el
-usuario lo autorice.
+esa decisión está documentada en la política de cookies. Sus dos scripts los
+sirve la propia plataforma bajo `/_vercel/`, sin paquete de npm de por medio, y
+solo se emiten cuando el build se ejecuta en Vercel: en local no existen y no
+ensucian la consola.
 
 ---
 
 ## 10. Auditorías automáticas
 
-El proyecto trae sus propias comprobaciones. Con el build servido en local:
+El proyecto trae sus propias comprobaciones.
 
 ```bash
-pnpm build && pnpm start                     # en una terminal
-pnpm auditar:contenido                       # mínimos de palabras y metadatos únicos
-pnpm auditar:web        http://localhost:3000  # consola, hidratación, responsive, a11y
-pnpm auditar:teclado    http://localhost:3000  # foco, menú móvil, cookies, áreas táctiles
-pnpm auditar:formulario http://localhost:3000  # validación, honeypot, Server Action
-pnpm auditar:lighthouse http://localhost:3000 / /servicios/electricidad
+pnpm auditar:contenido                       # mínimos de palabras, metadatos y redirecciones
+
+pnpm build && pnpm preview                   # en una terminal
+pnpm auditar:web                             # consola, responsive, a11y, JSON-LD, redirecciones
+pnpm auditar:teclado                         # foco, menú móvil, cookies, áreas táctiles
+pnpm auditar:lighthouse http://127.0.0.1:4321 / /servicios/electricidad
+
+pnpm dev                                     # el formulario necesita el endpoint
+pnpm auditar:formulario http://127.0.0.1:4322
 ```
 
 `auditar:web` comprueba que no hay scroll horizontal en 360, 390, 430, 768,
-1024, 1440 y 1920 px, que no hay errores de consola ni de hidratación, que cada
-página tiene un solo `h1`, `alt` en todas las imágenes y JSON-LD válido.
+1024, 1440 y 1920 px, que no hay errores de consola, que cada página tiene un
+solo `h1`, `alt` en todas las imágenes y JSON-LD válido.
 
 Las auditorías con navegador usan Playwright, Lighthouse y el Chromium del
 sistema. **No van en las dependencias del proyecto a propósito:** son cientos de
@@ -296,6 +336,10 @@ pnpm auditar:instalar
 
 Si el Chromium de tu máquina está en otra ruta, exporta `CHROMIUM_PATH`.
 
+Estado actual con el dominio definido, en Lighthouse móvil:
+**rendimiento 100 · accesibilidad 100 · buenas prácticas 100 · SEO 100**,
+con LCP 1,5 s, CLS 0 y TBT 0 ms.
+
 ---
 
 ## 11. Checklist de lanzamiento
@@ -305,14 +349,13 @@ Si el Chromium de tu máquina está en otra ruta, exporta `CHROMIUM_PATH`.
 - [ ] Proyecto importado en Vercel con la rama de producción en `main`
 - [ ] `RESEND_API_KEY`, `EMAIL_REMITENTE` y `EMAIL_DESTINATARIO` definidas
 - [ ] Prueba de envío del formulario contra tu propio correo
-- [ ] `NEXT_PUBLIC_SITE_URL` vacía: la web queda en `noindex` a propósito
-      (o `NEXT_PUBLIC_PERMITIR_INDEXACION=true` si quieres que Google la vea ya)
+- [ ] `PUBLIC_SITE_URL` vacía: la web queda en `noindex` a propósito
+      (o `PUBLIC_PERMITIR_INDEXACION=true` si quieres que Google la vea ya)
 
 ### Antes de abrirla a Google
 
 - [ ] Datos fiscales y NAP rellenos (`site.ts` y `legal.ts`)
 - [ ] Textos legales revisados por un asesor
-- [ ] `RESEND_API_KEY`, `EMAIL_REMITENTE` y `EMAIL_DESTINATARIO` en Vercel
 - [ ] Dominio verificado en Resend (SPF y DKIM)
 - [ ] Prueba real de envío del formulario, con autorespuesta incluida
 - [ ] Dominio `zsolutions.es` apuntando a Vercel, con `www` redirigido
@@ -328,10 +371,6 @@ Si el Chromium de tu máquina está en otra ruta, exporta `CHROMIUM_PATH`.
 
 ## 12. Despliegue en Vercel
 
-El repositorio trae `vercel.json` con el framework, los comandos de instalación
-y build y las redirecciones permanentes. `packageManager` fija la versión de
-pnpm para que Vercel instale exactamente con el mismo lockfile que en local.
-
 ### Puesta en marcha, paso a paso
 
 1. En [vercel.com/new](https://vercel.com/new), importar el repositorio
@@ -342,8 +381,21 @@ pnpm para que Vercel instale exactamente con el mismo lockfile que en local.
 3. **Production Branch: `main`.** Vercel solo publica en el dominio principal lo
    que hay en la rama de producción; el resto de ramas genera
    previsualizaciones con su propia URL.
-4. Framework: Next.js (se detecta solo gracias a `vercel.json`).
+4. Framework: Astro (se detecta solo gracias a `vercel.json`).
 5. Añadir las variables de entorno de §2 y desplegar.
+
+### Qué sube exactamente a Vercel
+
+- **`dist/`**, con 38 páginas HTML, el CSS, las fuentes, las imágenes y unos
+  pocos kilobytes de JavaScript. Se sirve desde la CDN.
+- **`api/presupuesto.ts`**, la única función. Vercel la detecta por estar en el
+  directorio `api/` de la raíz, no a través del framework.
+
+Esa separación es el motivo de haber cambiado de stack: el despliegue ya no
+tiene que empaquetar ninguna función del framework, que es la fase en la que
+fallaba antes. Si algún día la función diera problemas, la web seguiría
+publicándose y viéndose igual; solo dejaría de enviarse el formulario, y la
+propia página ofrece WhatsApp y teléfono como alternativa.
 
 ### El sitio se adapta al dominio donde esté servido
 
@@ -351,61 +403,47 @@ No hay ningún dominio escrito a fuego. Las canonicals, el sitemap, el JSON-LD y
 las miniaturas Open Graph se resuelven en tiempo de compilación según el
 entorno (`src/lib/seo.ts`).
 
-- **Producción:** `NEXT_PUBLIC_SITE_URL` si está definida; si no, el dominio de
+- **Producción:** `PUBLIC_SITE_URL` si está definida; si no, el dominio de
   producción del proyecto en Vercel.
 - **Previsualizaciones:** la URL de esa previsualización, para que al compartir
-  el enlace la miniatura y el título salgan bien.
-- **Local:** `http://localhost:3000`.
+  el enlace la miniatura y el título salgan bien. Nunca se indexan.
+- **Local:** `http://localhost:4321`.
 
 ### Cuando llegue el dominio
 
 1. Añadir `zsolutions.es` y `www.zsolutions.es` en Vercel, con `www` redirigido
    al dominio sin www (o al revés, pero solo uno como principal).
-2. Definir `NEXT_PUBLIC_SITE_URL=https://zsolutions.es` en producción y volver a
+2. Definir `PUBLIC_SITE_URL=https://zsolutions.es` en producción y volver a
    desplegar. Eso activa también la indexación.
 3. Redirigir `contacto.zsolutions.es` con un 301 a `https://zsolutions.es/contacto`.
    Se configura a nivel de dominio en Vercel, no en `vercel.json`.
 4. Verificar el dominio en Resend (SPF y DKIM) y cambiar `EMAIL_REMITENTE` a una
    dirección propia.
 
-### Detalles que ya están resueltos
-
-- **La miniatura para redes es una imagen estática**, `public/og.png`. La ruta
-  `/api/og` que la componía con `next/og` se ha retirado: ese paquete arrastra
-  binarios WebAssembly que hay que empaquetar dentro de una función, y las
-  funciones edge del plan Hobby tienen un límite de 1 MB que suele superar.
-  El fichero es exactamente el diseño que generaba aquella ruta, así que no se
-  pierde nada de imagen; lo único que se pierde es tener una miniatura distinta
-  por página. Está anotado como pendiente en `src/lib/seo.ts` para recuperarlo
-  cuando el despliegue esté asentado.
-- **La web no necesita ninguna función en servidor salvo la del formulario.**
-  Los slugs de servicio y de zona son un conjunto cerrado (`dynamicParams =
-  false`), así que todo lo demás es HTML estático servido desde el CDN.
-- Analytics y Speed Insights se activan solos en Vercel. En local devuelven 404
-  y por eso las auditorías los ignoran.
-
 ### Decisiones tomadas para que el build no falle
 
-- **`engines` no se declara.** Vercel rechaza los rangos que no reconoce
-  (`>=20.9.0` entre ellos) con un `Found invalid Node.js Version` y aborta el
-  despliegue. La versión de Node se elige en Settings → General.
-- **`vercel.json` es deliberadamente corto:** framework y poco más. Las claves
-  `regions`, `cleanUrls`, `trailingSlash` y `outputDirectory` sobran en un
-  proyecto Next.js y algunas fallan directamente (`regions` no está permitida
-  en el plan Hobby).
-- **Playwright y Lighthouse no están en las dependencias.** Vercel instala las
-  de desarrollo en cada build, y según la versión de pnpm que use, Playwright
-  intenta descargarse los navegadores en el `postinstall`. Se instalan a mano
-  con `pnpm auditar:instalar` cuando hacen falta.
+- **La web es estática.** No hay que empaquetar funciones del framework, ni
+  imágenes optimizadas al vuelo, ni tipografías descargadas durante el build.
+- **`engines.node` es `22.x`**, la única forma que Vercel acepta sin
+  discutir. Un rango tipo `>=22.12.0` lo rechaza con `Found invalid Node.js
+  Version` y aborta el despliegue.
+- **`packageManager` fija pnpm 10**, para que Vercel no tenga que adivinar la
+  versión a partir del lockfile.
+- **Ni `sharp`, ni Playwright, ni Lighthouse están en las dependencias.** Vercel
+  instala también las de desarrollo, y son justo las que arrastran binarios
+  nativos y descargas en el `postinstall`. Se instalan a mano cuando hacen
+  falta.
+- **`vercel.json` es corto:** framework, comando de build, directorio de salida,
+  URLs limpias, redirecciones y cabeceras de seguridad. Nada de `regions`, que
+  no está permitida en el plan Hobby.
 
 ### Si el despliegue no aparece
 
 Lo primero es descartar el código, y para eso está el workflow
 `.github/workflows/build.yml`: reproduce en GitHub Actions el mismo build que
-ejecuta Vercel, con pnpm 9, Node 22 y las mismas variables. **Si esa
-comprobación sale en verde y Vercel sigue fallando, el problema no está en el
-código sino en la configuración del proyecto.** Se ve en la pestaña *Actions*
-del repositorio.
+ejecuta Vercel, con Node 22 y las mismas variables. **Si esa comprobación sale
+en verde y Vercel sigue fallando, el problema no está en el código sino en la
+configuración del proyecto.** Se ve en la pestaña *Actions* del repositorio.
 
 Causas del lado de Vercel, por orden de probabilidad:
 
@@ -414,8 +452,9 @@ Causas del lado de Vercel, por orden de probabilidad:
 2. **El *Root Directory* no es la raíz del repositorio.** Settings → General →
    Root Directory debe estar vacío o ser `./`.
 3. **Hay una configuración antigua en el panel** que pisa la del repositorio.
-   Settings → General → Build & Development Settings: si Install Command o
-   Build Command están sobrescritos con algo raro, quitar el override.
+   Settings → General → Build & Development Settings: si Framework Preset sigue
+   en *Next.js*, o si Install Command o Build Command están sobrescritos,
+   quitar los override.
 4. **La versión de Node.** Settings → General → Node.js Version: 22.x.
 5. **El proyecto no está conectado a este repositorio.**
 

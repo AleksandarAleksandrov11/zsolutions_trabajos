@@ -1,8 +1,3 @@
-"use client";
-
-import { motion, useReducedMotion } from "motion/react";
-import { EASE_BRAND } from "@/lib/motion";
-
 type Props = {
   paso: number;
   total: number;
@@ -10,7 +5,6 @@ type Props = {
 };
 
 export function ProgressBar({ paso, total, titulos }: Props) {
-  const reducido = useReducedMotion();
   const progreso = (paso + 1) / total;
 
   return (
@@ -31,11 +25,9 @@ export function ProgressBar({ paso, total, titulos }: Props) {
         aria-valuenow={paso + 1}
         aria-label="Progreso del formulario"
       >
-        <motion.span
-          className="absolute inset-0 origin-left bg-brand-blue"
-          initial={false}
-          animate={{ scaleX: progreso }}
-          transition={{ duration: reducido ? 0.15 : 0.45, ease: EASE_BRAND }}
+        <span
+          className="absolute inset-0 origin-left bg-brand-blue transition-transform duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ transform: `scaleX(${progreso})` }}
         />
       </div>
 

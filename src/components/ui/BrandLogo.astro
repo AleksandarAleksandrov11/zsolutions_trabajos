@@ -1,0 +1,81 @@
+---
+import { cn } from "@/lib/utils";
+
+/*
+ * TODO (Alex): sustituir por los SVG oficiales del manual de identidad.
+ * Esta es una construcción fiel a lo descrito en el manual (la Z con el rayo
+ * y las dos líneas de fuga), pero NO es el archivo original. En cuanto
+ * facilites los SVG oficiales, se reemplaza el contenido de este componente
+ * sin tocar ninguna página: todas usan `BrandLogo`.
+ *
+ * Normas del manual respetadas aquí:
+ * · Área de seguridad reservada mediante el propio viewBox.
+ * · Una sola tinta (currentColor): azul corporativo, blanco o negro.
+ * · Nunca en naranja. Nunca contorneado, enmarcado ni deformado
+ *   (`preserveAspectRatio` por defecto mantiene la proporción).
+ */
+
+type Props = {
+  class?: string;
+  /** Con marca denominativa al lado (horizontal) o solo el isotipo. */
+  variante?: "horizontal" | "isotipo" | "vertical";
+  /** Añade el lema bajo la marca, como permite el apartado 06 del manual. */
+  conLema?: boolean;
+  title?: string;
+};
+
+const {
+  class: clase,
+  variante = "horizontal",
+  conLema = false,
+  title = "ZSolutions",
+} = Astro.props;
+
+const claseIsotipo =
+  variante === "isotipo" ? "h-full w-auto" : variante === "vertical" ? "h-12 w-auto" : "h-7 w-auto shrink-0";
+---
+
+<span
+  class={cn(
+    "text-current",
+    variante === "vertical"
+      ? "inline-flex flex-col items-center gap-3"
+      : "inline-flex items-center gap-2.5",
+    clase,
+  )}
+  title={title}
+>
+  <svg
+    viewBox="0 0 120 96"
+    class={claseIsotipo}
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+  >
+    {/* Z con el rayo calado en la diagonal */}
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M8 8h72v14L40 70h40v14H8V70l40-48H8V8Zm50 22L42 50h8l-11 15 20-22h-9l8-11Z"
+    ></path>
+    {/* Dos líneas de fuga: progresión, velocidad, eficiencia */}
+    <path d="M86 30h26v9H86z" opacity=".95"></path>
+    <path d="M86 47h18v9H86z" opacity=".65"></path>
+  </svg>
+
+  {
+    variante === "vertical" ? (
+      <>
+        <span class="font-display text-2xl leading-none tracking-tight">ZSolutions</span>
+        {conLema ? <span class="text-eyebrow text-fg-muted/70">Instalaciones</span> : null}
+      </>
+    ) : variante === "horizontal" ? (
+      <span class="flex flex-col">
+        <span class="font-display text-xl leading-none tracking-tight">ZSolutions</span>
+        {conLema ? (
+          <span class="text-eyebrow -mt-0.5 text-current/60">Instalaciones</span>
+        ) : null}
+      </span>
+    ) : null
+  }
+</span>

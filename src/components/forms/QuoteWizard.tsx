@@ -1,9 +1,5 @@
-"use client";
-
-import Link from "next/link";
-import { useActionState, useCallback, useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { track } from "@vercel/analytics";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ReactNode, SubmitEvent } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -28,7 +24,7 @@ import {
   GrupoOpciones,
   OpcionRadio,
 } from "@/components/forms/FormField";
-import { enviarPresupuesto, type EstadoPresupuesto } from "@/actions/presupuesto";
+import type { EstadoPresupuesto } from "@/lib/presupuesto";
 import {
   etiquetasCanal,
   etiquetasEspacio,
@@ -54,7 +50,6 @@ import {
   type Urgencia,
 } from "@/lib/validation";
 import { site } from "@/content/site";
-import { EASE_BRAND } from "@/lib/motion";
 
 const CLAVE_SESION = "zs_presupuesto";
 
@@ -134,14 +129,12 @@ export function QuoteWizard() {
   const [tocado, setTocado] = useState(false);
   const [abiertoEn] = useState(() => Date.now());
 
-  const reducido = useReducedMotion();
   const tituloRef = useRef<HTMLHeadingElement>(null);
+  const trampaRef = useRef<HTMLInputElement>(null);
   const primerRender = useRef(true);
 
-  const [estado, accion, pendiente] = useActionState<EstadoPresupuesto, FormData>(
-    enviarPresupuesto,
-    { estado: "inicial" },
-  );
+  const [estado, setEstado] = useState<EstadoPresupuesto>({ estado: "inicial" });
+  const [pendiente, setPendiente] = useState(false);
 
   /* --- Persistencia en sessionStorage: no se pierde nada al recargar --- */
   useEffect(() => {
@@ -173,7 +166,13 @@ export function QuoteWizard() {
   /* --- Evento de conversión --- */
   useEffect(() => {
     if (estado.estado !== "ok") return;
-    track("presupuesto_enviado", { servicio: datos.servicio || "sin-definir" });
+    /* Evento de conversión de Vercel Web Analytics. El script se carga como
+       etiqueta suelta en el layout, así que se usa su API global en lugar de
+       un paquete de npm. Si la analítica está bloqueada, no pasa nada. */
+    window.va?.("event", {
+      name: "presupuesto_enviado",
+      data: { servicio: datos.servicio || "sin-definir" },
+    });
     try {
       sessionStorage.removeItem(CLAVE_SESION);
     } catch {
@@ -227,6 +226,48 @@ export function QuoteWizard() {
     setErrores(analisis.success ? {} : erroresDesde(analisis.error));
   }, [datos, paso, tocado]);
 
+  /**
+   * Envío.
+   *
+   * El formulario habla con `api/presupuesto.ts`, una función independiente
+   * de Vercel, mediante una petición normal. La validación del cliente es
+   * solo cortesía: la de verdad, la que decide, es la del servidor.
+   */
+  const enviar = useCallback(
+    async (evento: SubmitEvent<HTMLFormElement>) => {
+      evento.preventDefault();
+      setTocado(true);
+      if (!validarPaso(paso)) return;
+
+      setPendiente(true);
+      try {
+        const respuesta = await fetch("/api/presupuesto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...datos,
+            origen: datos.origen || undefined,
+            empresa: trampaRef.current?.value ?? "",
+            abiertoEn,
+          }),
+        });
+
+        const cuerpo = (await respuesta.json()) as EstadoPresupuesto;
+        setEstado(cuerpo);
+        if (cuerpo.estado === "error" && cuerpo.errores) setErrores(cuerpo.errores);
+      } catch {
+        setEstado({
+          estado: "error",
+          mensaje:
+            "No he podido conectar para enviar la solicitud. Comprueba tu conexión e inténtalo otra vez, o escríbeme por WhatsApp.",
+        });
+      } finally {
+        setPendiente(false);
+      }
+    },
+    [abiertoEn, datos, paso, validarPaso],
+  );
+
   /* ---------------------------------------------------------------
    * Confirmación
    * --------------------------------------------------------------- */
@@ -259,29 +300,15 @@ export function QuoteWizard() {
 
   return (
     <form
-      action={accion}
+      onSubmit={enviar}
       className="rounded-[2px] border border-white/10 bg-surface/40 p-6 sm:p-8 md:p-10"
       noValidate
     >
-      {/* Campos que viajan al servidor */}
-      <input type="hidden" name="servicio" value={datos.servicio} />
-      <input type="hidden" name="espacio" value={datos.espacio} />
-      <input type="hidden" name="ubicacion" value={datos.ubicacion} />
-      <input type="hidden" name="detalle" value={datos.detalle} />
-      <input type="hidden" name="urgencia" value={datos.urgencia} />
-      <input type="hidden" name="canal" value={datos.canal} />
-      <input type="hidden" name="comentarios" value={datos.comentarios} />
-      <input type="hidden" name="nombre" value={datos.nombre} />
-      <input type="hidden" name="telefono" value={datos.telefono} />
-      <input type="hidden" name="email" value={datos.email} />
-      <input type="hidden" name="origen" value={datos.origen} />
-      <input type="hidden" name="privacidad" value={datos.privacidad ? "true" : ""} />
-      <input type="hidden" name="abiertoEn" value={abiertoEn} />
-
       {/* Honeypot: invisible para personas, irresistible para bots */}
       <div aria-hidden="true" className="absolute h-0 w-0 overflow-hidden opacity-0">
         <label htmlFor="zs-empresa">No rellenar</label>
         <input
+          ref={trampaRef}
           id="zs-empresa"
           type="text"
           name="empresa"
@@ -306,7 +333,7 @@ export function QuoteWizard() {
 
       <div className="mt-8">
         {/* Paso 1 · Servicio */}
-        <Panel activo={paso === 0} reducido={reducido}>
+        <Panel activo={paso === 0}>
           <GrupoOpciones
             leyenda="Elige el servicio que necesitas"
             error={errores.servicio}
@@ -336,7 +363,7 @@ export function QuoteWizard() {
         </Panel>
 
         {/* Paso 2 · Espacio */}
-        <Panel activo={paso === 1} reducido={reducido}>
+        <Panel activo={paso === 1}>
           <GrupoOpciones
             leyenda="Tipo de espacio"
             error={errores.espacio}
@@ -373,7 +400,7 @@ export function QuoteWizard() {
         </Panel>
 
         {/* Paso 3 · Detalle */}
-        <Panel activo={paso === 2} reducido={reducido}>
+        <Panel activo={paso === 2}>
           <CampoArea
             etiqueta="Cuéntame qué necesitas"
             nombre="ui-detalle"
@@ -407,7 +434,7 @@ export function QuoteWizard() {
         </Panel>
 
         {/* Paso 4 · Canal */}
-        <Panel activo={paso === 3} reducido={reducido}>
+        <Panel activo={paso === 3}>
           <GrupoOpciones
             leyenda="¿Por dónde prefieres que te conteste?"
             error={errores.canal}
@@ -443,7 +470,7 @@ export function QuoteWizard() {
         </Panel>
 
         {/* Paso 5 · Datos */}
-        <Panel activo={paso === 4} reducido={reducido}>
+        <Panel activo={paso === 4}>
           <div className="grid gap-6 sm:grid-cols-2">
             <CampoTexto
               className="sm:col-span-2"
@@ -516,12 +543,12 @@ export function QuoteWizard() {
               />
               <span className="text-sm text-fg-muted">
                 He leído y acepto la{" "}
-                <Link
+                <a
                   href="/politica-de-privacidad"
                   className="text-fg underline underline-offset-4 hover:text-brand-orange"
                 >
                   política de privacidad
-                </Link>
+                </a>
                 . Tus datos se usan solo para responderte a esta solicitud.
               </span>
             </label>
@@ -583,24 +610,15 @@ export function QuoteWizard() {
  * de modo que ni el teclado ni un lector de pantalla llegan a ellos.
  * Solo se animan `opacity` y `transform`.
  */
-function Panel({
-  activo,
-  reducido,
-  children,
-}: {
-  activo: boolean;
-  reducido: boolean | null;
-  children: React.ReactNode;
-}) {
+function Panel({ activo, children }: { activo: boolean; children: ReactNode }) {
   return (
-    <motion.div
+    <div
       hidden={!activo}
       inert={!activo}
-      initial={false}
-      animate={activo ? { opacity: 1, x: 0 } : { opacity: 0, x: 28 }}
-      transition={{ duration: reducido ? 0.15 : 0.4, ease: EASE_BRAND }}
+      className="transition-[opacity,transform] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      style={activo ? { opacity: 1, transform: "none" } : { opacity: 0, transform: "translateX(28px)" }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

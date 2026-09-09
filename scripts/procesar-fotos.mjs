@@ -1,9 +1,15 @@
 /**
  * Optimiza las fotos originales de Alex y las deja en `public/images`.
- * Uso: node scripts/procesar-fotos.mjs <carpeta-origen>
+ *
+ * Este guion solo produce el JPEG base de cada foto. Las variantes AVIF y WebP
+ * y el fichero `src/content/fotos.ts` los genera después
+ * `scripts/generar-variantes.mjs`, que es quien conoce el formato. `pnpm fotos`
+ * encadena los dos.
+ *
+ * Uso: pnpm fotos <carpeta-origen>
  */
 import sharp from "sharp";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const origen = process.argv[2];
@@ -23,8 +29,6 @@ const fotos = [
   { entrada: "image00001.jpeg", nombre: "alex-retrato-taller", ancho: 1400 },
 ];
 
-const manifiesto = [];
-
 for (const foto of fotos) {
   const src = path.join(origen, foto.entrada);
   const base = sharp(src).rotate();
@@ -39,47 +43,7 @@ for (const foto of fotos) {
     .jpeg({ quality: 82, mozjpeg: true, progressive: true })
     .toFile(path.join(salida, `${foto.nombre}.jpg`));
 
-  /* Placeholder blur en base64, para que no haya salto de layout ni flash */
-  const blur = await base
-    .clone()
-    .resize({ width: 16 })
-    .blur(1.2)
-    .webp({ quality: 30 })
-    .toBuffer();
-
-  manifiesto.push({
-    nombre: foto.nombre,
-    src: `/images/${foto.nombre}.jpg`,
-    ancho: anchoFinal,
-    alto,
-    blur: `data:image/webp;base64,${blur.toString("base64")}`,
-  });
-
   console.log(`✓ ${foto.nombre}.jpg  ${anchoFinal}×${alto}`);
 }
 
-const ts = `/* GENERADO por scripts/procesar-fotos.mjs — no editar a mano. */
-
-export type FotoOptimizada = {
-  src: string;
-  ancho: number;
-  alto: number;
-  blur: string;
-};
-
-export const fotos = ${JSON.stringify(
-  Object.fromEntries(
-    manifiesto.map((f) => [
-      f.nombre,
-      { src: f.src, ancho: f.ancho, alto: f.alto, blur: f.blur },
-    ]),
-  ),
-  null,
-  2,
-)} satisfies Record<string, FotoOptimizada>;
-
-export type NombreFoto = keyof typeof fotos;
-`;
-
-await writeFile("src/content/fotos.ts", ts);
-console.log("✓ src/content/fotos.ts");
+console.log("\nAhora ejecuta `pnpm variantes` para generar AVIF/WebP y fotos.ts.");

@@ -1,0 +1,22 @@
+---
+type Props = {
+  class?: string;
+  /** Separación entre elementos, en segundos. */
+  stagger?: number;
+  as?: "div" | "ul" | "ol";
+};
+
+const { class: clase, stagger = 0.08, as: Como = "div" }: Props = Astro.props;
+
+/**
+ * Contenedor de entrada escalonada.
+ *
+ * Se observa el grupo, no cada hijo: cuando el grupo entra en pantalla, sus
+ * `RevealItem` aparecen uno detrás de otro. Es el mismo comportamiento que
+ * tenía con la librería de animación, en CSS y sin JavaScript de componente.
+ */
+---
+
+<Como class={clase} data-grupo-revelar={String(stagger)}>
+  <slot />
+</Como>

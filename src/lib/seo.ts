@@ -1,10 +1,15 @@
-import type { Metadata } from "next";
 import { site } from "@/content/site";
+
+/** Lectura tolerante del entorno: en el navegador no existe `process`. */
+function env(clave: string): string | undefined {
+  if (typeof process === "undefined" || !process.env) return undefined;
+  return process.env[clave];
+}
 
 /**
  * URL base del sitio.
  *
- * Se resuelve en tiempo de compilación, que es cuando se generan las 47 rutas
+ * Se resuelve en tiempo de compilación, que es cuando se generan las rutas
  * estáticas, el sitemap y las URL de las imágenes Open Graph.
  *
  * No hay ningún dominio escrito a fuego: la web se autodescribe con la
@@ -13,7 +18,9 @@ import { site } from "@/content/site";
  * definitivo, sin tocar código.
  *
  * Orden de prioridad:
- *  1. `NEXT_PUBLIC_SITE_URL`, el dominio definitivo cuando ya esté apuntado.
+ *  1. `PUBLIC_SITE_URL`, el dominio definitivo cuando ya esté apuntado.
+ *     Se acepta también `NEXT_PUBLIC_SITE_URL` por compatibilidad con la
+ *     configuración que ya pueda existir en el proyecto de Vercel.
  *  2. El dominio de producción del proyecto en Vercel.
  *  3. La URL única de la previsualización, para que cada preview se autodescriba.
  *  4. `localhost` en desarrollo.
@@ -22,15 +29,17 @@ function resolverBaseUrl(): string {
   const limpiar = (valor: string) =>
     (valor.startsWith("http") ? valor : `https://${valor}`).replace(/\/+$/, "");
 
-  if (process.env.NEXT_PUBLIC_SITE_URL) return limpiar(process.env.NEXT_PUBLIC_SITE_URL);
+  const declarada = env("PUBLIC_SITE_URL") ?? env("NEXT_PUBLIC_SITE_URL");
+  if (declarada) return limpiar(declarada);
 
-  if (process.env.VERCEL_ENV === "production" && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    return limpiar(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+  if (env("VERCEL_ENV") === "production" && env("VERCEL_PROJECT_PRODUCTION_URL")) {
+    return limpiar(env("VERCEL_PROJECT_PRODUCTION_URL") as string);
   }
 
-  if (process.env.VERCEL_URL) return limpiar(process.env.VERCEL_URL);
+  const url = env("VERCEL_URL");
+  if (url) return limpiar(url);
 
-  return "http://localhost:3000";
+  return "http://localhost:4321";
 }
 
 export const BASE_URL = resolverBaseUrl();
@@ -47,26 +56,44 @@ export const DOMINIO_ACTUAL = BASE_URL.replace(/^https?:\/\//, "");
  * búsquedas, y hay que deshacerlo a base de redirecciones y reindexación.
  *
  * Se activa de dos formas:
- *  · Definiendo `NEXT_PUBLIC_SITE_URL`, que es lo que harás al apuntar el
- *    dominio. Es el camino recomendado.
- *  · Forzándolo con `NEXT_PUBLIC_PERMITIR_INDEXACION=true`, si prefieres que
- *    la dirección provisional entre en Google desde ya, asumiendo lo anterior.
+ *  · Definiendo `PUBLIC_SITE_URL`, que es lo que harás al apuntar el dominio.
+ *    Es el camino recomendado.
+ *  · Forzándolo con `PUBLIC_PERMITIR_INDEXACION=true`, si prefieres que la
+ *    dirección provisional entre en Google desde ya, asumiendo lo anterior.
  *
  * Las previsualizaciones nunca se indexan, se ponga lo que se ponga.
- *
- * Nota: con la indexación cerrada, Lighthouse baja la puntuación de SEO a
- * unos 69 puntos por el `noindex`. No es un fallo de la web: es exactamente
- * lo que se le ha pedido. Con el dominio puesto vuelve a 100.
  */
 export const ES_INDEXABLE =
-  (Boolean(process.env.NEXT_PUBLIC_SITE_URL) ||
-    process.env.NEXT_PUBLIC_PERMITIR_INDEXACION === "true") &&
-  process.env.VERCEL_ENV !== "preview";
+  (Boolean(env("PUBLIC_SITE_URL") ?? env("NEXT_PUBLIC_SITE_URL")) ||
+    (env("PUBLIC_PERMITIR_INDEXACION") ?? env("NEXT_PUBLIC_PERMITIR_INDEXACION")) ===
+      "true") &&
+  env("VERCEL_ENV") !== "preview";
 
+/**
+ * Miniatura para redes sociales.
+ *
+ * Es una imagen estática de marca, no generada al vuelo: una imagen compuesta
+ * en tiempo de petición obligaría a desplegar una función de servidor, y todo
+ * este sitio se sirve como ficheros estáticos.
+ */
+export function urlOg(): string {
+  return `${BASE_URL}/og.png`;
+}
 
+export type Metadatos = {
+  /** Título completo, tal cual va en la pestaña y en los resultados. */
+  title: string;
+  description: string;
+  /** URL canónica absoluta. */
+  canonical: string;
+  /** Miniatura absoluta para Open Graph y Twitter. */
+  imagen: string;
+  indexable: boolean;
+  locale: string;
+  siteName: string;
+};
 
 type Args = {
-  /** Sin el sufijo de marca: se añade solo cuando cabe. */
   title: string;
   description: string;
   /** Ruta absoluta del sitio, empezando por "/". */
@@ -75,62 +102,19 @@ type Args = {
   noIndex?: boolean;
 };
 
-/**
- * Miniatura para redes sociales.
- *
- * Es una imagen estática de marca, no generada al vuelo. La ruta `/api/og`
- * que la componía con `next/og` se ha retirado: ese paquete arrastra binarios
- * WebAssembly que hay que empaquetar dentro de la función, y era lo único que
- * quedaba en la fase de despliegue en la que Vercel fallaba. El fichero de
- * `public/og.png` es exactamente el diseño que generaba aquella ruta.
- *
- * TODO: recuperar la miniatura por página cuando el despliegue esté asentado.
- * Hoy todas las páginas comparten la misma, que es lo que hace la mayoría de
- * sitios y no penaliza nada.
- */
-export function urlOg(): string {
-  return `${BASE_URL}/og.png`;
-}
-
 export function crearMetadata({
   title,
   description,
   path,
   noIndex = false,
-}: Args): Metadata {
-  const url = `${BASE_URL}${path === "/" ? "" : path}`;
-  const imagen = urlOg();
-
-  /* Cuidado: en el API de metadatos de Next, una página que declara la clave
-     `robots` sobrescribe la del layout, aunque su valor sea `undefined`. Por
-     eso aquí se resuelve siempre de forma explícita en lugar de delegar. */
-  const indexable = ES_INDEXABLE && !noIndex;
-
+}: Args): Metadatos {
   return {
     title,
     description,
-    alternates: { canonical: url },
-    robots: indexable
-      ? {
-          index: true,
-          follow: true,
-          googleBot: { index: true, follow: true, "max-image-preview": "large" },
-        }
-      : { index: false, follow: true },
-    openGraph: {
-      type: "website",
-      locale: site.locale,
-      siteName: site.nombre,
-      url,
-      title,
-      description,
-      images: [{ url: imagen, width: 1200, height: 630, alt: title }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [imagen],
-    },
+    canonical: `${BASE_URL}${path === "/" ? "" : path}`,
+    imagen: urlOg(),
+    indexable: ES_INDEXABLE && !noIndex,
+    locale: site.locale,
+    siteName: site.nombre,
   };
 }

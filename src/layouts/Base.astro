@@ -1,0 +1,242 @@
+---
+import Header from "@/components/layout/Header.astro";
+import CookieBanner from "@/components/layout/CookieBanner.astro";
+import WhatsAppFloat from "@/components/layout/WhatsAppFloat.astro";
+import JsonLd from "@/components/seo/JsonLd.astro";
+import Footer from "@/components/layout/Footer.astro";
+import { schemaNegocioLocal, schemaPersona, schemaWebSite } from "@/lib/schema";
+import type { JsonLdObjeto } from "@/lib/schema";
+import type { Metadatos } from "@/lib/seo";
+import { site } from "@/content/site";
+import "@/styles/global.css";
+
+type Props = {
+  meta: Metadatos;
+  /** JSON-LD específico de la página, además del común del sitio. */
+  schema?: JsonLdObjeto | JsonLdObjeto[];
+};
+
+const { meta, schema } = Astro.props;
+
+const robots = meta.indexable
+  ? "index, follow, max-image-preview:large"
+  : "noindex, follow";
+
+/* Los scripts de analítica los sirve la propia plataforma bajo `/_vercel/`.
+   Fuera de Vercel esas rutas no existen, así que solo se emiten cuando el
+   build se ejecuta allí: en local no hay peticiones fallidas ni ruido en la
+   consola. */
+const enVercel = Boolean(process.env.VERCEL);
+---
+
+<!doctype html>
+<html lang={site.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0F0F10" />
+    <meta name="color-scheme" content="dark" />
+
+    <title>{meta.title}</title>
+    <meta name="description" content={meta.description} />
+    <link rel="canonical" href={meta.canonical} />
+    <meta name="robots" content={robots} />
+    <meta name="googlebot" content={robots} />
+    <meta name="author" content={site.fundador} />
+    <meta name="application-name" content={site.nombre} />
+    <meta name="format-detection" content="telephone=yes, address=no, email=no" />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={meta.locale} />
+    <meta property="og:site_name" content={meta.siteName} />
+    <meta property="og:url" content={meta.canonical} />
+    <meta property="og:title" content={meta.title} />
+    <meta property="og:description" content={meta.description} />
+    <meta property="og:image" content={meta.imagen} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={meta.title} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={meta.title} />
+    <meta name="twitter:description" content={meta.description} />
+    <meta name="twitter:image" content={meta.imagen} />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="mask-icon" href="/icons/icon-monocromo.svg" color="#2F4AA0" />
+    <link rel="apple-touch-icon" href="/icons/apple-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    {/* La tipografía de marca se sirve desde este mismo dominio. */}
+    <link
+      rel="preload"
+      href="/fonts/righteous-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    {/* TODO (Alex): pegar aquí la etiqueta de verificación de Search Console. */}
+
+    <JsonLd datos={[schemaNegocioLocal(), schemaPersona(), schemaWebSite()]} />
+    {schema ? <JsonLd datos={schema} /> : null}
+  </head>
+
+  <body class="grano min-h-dvh bg-bg text-fg antialiased">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-200 focus:rounded-[2px] focus:bg-brand-blue focus:px-4 focus:py-3 focus:text-sm focus:text-white"
+    >
+      Saltar al contenido principal
+    </a>
+
+    <Header />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Footer />
+
+    <WhatsAppFloat />
+    <CookieBanner />
+
+    {/*
+      Analítica sin cookies: se considera esencial y se documenta en la
+      política de cookies. Son etiquetas sueltas servidas por la propia
+      plataforma, sin paquete de npm de por medio.
+    */}
+    {
+      enVercel ? (
+        <>
+          <script is:inline defer src="/_vercel/insights/script.js" />
+          <script is:inline defer src="/_vercel/speed-insights/script.js" />
+        </>
+      ) : null
+    }
+  </body>
+</html>
+
+<script>
+  /**
+   * Comportamientos transversales de la web.
+   *
+   * Es todo el JavaScript que se ejecuta en una página normal: unas pocas
+   * decenas de líneas sin dependencias. Lo primero que hace es marcar el
+   * documento con la clase `js`; hasta ese momento el CSS deja todo el
+   * contenido visible, de modo que si el script no llega a ejecutarse la
+   * página se lee igual, sin bloques en blanco.
+   */
+  const raiz = document.documentElement;
+  raiz.classList.add("js");
+
+  const menosMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* --- Revelado al entrar en pantalla --------------------------------- */
+  /* La cascada de un grupo largo no puede hacerse eterna: se limita a medio
+     segundo, pase lo que pase. */
+  const RETARDO_MAXIMO = 0.6;
+
+  const revelar = (elemento: Element, retardo: number) => {
+    const aplicado = Math.min(retardo, RETARDO_MAXIMO);
+    if (aplicado > 0) {
+      (elemento as HTMLElement).style.setProperty(
+        "--retardo-revelar",
+        `${aplicado.toFixed(2)}s`,
+      );
+    }
+    elemento.classList.add("visible");
+  };
+
+  const observador = new IntersectionObserver(
+    (entradas) => {
+      for (const entrada of entradas) {
+        if (!entrada.isIntersecting) continue;
+        const elemento = entrada.target as HTMLElement;
+        observador.unobserve(elemento);
+
+        if (elemento.hasAttribute("data-grupo-revelar")) {
+          /* Grupo: sus hijos entran escalonados, como pide el sistema. */
+          const paso = Number(elemento.dataset.grupoRevelar) || 0.08;
+          const hijos = elemento.querySelectorAll("[data-revelar]");
+          hijos.forEach((hijo, i) => revelar(hijo, menosMovimiento ? 0 : i * paso));
+        } else {
+          revelar(elemento, 0);
+        }
+      }
+    },
+    /* Umbral cero con margen inferior negativo: el elemento aparece en cuanto
+       asoma un poco por debajo. Es importante que sea así y no un porcentaje
+       del elemento: un bloque más alto que la ventana nunca llegaría a estar
+       visible en un 20 % y se quedaría oculto para siempre. */
+    { threshold: 0, rootMargin: "0px 0px -10% 0px" },
+  );
+
+  document.querySelectorAll("[data-grupo-revelar]").forEach((grupo) => {
+    observador.observe(grupo);
+  });
+
+  document.querySelectorAll("[data-revelar]").forEach((elemento) => {
+    /* Los que están dentro de un grupo los dispara el grupo. */
+    if (elemento.closest("[data-grupo-revelar]")) return;
+    observador.observe(elemento);
+  });
+
+  /* --- Contadores ------------------------------------------------------ */
+  const contadores = document.querySelectorAll<HTMLElement>("[data-contador]");
+  if (contadores.length > 0) {
+    const observadorContadores = new IntersectionObserver(
+      (entradas) => {
+        for (const entrada of entradas) {
+          if (!entrada.isIntersecting) continue;
+          const nodo = entrada.target as HTMLElement;
+          observadorContadores.unobserve(nodo);
+
+          const destino = Number(nodo.dataset.contador) || 0;
+          if (menosMovimiento) continue;
+
+          const duracion = 1200;
+          const inicio = performance.now();
+          const paso = (ahora: number) => {
+            const avance = Math.min((ahora - inicio) / duracion, 1);
+            /* easeOutExpo */
+            const suave = avance === 1 ? 1 : 1 - Math.pow(2, -10 * avance);
+            nodo.textContent = String(Math.round(suave * destino));
+            if (avance < 1) requestAnimationFrame(paso);
+          };
+          nodo.textContent = "0";
+          requestAnimationFrame(paso);
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    contadores.forEach((nodo) => observadorContadores.observe(nodo));
+  }
+
+  /* --- Parallax del hero ----------------------------------------------- */
+  const hero = document.querySelector<HTMLElement>("[data-hero]");
+  const fondo = hero?.querySelector<HTMLElement>("[data-hero-fondo]");
+
+  if (hero && fondo && !menosMovimiento) {
+    let pendiente = false;
+
+    const pintar = () => {
+      pendiente = false;
+      const alto = hero.offsetHeight || 1;
+      /* 0 arriba del todo, 1 cuando el hero ya ha salido por arriba. */
+      const avance = Math.min(Math.max(window.scrollY / alto, 0), 1);
+      fondo.style.transform = `translate3d(0, ${avance * 15}%, 0)`;
+    };
+
+    const alScroll = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(pintar);
+    };
+
+    pintar();
+    window.addEventListener("scroll", alScroll, { passive: true });
+    window.addEventListener("resize", alScroll, { passive: true });
+  }
+</script>

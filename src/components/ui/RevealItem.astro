@@ -1,0 +1,12 @@
+---
+type Props = {
+  class?: string;
+  as?: "div" | "li" | "article";
+};
+
+const { class: clase, as: Como = "div" }: Props = Astro.props;
+---
+
+<Como class={clase} data-revelar>
+  <slot />
+</Como>

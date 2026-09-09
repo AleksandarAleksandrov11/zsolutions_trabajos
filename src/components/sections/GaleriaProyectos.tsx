@@ -1,11 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { proyectos, type Proyecto } from "@/content/proyectos";
-import { EASE_BRAND } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 export type Filtro = { id: string; label: string };
@@ -25,7 +22,6 @@ export function GaleriaProyectos({ etiquetasServicio, etiquetasZona }: Props) {
   const [abierto, setAbierto] = useState<{ proyecto: number; imagen: number } | null>(
     null,
   );
-  const reducido = useReducedMotion();
   const dialogoRef = useRef<HTMLDivElement>(null);
   const disparadorRef = useRef<HTMLButtonElement | null>(null);
 
@@ -203,11 +199,13 @@ export function GaleriaProyectos({ etiquetasServicio, etiquetasZona }: Props) {
                 className="barrido-z group block w-full overflow-hidden rounded-[2px] border border-white/10 bg-surface/50 text-left transition-colors hover:border-brand-blue/60"
               >
                 {portada ? (
-                  <Image
+                  <img
                     src={portada.src}
                     alt={portada.alt}
                     width={portada.ancho}
                     height={portada.alto}
+                    loading="lazy"
+                    decoding="async"
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="aspect-4/3 w-full object-cover"
                   />
@@ -230,19 +228,14 @@ export function GaleriaProyectos({ etiquetasServicio, etiquetasZona }: Props) {
       </ul>
 
       {/* Visor */}
-      <AnimatePresence>
-        {proyectoActivo && abierto ? (
-          <motion.div
-            ref={dialogoRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label={proyectoActivo.titulo}
-            className="fixed inset-0 z-100 flex flex-col bg-bg/97 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reducido ? 0.15 : 0.25, ease: EASE_BRAND }}
-          >
+      {proyectoActivo && abierto ? (
+        <div
+          ref={dialogoRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={proyectoActivo.titulo}
+          className="visor-proyecto fixed inset-0 z-100 flex flex-col bg-bg/97 backdrop-blur-sm"
+        >
             <div className="container-brand flex h-20 shrink-0 items-center justify-between">
               <p className="text-eyebrow text-brand-orange">
                 {abierto.imagen + 1} / {proyectoActivo.imagenes.length}
@@ -269,7 +262,7 @@ export function GaleriaProyectos({ etiquetasServicio, etiquetasZona }: Props) {
 
               <figure className="flex min-w-0 flex-1 flex-col items-center gap-4">
                 {proyectoActivo.imagenes[abierto.imagen] ? (
-                  <Image
+                  <img
                     src={proyectoActivo.imagenes[abierto.imagen].src}
                     alt={proyectoActivo.imagenes[abierto.imagen].alt}
                     width={proyectoActivo.imagenes[abierto.imagen].ancho}
@@ -295,9 +288,8 @@ export function GaleriaProyectos({ etiquetasServicio, etiquetasZona }: Props) {
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+        </div>
+      ) : null}
     </>
   );
 }
