@@ -1,0 +1,25 @@
+---
+type Props = {
+  class?: string;
+  /** Retardo en segundos. */
+  delay?: number;
+  /** Etiqueta HTML resultante. */
+  as?: "div" | "li" | "section" | "article" | "header" | "figure";
+};
+
+const { class: clase, delay = 0, as: Como = "div" }: Props = Astro.props;
+
+/**
+ * Revelado al entrar en pantalla.
+ *
+ * El elemento se marca con `data-revelar` y de la animación se encargan el
+ * CSS de `global.css` y el IntersectionObserver de `Base.astro`. La clave
+ * está en que el contenido parte de VISIBLE: si el JavaScript falla o tarda,
+ * la página se lee igual. Antes esto lo resolvía una librería de animación
+ * que obligaba a hidratar en el navegador secciones que son texto estático.
+ */
+---
+
+<Como class={clase} data-revelar style={delay ? `--retardo-revelar:${delay}s` : undefined}>
+  <slot />
+</Como>

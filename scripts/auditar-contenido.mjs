@@ -4,6 +4,8 @@
  */
 import { servicios } from "../src/content/servicios.ts";
 import { zonas } from "../src/content/zonas.ts";
+import { redirecciones } from "../src/content/redirecciones.ts";
+import { readFile } from "node:fs/promises";
 
 const palabras = (t) => String(t).trim().split(/\s+/).filter(Boolean).length;
 let fallos = 0;
@@ -69,6 +71,31 @@ for (const z of zonas) {
 }
 if (slugsZona.size !== zonas.length) { console.log("✗ slugs de zona duplicados"); fallos++; }
 console.log(`✓ ${servicios.length} servicios · ${zonas.length} zonas comprobadas`);
+
+console.log("\n=== REDIRECCIONES ===");
+{
+  /* `vercel.json` es JSON y no puede importar la lista, así que se comprueba
+     que sigue diciendo exactamente lo mismo que `src/content/redirecciones.ts`.
+     Sin esto, tocar una sola de las dos pasaría inadvertido hasta producción. */
+  const vercel = JSON.parse(await readFile("vercel.json", "utf8"));
+  const enVercel = (vercel.redirects ?? [])
+    .map((r) => `${r.source} → ${r.destination} ${r.permanent ? "301" : "302"}`)
+    .sort();
+  const esperadas = redirecciones
+    .map((r) => `${r.desde} → ${r.hacia} 301`)
+    .sort();
+
+  const sobran = enVercel.filter((r) => !esperadas.includes(r));
+  const faltan = esperadas.filter((r) => !enVercel.includes(r));
+
+  if (sobran.length || faltan.length) {
+    if (faltan.length) console.log("✗ faltan en vercel.json:", faltan);
+    if (sobran.length) console.log("✗ sobran en vercel.json:", sobran);
+    fallos += sobran.length + faltan.length;
+  } else {
+    console.log(`✓ ${esperadas.length} redirecciones iguales en el código y en vercel.json`);
+  }
+}
 
 console.log(fallos === 0 ? "\n✓ AUDITORÍA DE CONTENIDO SUPERADA\n" : `\n✗ ${fallos} incidencias\n`);
 process.exit(fallos === 0 ? 0 : 1);

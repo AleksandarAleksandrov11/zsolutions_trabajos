@@ -1,0 +1,23 @@
+---
+import { clasesBoton, type TamanoBoton, type VarianteBoton } from "@/lib/boton";
+
+type Props = {
+  variante?: VarianteBoton;
+  tamano?: TamanoBoton;
+  class?: string;
+  type?: "button" | "submit" | "reset";
+  [clave: string]: unknown;
+};
+
+const {
+  variante = "primario",
+  tamano = "md",
+  class: clase,
+  type = "button",
+  ...resto
+} = Astro.props;
+---
+
+<button type={type} class={clasesBoton(variante, tamano, clase)} {...resto}>
+  <slot />
+</button>

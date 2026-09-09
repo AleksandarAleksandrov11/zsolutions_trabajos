@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { site } from "@/content/site";
+import { site } from "../content/site";
 import {
   etiquetasCanal,
   etiquetasEspacio,
@@ -7,7 +7,7 @@ import {
   etiquetasServicio,
   etiquetasUrgencia,
   type DatosPresupuesto,
-} from "@/lib/validation";
+} from "./validation";
 
 /* Variables de entorno documentadas en el README y en .env.example */
 const CLAVE = process.env.RESEND_API_KEY;

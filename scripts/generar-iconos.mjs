@@ -2,9 +2,9 @@
  * Genera todo el paquete de iconos del sitio a partir del isotipo de marca.
  *
  * Salida:
- *   src/app/favicon.ico            16 · 32 · 48 px
- *   src/app/icon.svg               vectorial, cualquier tamaño
- *   src/app/apple-icon.png         180 × 180 (Apple Touch Icon)
+ *   public/favicon.ico             16 · 32 · 48 px
+ *   public/icons/icon.svg          vectorial, cualquier tamaño
+ *   public/icons/apple-icon.png    180 × 180 (Apple Touch Icon)
  *   public/icons/icon-192.png      PWA
  *   public/icons/icon-512.png      PWA
  *   public/icons/maskable-512.png  PWA con zona segura
@@ -85,14 +85,14 @@ async function ico(svg, tamanos, destino) {
   console.log(`✓ ${destino}  (${tamanos.join(" · ")} px)`);
 }
 
-await writeFile("src/app/icon.svg", iconoPrincipal);
-console.log("✓ src/app/icon.svg");
+await writeFile("public/icons/icon.svg", iconoPrincipal);
+console.log("✓ public/icons/icon.svg");
 
 await writeFile("public/icons/icon-monocromo.svg", iconoMonocromo);
 console.log("✓ public/icons/icon-monocromo.svg");
 
-await ico(iconoPrincipal, [16, 32, 48], "src/app/favicon.ico");
-await png(iconoPrincipal, 180, "src/app/apple-icon.png");
+await ico(iconoPrincipal, [16, 32, 48], "public/favicon.ico");
+await png(iconoPrincipal, 180, "public/icons/apple-icon.png");
 await png(iconoPrincipal, 192, "public/icons/icon-192.png");
 await png(iconoPrincipal, 512, "public/icons/icon-512.png");
 await png(iconoMaskable, 512, "public/icons/maskable-512.png");

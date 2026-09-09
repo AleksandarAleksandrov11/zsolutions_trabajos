@@ -1,11 +1,11 @@
 /**
  * Lighthouse móvil sobre el build de producción.
- * Uso: node scripts/lighthouse.mjs http://127.0.0.1:3213 /ruta /otra
+ * Uso: node scripts/lighthouse.mjs http://127.0.0.1:4321 /ruta /otra
  */
 import lighthouse from "lighthouse";
 import { launch } from "chrome-launcher";
 
-const BASE = process.argv[2] ?? "http://127.0.0.1:3213";
+const BASE = process.argv[2] ?? "http://127.0.0.1:4321";
 const RUTAS = process.argv.slice(3);
 if (RUTAS.length === 0) RUTAS.push("/");
 

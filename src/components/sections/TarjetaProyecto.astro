@@ -1,0 +1,37 @@
+---
+import type { Proyecto } from "@/content/proyectos";
+import { getServicio } from "@/content/servicios";
+import { getZona } from "@/content/zonas";
+
+type Props = { proyecto: Proyecto };
+const { proyecto } = Astro.props;
+
+const servicio = getServicio(proyecto.servicio);
+const zona = getZona(proyecto.zona);
+const portada = proyecto.imagenes[0];
+---
+
+<article
+  class="barrido-z group overflow-hidden rounded-[2px] border border-white/10 bg-surface/50 transition-colors hover:border-brand-blue/60"
+>
+  {
+    portada ? (
+      <img
+        src={portada.src}
+        alt={portada.alt}
+        width={portada.ancho}
+        height={portada.alto}
+        loading="lazy"
+        decoding="async"
+        class="aspect-4/3 w-full object-cover"
+      />
+    ) : null
+  }
+  <div class="p-6">
+    <p class="text-eyebrow text-brand-orange">
+      {servicio?.nombre}{zona ? ` · ${zona.ciudad}` : ""}
+    </p>
+    <h3 class="mt-3 text-2xl">{proyecto.titulo}</h3>
+    <p class="mt-3 text-sm text-fg-muted">{proyecto.reto}</p>
+  </div>
+</article>

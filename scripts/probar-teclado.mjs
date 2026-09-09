@@ -3,7 +3,7 @@
  */
 import { chromium } from "playwright";
 
-const BASE = process.argv[2] ?? "http://127.0.0.1:3219";
+const BASE = process.argv[2] ?? "http://127.0.0.1:4321";
 const navegador = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium",
   args: ["--no-sandbox"],

@@ -1,0 +1,279 @@
+---
+import { Phone, Mail, Menu, X } from "lucide-react";
+import BrandLogo from "@/components/ui/BrandLogo.astro";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import {
+  hrefEmail,
+  hrefTelefono,
+  hrefWhatsApp,
+  mensajeWhatsApp,
+  navLegal,
+  navPrincipal,
+  site,
+  telefonoVisible,
+} from "@/content/site";
+import { numeroSeccion } from "@/lib/utils";
+
+/**
+ * Cabecera y menú móvil.
+ *
+ * Todo el marcado sale ya resuelto del build: el enlace activo se calcula
+ * aquí, en tiempo de compilación, a partir de la ruta de la página. Lo único
+ * que viaja al navegador es el script del final, que compacta la cabecera al
+ * hacer scroll y abre y cierra el menú. No hay framework de por medio.
+ */
+const ruta = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const telefono = telefonoVisible();
+---
+
+<header
+  id="cabecera"
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent bg-transparent transition-[background-color,backdrop-filter,border-color] duration-300"
+  style="padding-top: env(safe-area-inset-top)"
+>
+  <div
+    id="cabecera-barra"
+    class="container-brand flex h-20 items-center justify-between gap-4 transition-[height] duration-300 md:h-24"
+  >
+    <a
+      href="/"
+      class="flex min-h-11 shrink-0 items-center text-fg transition-opacity hover:opacity-80"
+      aria-label={`${site.nombre} · Inicio`}
+    >
+      <BrandLogo variante="horizontal" class="transition-transform duration-300" />
+    </a>
+
+    <nav aria-label="Navegación principal" class="hidden lg:block">
+      <ul class="flex items-center gap-1">
+        {
+          navPrincipal.map((enlace) => {
+            const activo = ruta === enlace.href || ruta.startsWith(`${enlace.href}/`);
+            return (
+              <li>
+                <a
+                  href={enlace.href}
+                  aria-current={activo ? "page" : undefined}
+                  class:list={[
+                    "relative flex min-h-11 items-center px-3.5 text-sm transition-colors",
+                    activo ? "text-fg" : "text-fg-muted/80 hover:text-fg",
+                  ]}
+                >
+                  {enlace.label}
+                  <span
+                    class:list={[
+                      "absolute inset-x-3.5 bottom-3 h-px origin-left bg-brand-blue transition-transform duration-300",
+                      activo ? "scale-x-100" : "scale-x-0",
+                    ]}
+                    aria-hidden="true"
+                  />
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      {
+        telefono ? (
+          <a
+            href={hrefTelefono()}
+            class="hidden min-h-11 items-center gap-2 px-3 text-sm text-fg-muted transition-colors hover:text-fg md:inline-flex"
+          >
+            <Phone className="h-4 w-4" aria-hidden="true" />
+            {telefono}
+          </a>
+        ) : null
+      }
+
+      {/* El wrapper controla la visibilidad: aplicar `hidden` sobre el propio
+          botón no gana a su `inline-flex` de base. */}
+      <span class="hidden sm:block">
+        <EnlaceBoton href="/contacto">Solicitar presupuesto</EnlaceBoton>
+      </span>
+
+      <button
+        id="abrir-menu"
+        type="button"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        aria-label="Abrir menú"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/20 text-fg transition-colors hover:border-white/50 lg:hidden"
+      >
+        <Menu className="h-5 w-5" aria-hidden="true" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<div
+  id="menu-movil"
+  class="menu-movil grano fixed inset-0 z-100 flex flex-col bg-bg lg:hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menú de navegación"
+  inert
+  style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom)"
+>
+  <div class="grid-plano absolute inset-0 opacity-40" aria-hidden="true"></div>
+
+  <div class="container-brand relative flex h-20 shrink-0 items-center justify-between">
+    <BrandLogo variante="horizontal" class="text-fg" />
+    <button
+      id="cerrar-menu"
+      type="button"
+      aria-label="Cerrar menú"
+      class="inline-flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/20 text-fg"
+    >
+      <X className="h-5 w-5" aria-hidden="true" />
+    </button>
+  </div>
+
+  <nav
+    aria-label="Navegación principal"
+    class="container-brand relative flex-1 overflow-y-auto py-6"
+  >
+    <ul class="flex flex-col">
+      {
+        navPrincipal.map((enlace, i) => (
+          <li class="border-b border-white/10">
+            <a
+              href={enlace.href}
+              class="flex items-baseline gap-4 py-5 text-3xl text-fg"
+            >
+              <span class="num-seccion">{numeroSeccion(i)}</span>
+              <span class="font-display">{enlace.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-8 flex flex-col gap-3">
+      <EnlaceBoton href="/contacto" tamano="lg" class="w-full">
+        Solicitar presupuesto
+      </EnlaceBoton>
+      <EnlaceBoton
+        href={hrefWhatsApp(mensajeWhatsApp)}
+        variante="secundario"
+        tamano="lg"
+        class="w-full"
+      >
+        Escribir por WhatsApp
+      </EnlaceBoton>
+    </div>
+
+    <div class="mt-8 flex flex-col gap-3 text-sm text-fg-muted">
+      {
+        telefono ? (
+          <a href={hrefTelefono()} class="flex min-h-11 items-center gap-3">
+            <Phone className="h-4 w-4 text-brand-blue" aria-hidden="true" />
+            {telefono}
+          </a>
+        ) : null
+      }
+      {
+        site.nap.email ? (
+          <a href={hrefEmail()} class="flex min-h-11 items-center gap-3">
+            <Mail className="h-4 w-4 text-brand-blue" aria-hidden="true" />
+            {site.nap.email}
+          </a>
+        ) : null
+      }
+    </div>
+
+    <ul class="mt-8 flex flex-wrap gap-x-5 gap-y-2 pb-6 text-xs text-fg-muted/60">
+      {
+        navLegal.map((enlace) => (
+          <li>
+            <a
+              href={enlace.href}
+              class="flex min-h-11 items-center transition-colors hover:text-fg"
+            >
+              {enlace.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
+
+<script>
+  const cabecera = document.getElementById("cabecera");
+  const barra = document.getElementById("cabecera-barra");
+  const menu = document.getElementById("menu-movil");
+  const abrir = document.getElementById("abrir-menu");
+  const cerrar = document.getElementById("cerrar-menu");
+
+  /* --- Compactar la cabecera al bajar --- */
+  if (cabecera && barra) {
+    const compactas = ["border-white/10", "bg-bg/85", "backdrop-blur-lg"];
+    let compacto: boolean | null = null;
+
+    const alScroll = () => {
+      const ahora = window.scrollY > 24;
+      if (ahora === compacto) return;
+      compacto = ahora;
+      cabecera.classList.toggle("border-transparent", !ahora);
+      compactas.forEach((clase) => cabecera.classList.toggle(clase, ahora));
+      barra.classList.toggle("h-16", ahora);
+      barra.classList.toggle("h-20", !ahora);
+      barra.classList.toggle("md:h-24", !ahora);
+    };
+
+    alScroll();
+    window.addEventListener("scroll", alScroll, { passive: true });
+  }
+
+  /* --- Menú móvil: apertura, foco atrapado y cierre con Escape --- */
+  if (menu && abrir && cerrar) {
+    const focusables = () =>
+      Array.from(
+        menu.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      ).filter((el) => el.offsetParent !== null);
+
+    const alTeclado = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        cerrarMenu();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const lista = focusables();
+      if (lista.length === 0) return;
+      const primero = lista[0];
+      const ultimo = lista[lista.length - 1];
+
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault();
+        primero.focus();
+      }
+    };
+
+    function abrirMenu() {
+      menu!.removeAttribute("inert");
+      menu!.dataset.abierto = "";
+      abrir!.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", alTeclado);
+      focusables()[0]?.focus();
+    }
+
+    function cerrarMenu() {
+      menu!.setAttribute("inert", "");
+      delete menu!.dataset.abierto;
+      abrir!.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", alTeclado);
+      abrir!.focus();
+    }
+
+    abrir.addEventListener("click", abrirMenu);
+    cerrar.addEventListener("click", cerrarMenu);
+  }
+</script>

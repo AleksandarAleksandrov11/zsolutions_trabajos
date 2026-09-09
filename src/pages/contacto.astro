@@ -1,0 +1,142 @@
+---
+import { Mail, MessageCircle, Phone } from "lucide-react";
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import Badge from "@/components/ui/Badge.astro";
+import { QuoteWizard } from "@/components/forms/QuoteWizard";
+import { schemaMigas } from "@/lib/schema";
+import { crearMetadata } from "@/lib/seo";
+import {
+  barraConfianza,
+  hrefEmail,
+  hrefTelefono,
+  hrefWhatsApp,
+  mensajeWhatsApp,
+  site,
+  telefonoVisible,
+} from "@/content/site";
+
+const migas = [{ label: "Contacto", href: "/contacto" }];
+const telefono = telefonoVisible();
+
+const meta = crearMetadata({
+  title: "Solicitar presupuesto | ZSolutions · Barcelona",
+  description:
+    "Cuéntame qué necesitas en cinco pasos y respondo en menos de 24 horas con una primera valoración. Sin coste y sin compromiso.",
+  path: "/contacto",
+});
+---
+
+<Base meta={meta} schema={schemaMigas(migas)}>
+  <header class="pt-36 pb-12 md:pt-44">
+    <div class="container-brand">
+      <Breadcrumbs migas={migas} />
+      <p class="text-eyebrow mt-8 mb-5 text-brand-orange">Presupuesto</p>
+      <h1 class="max-w-4xl text-6xl">Cuéntame qué necesitas</h1>
+      <p class="mt-7 max-w-2xl text-lg text-fg-muted">
+        Cinco pasos cortos. Cuanto mejor entienda el trabajo, más útil será la primera
+        valoración, y menos vueltas daremos después. Respondo en {site.respuesta}.
+      </p>
+    </div>
+  </header>
+
+  <section class="pb-section" aria-label="Formulario de presupuesto">
+    <div class="container-brand">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-12">
+        {/* El formulario es la única parte de la web que necesita ejecutarse en
+            el navegador, así que es lo único que se hidrata. */}
+        <QuoteWizard client:load />
+
+        {/* Alternativas siempre visibles */}
+        <aside class="flex flex-col gap-6 lg:sticky lg:top-32 lg:self-start">
+          <div class="rounded-[2px] border border-white/10 bg-surface/40 p-6">
+            <h2 class="text-eyebrow mb-5 text-fg-muted/50">¿Prefieres el camino corto?</h2>
+
+            <ul class="flex flex-col gap-3">
+              <li>
+                <a
+                  href={hrefWhatsApp(mensajeWhatsApp)}
+                  target={site.nap.whatsapp ? "_blank" : undefined}
+                  rel={site.nap.whatsapp ? "noopener noreferrer" : undefined}
+                  class="flex min-h-14 items-center gap-3 rounded-[2px] border border-white/12 px-4 text-sm transition-colors hover:border-brand-blue"
+                >
+                  <MessageCircle
+                    className="h-4 w-4 shrink-0 text-brand-blue"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    <span class="block font-bold">WhatsApp</span>
+                    <span class="block text-xs text-fg-muted">
+                      {site.nap.whatsapp ? "Escríbeme directamente" : "Pendiente de número"}
+                    </span>
+                  </span>
+                </a>
+              </li>
+
+              <li>
+                {
+                  telefono ? (
+                    <a
+                      href={hrefTelefono()}
+                      class="flex min-h-14 items-center gap-3 rounded-[2px] border border-white/12 px-4 text-sm transition-colors hover:border-brand-blue"
+                    >
+                      <Phone className="h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
+                      <span>
+                        <span class="block font-bold">{telefono}</span>
+                        <span class="block text-xs text-fg-muted">Llamada directa</span>
+                      </span>
+                    </a>
+                  ) : (
+                    <div class="flex min-h-14 items-center gap-3 rounded-[2px] border border-dashed border-white/12 px-4 text-sm">
+                      <Phone className="h-4 w-4 shrink-0 text-fg-muted/50" aria-hidden="true" />
+                      <Badge tono="pendiente">TODO · teléfono</Badge>
+                    </div>
+                  )
+                }
+              </li>
+
+              <li>
+                {
+                  site.nap.email ? (
+                    <a
+                      href={hrefEmail()}
+                      class="flex min-h-14 items-center gap-3 rounded-[2px] border border-white/12 px-4 text-sm transition-colors hover:border-brand-blue"
+                    >
+                      <Mail className="h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
+                      <span>
+                        <span class="block font-bold">{site.nap.email}</span>
+                        <span class="block text-xs text-fg-muted">Correo electrónico</span>
+                      </span>
+                    </a>
+                  ) : (
+                    <div class="flex min-h-14 items-center gap-3 rounded-[2px] border border-dashed border-white/12 px-4 text-sm">
+                      <Mail className="h-4 w-4 shrink-0 text-fg-muted/50" aria-hidden="true" />
+                      <Badge tono="pendiente">TODO · email</Badge>
+                    </div>
+                  )
+                }
+              </li>
+            </ul>
+          </div>
+
+          <div class="rounded-[2px] border border-white/10 bg-surface/40 p-6">
+            <h2 class="text-eyebrow mb-5 text-fg-muted/50">Con quién hablas</h2>
+            <ul class="flex flex-col gap-2.5">
+              {
+                barraConfianza.map((item) => (
+                  <li class="flex items-center gap-2.5 text-sm text-fg-muted">
+                    <span class="h-1.5 w-1.5 shrink-0 bg-brand-blue" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="mt-5 text-xs text-fg-muted/60">
+              Quien recibe esta solicitud es {site.fundador}, no una centralita.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</Base>

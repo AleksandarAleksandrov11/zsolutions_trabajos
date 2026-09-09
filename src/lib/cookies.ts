@@ -1,4 +1,3 @@
-"use client";
 
 /**
  * Gestión del consentimiento de cookies.
@@ -6,8 +5,9 @@
  * · Se guarda en una cookie propia de primera parte, `zs_consent`,
  *   con caducidad de 12 meses (lo que declara la política de cookies).
  * · `necesarias` siempre es true: sin ellas el sitio no puede prestarse.
- * · Ningún script no esencial debe cargarse antes de que esto devuelva
- *   `true` para su categoría. Ver `ConsentGate`.
+ * · Ningún script no esencial debe cargarse antes de que `leerConsentimiento()`
+ *   devuelva `true` para su categoría. Hoy no hay ninguno: la analítica de
+ *   Vercel funciona sin cookies y se documenta como esencial en la política.
  */
 
 export const NOMBRE_COOKIE = "zs_consent";

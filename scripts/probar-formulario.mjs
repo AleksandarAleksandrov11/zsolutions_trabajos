@@ -5,7 +5,7 @@
  */
 import { chromium } from "playwright";
 
-const BASE = process.argv[2] ?? "http://127.0.0.1:3216";
+const BASE = process.argv[2] ?? "http://127.0.0.1:4321";
 const navegador = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium",
   args: ["--no-sandbox"],
@@ -19,7 +19,27 @@ const ok = (c, m) => { console.log(`${c ? "✓" : "✗"} ${m}`); if (!c) fallos+
 const form = () => page.locator("form");
 const elegir = (texto) => form().getByText(texto, { exact: true }).first().click();
 
+/* El formulario es una isla: hasta que Astro no la hidrata no hay manejadores
+   y los clics no hacen nada. En desarrollo eso puede tardar lo que tarde Vite
+   en transformar los módulos, así que se espera a que la isla esté lista en
+   lugar de a un tiempo fijo. */
+const esperarHidratacion = async () => {
+  /* Nada más montarse, el formulario vuelca su estado en sessionStorage. Esa
+     escritura es la primera señal fiable de que ya está vivo, y sirve igual en
+     desarrollo y en el build de producción. */
+  await page.waitForFunction(
+    () => sessionStorage.getItem("zs_presupuesto") !== null,
+    null,
+    { timeout: 30000 },
+  );
+};
+
 await page.goto(`${BASE}/contacto`, { waitUntil: "networkidle" });
+await esperarHidratacion();
+
+/* El aviso de cookies tapa la parte baja del formulario. */
+await page.locator('[data-cookies="aceptar"]').click().catch(() => {});
+await page.waitForTimeout(300);
 
 /* 1 · No deja avanzar sin elegir servicio */
 await form().getByRole("button", { name: "Continuar" }).click();
@@ -71,6 +91,7 @@ ok(Boolean(guardado && guardado.includes("Gràcia")), "Guarda el estado en sessi
 
 /* 8 · Se recupera al recargar */
 await page.reload({ waitUntil: "networkidle" });
+await esperarHidratacion();
 const recuperado = await page.evaluate(() => {
   const d = JSON.parse(sessionStorage.getItem("zs_presupuesto") ?? "{}");
   return d.ubicacion;
@@ -84,7 +105,7 @@ const honeypot = await page.evaluate(() => {
 });
 ok(honeypot?.tab === "-1" && honeypot?.auto === "off", "Honeypot presente, tabindex -1 y sin autocompletado");
 
-/* 10 · Recorrido completo y envío real contra la Server Action */
+/* 10 · Recorrido completo y envío real contra `api/presupuesto` */
 await elegir("Electricidad");
 await form().getByRole("button", { name: "Continuar" }).click();
 await page.waitForTimeout(300);
@@ -107,11 +128,11 @@ await form().getByLabel("Nombre").fill("Cliente de prueba");
 await form().getByRole("button", { name: "Enviar solicitud" }).click();
 await page.waitForTimeout(900);
 const textoTrasEnvio = await page.locator("form").innerText();
-ok(/política de privacidad|teléfono o un correo/i.test(textoTrasEnvio), "El servidor rechaza el envío sin RGPD ni contacto");
+ok(/política de privacidad|teléfono o un correo/i.test(textoTrasEnvio), "No deja enviar sin aceptar el RGPD ni dejar un contacto");
 
-/* La Server Action descarta como bot cualquier envío hecho en menos de
-   3,5 s desde que se abre el formulario. Se espera para atravesar esa
-   comprobación y llegar de verdad al envío de correo. */
+/* El endpoint descarta como bot cualquier envío hecho en menos de 3,5 s
+   desde que se abre el formulario. Se espera para atravesar esa comprobación
+   y llegar de verdad al envío de correo. */
 await page.waitForTimeout(4200);
 await form().getByLabel("Teléfono o WhatsApp").fill("600123456");
 await form().locator('input[type="checkbox"]').check();
@@ -124,7 +145,7 @@ console.log("    → formulario:", detalle.slice(-420).replace(/\n+/g, " | "));
    confirmación, "falta configuración" o "no se ha podido enviar". */
 ok(
   /Gracias\.|no puedo procesar el formulario|No he podido enviar la solicitud/i.test(resultado),
-  "La Server Action responde y nunca da por bueno un envío fallido",
+  "El endpoint responde y nunca da por bueno un envío fallido",
 );
 console.log(
   `    → respuesta: ${

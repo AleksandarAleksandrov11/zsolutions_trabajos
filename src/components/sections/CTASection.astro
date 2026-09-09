@@ -1,0 +1,68 @@
+---
+import { ArrowRight, MessageCircle, Phone } from "lucide-react";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import Reveal from "@/components/ui/Reveal.astro";
+import {
+  hrefTelefono,
+  hrefWhatsApp,
+  mensajeWhatsApp,
+  site,
+  telefonoVisible,
+} from "@/content/site";
+
+type Props = { titulo?: string; descripcion?: string };
+
+const {
+  titulo = "Cuéntame qué necesitas",
+  descripcion = `Respondo en ${site.respuesta} con una primera valoración. Sin coste y sin compromiso. Si el trabajo no me corresponde, también te lo diré.`,
+} = Astro.props;
+
+const telefono = telefonoVisible();
+---
+
+<section class="pb-section" aria-labelledby="titulo-cta">
+  <div class="container-brand">
+    <Reveal>
+      <div
+        class="relative overflow-hidden rounded-[2px] border border-brand-blue/40 bg-brand-blue-deep/35 px-6 py-14 sm:px-12 md:py-20"
+      >
+        <div class="grid-plano absolute inset-0 opacity-50" aria-hidden="true"></div>
+        <div
+          class="rayas-z absolute -right-10 -top-10 h-56 w-96 opacity-25"
+          style="mask-image:linear-gradient(to left, black, transparent)"
+          aria-hidden="true"
+        >
+        </div>
+
+        <div class="relative max-w-2xl">
+          <p class="text-eyebrow mb-5 text-brand-orange">Siguiente paso</p>
+          <h2 id="titulo-cta" class="text-5xl">{titulo}</h2>
+          <p class="mt-6 text-lg text-fg-muted">{descripcion}</p>
+
+          <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <EnlaceBoton href="/contacto" tamano="lg">
+              Solicitar presupuesto
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </EnlaceBoton>
+            <EnlaceBoton
+              href={hrefWhatsApp(mensajeWhatsApp)}
+              variante="secundario"
+              tamano="lg"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              WhatsApp
+            </EnlaceBoton>
+            {
+              telefono ? (
+                <EnlaceBoton href={hrefTelefono()} variante="secundario" tamano="lg">
+                  <Phone className="h-4 w-4" aria-hidden="true" />
+                  {telefono}
+                </EnlaceBoton>
+              ) : null
+            }
+          </div>
+        </div>
+      </div>
+    </Reveal>
+  </div>
+</section>

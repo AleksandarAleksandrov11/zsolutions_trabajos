@@ -1,0 +1,91 @@
+---
+import { ArrowUpRight } from "lucide-react";
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import ZonesMap from "@/components/sections/ZonesMap.astro";
+import CTASection from "@/components/sections/CTASection.astro";
+import { schemaMigas } from "@/lib/schema";
+import { crearMetadata } from "@/lib/seo";
+import { zonasPorComarca } from "@/content/zonas";
+
+const migas = [{ label: "Zonas", href: "/zonas" }];
+const porComarca = zonasPorComarca();
+
+const meta = crearMetadata({
+  title: "Zonas de actuación en Barcelona y Cataluña | ZSolutions",
+  description:
+    "Instalaciones en Barcelona, área metropolitana, Vallès, Baix Llobregat, Maresme, Garraf y resto de Cataluña. Cada zona con su página y su contexto real.",
+  path: "/zonas",
+});
+---
+
+<Base meta={meta} schema={schemaMigas(migas)}>
+  <header class="pt-36 pb-12 md:pt-44">
+    <div class="container-brand">
+      <Breadcrumbs migas={migas} />
+      <p class="text-eyebrow mt-8 mb-5 text-brand-orange">Zonas de actuación</p>
+      <h1 class="max-w-4xl text-6xl">Barcelona, área metropolitana y Cataluña</h1>
+      <p class="mt-7 max-w-2xl text-lg text-fg-muted">
+        No todas las zonas plantean el mismo trabajo. Un bloque de los sesenta en
+        L&apos;Hospitalet, una finca del Eixample, una casa unifamiliar en Sant Cugat y
+        una nave en El Prat tienen problemas de instalación distintos. Cada página
+        explica qué se pide realmente en ese municipio.
+      </p>
+    </div>
+  </header>
+
+  <ZonesMap numero="01" />
+
+  <section class="pb-section" aria-labelledby="titulo-listado-zonas">
+    <div class="container-brand">
+      <SectionHeading
+        numero="02"
+        eyebrow="Listado completo"
+        tituloId="titulo-listado-zonas"
+        titulo="Zonas con página propia"
+        descripcion="Si tu municipio no aparece, pregúntame igualmente. Para un aviso corto muy lejos te diré con franqueza si te conviene alguien más cercano."
+      />
+
+      <div class="mt-14 flex flex-col gap-14">
+        {
+          porComarca.map((grupo) => (
+            <div>
+              <h3 class="text-eyebrow mb-6 flex items-center gap-3 text-fg-muted/50">
+                {grupo.comarca}
+                <span class="cota flex-1" aria-hidden="true" />
+                <span class="font-display text-brand-blue">
+                  {String(grupo.zonas.length).padStart(2, "0")}
+                </span>
+              </h3>
+
+              <RevealGroup as="ul" class="grid gap-3 md:grid-cols-2" stagger={0.05}>
+                {grupo.zonas.map((zona) => (
+                  <RevealItem as="li">
+                    <a
+                      href={`/zonas/${zona.slug}`}
+                      class="barrido-z group flex h-full items-start justify-between gap-6 rounded-[2px] border border-white/10 bg-surface/40 p-6 transition-colors hover:border-brand-blue/60 sm:p-7"
+                    >
+                      <span class="min-w-0">
+                        <span class="block font-display text-2xl">{zona.nombreLargo}</span>
+                        <span class="mt-2 block text-sm text-fg-muted">{zona.claim}</span>
+                      </span>
+                      <ArrowUpRight
+                        className="h-5 w-5 shrink-0 text-fg-muted/40 transition-all group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-brand-orange"
+                        aria-hidden="true"
+                      />
+                    </a>
+                  </RevealItem>
+                ))}
+              </RevealGroup>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <CTASection />
+</Base>

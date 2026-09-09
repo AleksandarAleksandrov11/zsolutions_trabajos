@@ -1,0 +1,21 @@
+---
+import type { JsonLdObjeto } from "@/lib/schema";
+
+type Props = { datos: JsonLdObjeto | JsonLdObjeto[] };
+
+const { datos } = Astro.props;
+const lista = Array.isArray(datos) ? datos : [datos];
+
+/* El contenido procede exclusivamente de `src/content/`, nunca de entrada de
+   usuario, y se serializa escapando `<` para evitar cualquier cierre
+   prematuro de la etiqueta script. */
+const bloques = lista.map((objeto) =>
+  JSON.stringify(objeto).replace(/</g, "\\u003c"),
+);
+---
+
+{
+  bloques.map((bloque) => (
+    <script type="application/ld+json" is:inline set:html={bloque} />
+  ))
+}

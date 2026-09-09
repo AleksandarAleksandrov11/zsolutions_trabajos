@@ -1,0 +1,76 @@
+---
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import {
+  certificacionesPorGrupo,
+  gruposCertificacion,
+} from "@/content/certificaciones";
+
+type Props = {
+  numero?: string;
+  /** En la home se muestra compacto; en Sobre Alex, con el detalle completo. */
+  detallado?: boolean;
+  titulo?: string;
+  descripcion?: string;
+};
+
+const {
+  numero = "04",
+  detallado = false,
+  titulo = "Certificaciones y formación",
+  descripcion = "Más de diez años formándome en el sector. Las habilitaciones oficiales no son un adorno del presupuesto: son lo que permite ejecutar, firmar y legalizar una instalación.",
+} = Astro.props;
+---
+
+<section class="relative py-section" aria-labelledby="titulo-certificaciones" id="certificaciones">
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow="Acreditaciones"
+      tituloId="titulo-certificaciones"
+      titulo={titulo}
+      descripcion={descripcion}
+    />
+
+    <div class="mt-14 flex flex-col gap-10">
+      {
+        gruposCertificacion.map((grupo) => (
+          <div>
+            <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+              <h3 class="text-eyebrow text-brand-orange">{grupo.titulo}</h3>
+              {detallado ? (
+                <p class="max-w-xl text-sm text-fg-muted/70 sm:text-right">
+                  {grupo.descripcion}
+                </p>
+              ) : null}
+            </div>
+
+            <RevealGroup
+              as="ul"
+              stagger={0.05}
+              class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              {certificacionesPorGrupo(grupo.id).map((certificacion) => (
+                <RevealItem
+                  as="li"
+                  class="flex flex-col gap-2 rounded-[2px] border border-white/10 bg-surface/40 p-5 transition-colors hover:border-brand-blue/50"
+                >
+                  <span class="font-display text-xs tracking-wider text-brand-blue">
+                    {certificacion.siglas}
+                  </span>
+                  <span class="text-sm font-bold text-fg">{certificacion.nombre}</span>
+                  {detallado ? (
+                    <span class="mt-1 text-xs leading-relaxed text-fg-muted/80">
+                      {certificacion.detalle}
+                    </span>
+                  ) : null}
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

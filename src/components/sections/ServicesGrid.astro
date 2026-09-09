@@ -1,0 +1,60 @@
+---
+import { ArrowUpRight } from "lucide-react";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import { ServiceIcon } from "@/components/ui/ServiceIcon";
+import { serviciosHome } from "@/content/servicios";
+import { numeroSeccion } from "@/lib/utils";
+
+type Props = { numero?: string };
+const { numero = "01" } = Astro.props;
+---
+
+<section class="py-section" aria-labelledby="titulo-servicios">
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow="Qué hago"
+      tituloId="titulo-servicios"
+      titulo="Seis oficios, un solo responsable"
+      descripcion="Cada uno con su habilitación en regla. Cuando un trabajo toca dos disciplinas, no hay que coordinar a dos empresas ni esperar a que se pongan de acuerdo."
+    />
+
+    <RevealGroup
+      as="ul"
+      class="mt-14 grid gap-px overflow-hidden rounded-[2px] border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      {
+        serviciosHome.map((servicio, i) => (
+          <RevealItem as="li" class="bg-bg">
+            <a
+              href={`/servicios/${servicio.slug}`}
+              class="barrido-z group flex h-full flex-col justify-between gap-8 p-7 transition-colors duration-300 hover:bg-surface/60 sm:p-8"
+            >
+              <div>
+                <div class="flex items-start justify-between gap-4">
+                  <span class="inline-flex h-12 w-12 items-center justify-center rounded-[2px] border border-white/12 bg-white/[0.03] text-brand-blue transition-colors duration-300 group-hover:border-brand-blue/60 group-hover:text-fg">
+                    <ServiceIcon nombre={servicio.icono} className="h-6 w-6" />
+                  </span>
+                  <span class="num-seccion pt-1">{numeroSeccion(i)}</span>
+                </div>
+
+                <h3 class="mt-7 text-2xl">{servicio.nombre}</h3>
+                <p class="mt-3 text-sm text-fg-muted">{servicio.resumenHome}</p>
+              </div>
+
+              <span class="text-eyebrow flex items-center gap-2 text-fg-muted/60 transition-colors group-hover:text-brand-orange">
+                Ver servicio
+                <ArrowUpRight
+                  className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  aria-hidden="true"
+                />
+              </span>
+            </a>
+          </RevealItem>
+        ))
+      }
+    </RevealGroup>
+  </div>
+</section>

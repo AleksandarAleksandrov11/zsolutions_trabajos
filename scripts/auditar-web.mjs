@@ -3,8 +3,9 @@
  * Uso: node scripts/auditar-web.mjs [baseUrl]
  */
 import { chromium } from "playwright";
+import { redirecciones } from "../src/content/redirecciones.ts";
 
-const BASE = process.argv[2] ?? "http://127.0.0.1:3210";
+const BASE = process.argv[2] ?? "http://127.0.0.1:4321";
 
 const RUTAS = [
   "/",
@@ -166,24 +167,28 @@ console.log("\n=== ESTRUCTURA Y ACCESIBILIDAD ===");
 /* ---- 4 · Redirecciones permanentes ---- */
 console.log("\n=== REDIRECCIONES ===");
 {
-  const esperadas = [
-    ["/presupuesto", "/contacto"],
-    ["/sobre-mi", "/sobre-alex"],
-    ["/servicios/lampista", "/servicios/lampisteria"],
-    ["/servicios/aire-acondicionado", "/servicios/climatizacion"],
-    ["/servicios/trabajos-en-altura", "/servicios/trabajos-verticales"],
-    ["/zonas/hospitalet", "/zonas/hospitalet-de-llobregat"],
-  ];
+  /* En producción las resuelve Vercel con un 301 antes de tocar disco; en
+     local y en preview lo que hay es la página de reenvío que genera Astro.
+     Las dos formas son válidas, así que se aceptan las dos. */
+  for (const { desde, hacia } of redirecciones) {
+    const res = await fetch(BASE + desde, { redirect: "manual" });
+    const cabecera = res.headers.get("location") ?? "";
 
-  for (const [origen, destino] of esperadas) {
-    const res = await fetch(BASE + origen, { redirect: "manual" });
-    const destinoReal = res.headers.get("location") ?? "";
-    const ok = res.status === 308 && destinoReal.endsWith(destino);
-    if (!ok) {
-      console.log(`✗ ${origen} → ${res.status} ${destinoReal}`);
-      fallos++;
+    let ok = res.status >= 300 && res.status < 400 && cabecera.endsWith(hacia);
+    let via = `${res.status} → ${cabecera}`;
+
+    if (!ok && res.status === 200) {
+      const html = await res.text();
+      const destino = html.match(/http-equiv="refresh"[^>]*url=([^"']+)/i)?.[1];
+      ok = destino === hacia;
+      via = `página de reenvío → ${destino ?? "?"}`;
+    }
+
+    if (ok) {
+      console.log(`✓ ${desde} → ${hacia}  (${via})`);
     } else {
-      console.log(`✓ ${origen} → ${destino} (308)`);
+      console.log(`✗ ${desde} → ${via}`);
+      fallos++;
     }
   }
 }
