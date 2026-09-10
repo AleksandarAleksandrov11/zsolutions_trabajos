@@ -105,7 +105,7 @@ export const ES_INDEXABLE = (() => {
  *
  * Si a una página no se le pasa la suya, cae en la de marca.
  */
-export function urlOg(ruta = "/og.png"): string {
+export function urlOg(ruta = "/og.jpg"): string {
   return `${BASE_URL}${ruta}`;
 }
 

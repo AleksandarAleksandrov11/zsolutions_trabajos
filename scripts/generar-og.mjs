@@ -85,7 +85,10 @@ async function componer({ archivo, foto, titulo, pie, posicion = "right top" }) 
       { input: logoPng, top: 96, left: 72 },
       { input: texto, top: 0, left: 0 },
     ])
-    .png({ compressionLevel: 9 })
+    /* JPEG y no PNG: son fotografías, y en PNG cada miniatura pesaba medio
+       mega. En JPEG bajan a una quinta parte y ninguna red social nota la
+       diferencia. */
+    .jpeg({ quality: 84, mozjpeg: true, progressive: true })
     .toFile(archivo);
 
   console.log(`✓ ${archivo}`);
@@ -95,7 +98,7 @@ await mkdir("public/og", { recursive: true });
 
 /* Portada */
 await componer({
-  archivo: "public/og.png",
+  archivo: "public/og.jpg",
   foto: "alex-cubierta-barcelona",
   titulo: "Instalaciones certificadas en Barcelona",
   pie: "Electricidad · Fontanería · Clima · Aerotermia · Verticales",
@@ -104,7 +107,7 @@ await componer({
 /* Una por servicio, con la foto de su propia página */
 for (const servicio of servicios) {
   await componer({
-    archivo: `public/og/servicios-${servicio.slug}.png`,
+    archivo: `public/og/servicios-${servicio.slug}.jpg`,
     foto: servicio.foto.nombre,
     titulo: servicio.nombre,
     pie: "ZSolutions · Barcelona y área metropolitana",
@@ -115,7 +118,7 @@ for (const servicio of servicios) {
 /* Una por agrupación de zona publicada */
 for (const zona of agrupaciones.filter((a) => a.publicada)) {
   await componer({
-    archivo: `public/og/zonas-${zona.slug}.png`,
+    archivo: `public/og/zonas-${zona.slug}.jpg`,
     foto: "alex-cubierta-barcelona",
     titulo: zona.nombre,
     pie: "Instalador certificado · ZSolutions",
@@ -124,10 +127,10 @@ for (const zona of agrupaciones.filter((a) => a.publicada)) {
 
 /* Y las páginas sueltas */
 const sueltas = [
-  { archivo: "public/og/proyectos.png", foto: "obra-electricidad", titulo: "Trabajos realizados", pie: "Electricidad, agua, clima y altura", posicion: "centre" },
-  { archivo: "public/og/sobre-alex.png", foto: "alex-retrato-obra", titulo: "Alex Zsurzs, instalador certificado", pie: "De peón de obra a instalador certificado", posicion: "centre" },
-  { archivo: "public/og/contacto.png", foto: "alex-espacio-confinado", titulo: "Pide tu presupuesto", pie: "Respuesta en menos de 24 horas", posicion: "centre" },
-  { archivo: "public/og/servicios.png", foto: "obra-herramientas", titulo: "Seis oficios, un solo responsable", pie: "ZSolutions · Barcelona", posicion: "centre" },
-  { archivo: "public/og/zonas.png", foto: "alex-cubierta-barcelona", titulo: "Dónde trabajo", pie: "Barcelona, área metropolitana y Cataluña" },
+  { archivo: "public/og/proyectos.jpg", foto: "obra-electricidad", titulo: "Trabajos realizados", pie: "Electricidad, agua, clima y altura", posicion: "centre" },
+  { archivo: "public/og/sobre-alex.jpg", foto: "alex-retrato-obra", titulo: "Alex Zsurzs, instalador certificado", pie: "De peón de obra a instalador certificado", posicion: "centre" },
+  { archivo: "public/og/contacto.jpg", foto: "alex-espacio-confinado", titulo: "Pide tu presupuesto", pie: "Respuesta en menos de 24 horas", posicion: "centre" },
+  { archivo: "public/og/servicios.jpg", foto: "obra-herramientas", titulo: "Seis oficios, un solo responsable", pie: "ZSolutions · Barcelona", posicion: "centre" },
+  { archivo: "public/og/zonas.jpg", foto: "alex-cubierta-barcelona", titulo: "Dónde trabajo", pie: "Barcelona, área metropolitana y Cataluña" },
 ];
 for (const s of sueltas) await componer(s);
