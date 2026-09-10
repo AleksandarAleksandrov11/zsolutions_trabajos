@@ -17,8 +17,8 @@ import { schemaFaq, schemaMigas } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { servicios } from "@/content/servicios";
 import { procesoGeneral } from "@/content/proceso";
-import { fotos } from "@/content/fotos";
 import { faqHome } from "@/content/faq";
+import { fondoCss } from "@/lib/fondos";
 
 const migas = [{ label: "Servicios", href: "/servicios" }];
 
@@ -30,13 +30,13 @@ const meta = crearMetadata({
   og: "/og/servicios.jpg",
 });
 
-const fondo = fotos["textura-hormigon"];
+const nombreFondo = "textura-hormigon" as const;
 ---
 
 <Base meta={meta} schema={[schemaFaq(faqHome), schemaMigas(migas)]}>
   <header
     class="seccion-foto pt-32 pb-16 sm:pt-40 sm:pb-20"
-    style={`--foto: url("${fondo.src}")`}
+    style={`--foto: ${fondoCss(nombreFondo)}`}
   >
     <div class="container-brand">
       <Breadcrumbs migas={migas} />

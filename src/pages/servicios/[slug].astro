@@ -22,7 +22,7 @@ import Comparador from "@/components/sections/Comparador.astro";
 import { comparativaDe } from "@/content/comparativas";
 import CintaConfianza from "@/components/sections/CintaConfianza.astro";
 import Sectores from "@/components/sections/Sectores.astro";
-import { fotos } from "@/content/fotos";
+import { fondoCss } from "@/lib/fondos";
 
 /* Conjunto cerrado de slugs: se generan todas sus páginas en la compilación y
    cualquier otra dirección da 404. */
@@ -65,7 +65,7 @@ const comparativa = comparativaDe(servicio.slug);
       sitúa de qué se está hablando antes de leer una palabra. */}
   <header
     class="seccion-foto pt-32 pb-14 sm:pt-40 sm:pb-20"
-    style={`--foto: url("${fotos[servicio.foto.nombre].src}")`}
+    style={`--foto: ${fondoCss(servicio.foto.nombre)}`}
   >
     <div class="container-brand">
       <Breadcrumbs migas={migas} />

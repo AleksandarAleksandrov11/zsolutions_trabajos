@@ -47,7 +47,7 @@ const pruebas = [
 >
   {/* Fondo decorativo: el bloque entero es `aria-hidden`, así que la foto va
       con `alt` vacío a propósito. Lo que cuenta el héroe lo dice el titular. */}
-  <div class="absolute inset-0 -z-10" aria-hidden="true">
+  <div class="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true" data-parallax>
     <Foto
       nombre={foto}
       alt=""
@@ -111,3 +111,42 @@ const pruebas = [
     </ul>
   </div>
 </section>
+
+<script>
+  /* Parallax del héroe.
+     La foto sube a un tercio de la velocidad del scroll. Es un detalle
+     pequeño y por eso se hace barato: una variable CSS actualizada en
+     `requestAnimationFrame`, y solo mientras el héroe está en pantalla.
+     Con movimiento reducido no se activa, y en móvil tampoco: ahí el coste
+     de repintar no compensa. */
+  const capa = document.querySelector<HTMLElement>("[data-parallax]");
+  const permitido =
+    capa &&
+    window.matchMedia("(min-width: 64rem)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (permitido) {
+    const foto = capa.querySelector<HTMLElement>("picture, img");
+    if (foto) {
+      foto.style.willChange = "transform";
+      let pendiente = false;
+
+      const mover = () => {
+        pendiente = false;
+        const alto = capa.offsetHeight;
+        const y = window.scrollY;
+        if (y > alto) return;
+        foto.style.transform = `translate3d(0, ${(y * 0.3).toFixed(1)}px, 0) scale(1.12)`;
+      };
+
+      const alScroll = () => {
+        if (pendiente) return;
+        pendiente = true;
+        requestAnimationFrame(mover);
+      };
+
+      mover();
+      window.addEventListener("scroll", alScroll, { passive: true });
+    }
+  }
+</script>

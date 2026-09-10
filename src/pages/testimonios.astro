@@ -12,7 +12,7 @@ import CTASection from "@/components/sections/CTASection.astro";
 import { schemaMigas } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { testimonios } from "@/content/testimonios";
-import { fotos } from "@/content/fotos";
+import { fondoCss } from "@/lib/fondos";
 
 /*
  * Página de opiniones.
@@ -35,13 +35,13 @@ const meta = crearMetadata({
 });
 
 const inicial = (autor: string) => autor.trim().charAt(0).toUpperCase();
-const fondo = fotos["fondo-bloques"];
+const nombreFondo = "fondo-bloques" as const;
 ---
 
 <Base meta={meta} schema={schemaMigas(migas)}>
   <header
     class="seccion-foto pt-32 pb-16 sm:pt-40 sm:pb-20"
-    style={`--foto: url("${fondo.src}")`}
+    style={`--foto: ${fondoCss(nombreFondo)}`}
   >
     <div class="container-brand">
       <Breadcrumbs migas={migas} />
@@ -86,7 +86,7 @@ const fondo = fotos["fondo-bloques"];
                   </span>
                 </div>
 
-                <div class="mt-5 flex gap-0.5" aria-label="Valoración de cinco sobre cinco">
+                <div class="mt-5 flex gap-0.5" role="img" aria-label="Valoración de cinco sobre cinco">
                   {[0, 1, 2, 3, 4].map(() => (
                     <Star className="h-4 w-4 fill-brand-orange text-brand-orange" aria-hidden="true" />
                   ))}

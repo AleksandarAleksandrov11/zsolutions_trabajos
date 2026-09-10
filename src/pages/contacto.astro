@@ -21,7 +21,7 @@ import {
 } from "@/content/site";
 import { procesoGeneral } from "@/content/proceso";
 import { faqContacto } from "@/content/faq";
-import { fotos } from "@/content/fotos";
+import { fondoCss } from "@/lib/fondos";
 
 const migas = [{ label: "Contacto", href: "/contacto" }];
 
@@ -62,13 +62,13 @@ const vias = [
   },
 ];
 
-const fondo = fotos["fondo-fachadas"];
+const nombreFondo = "fondo-fachadas" as const;
 ---
 
 <Base meta={meta} schema={[schemaFaq(faqContacto), schemaMigas(migas)]}>
   <header
     class="seccion-foto seccion-foto-azul pt-32 pb-16 sm:pt-40 sm:pb-20"
-    style={`--foto: url("${fondo.src}"); --foto-posicion: center bottom`}
+    style={`--foto: ${fondoCss(nombreFondo)}; --foto-posicion: center bottom`}
   >
     <div class="container-brand">
       <Breadcrumbs migas={migas} />

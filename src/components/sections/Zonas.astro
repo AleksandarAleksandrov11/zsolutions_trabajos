@@ -7,19 +7,19 @@ import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import MapaZonas from "@/components/sections/MapaZonas.astro";
 import { agrupaciones, zonas } from "@/content/zonas";
-import { fotos } from "@/content/fotos";
 import { secciones } from "@/content/secciones";
+import { fondoCss } from "@/lib/fondos";
 
 type Props = { numero?: string };
 const { numero = "06" } = Astro.props;
 
 const publicadas = agrupaciones.filter((a) => a.publicada);
-const fondo = fotos["fondo-fachadas"];
+const nombreFondo = "fondo-fachadas" as const;
 ---
 
 <section
   class="seccion-foto py-section"
-  style={`--foto: url("${fondo.src}"); --foto-posicion: center bottom`}
+  style={`--foto: ${fondoCss(nombreFondo)}; --foto-posicion: center bottom`}
   aria-labelledby="titulo-zonas"
 >
   <div class="container-brand">

@@ -4,8 +4,8 @@ import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import { ArrowRight } from "lucide-react";
-import { fotos } from "@/content/fotos";
 import { secciones } from "@/content/secciones";
+import { fondoCss } from "@/lib/fondos";
 
 type Props = { numero?: string };
 const { numero = "03" } = Astro.props;
@@ -33,12 +33,12 @@ const razones = [
   },
 ];
 
-const fondo = fotos["textura-hormigon"];
+const nombreFondo = "textura-hormigon" as const;
 ---
 
 <section
   class="seccion-foto py-section"
-  style={`--foto: url("${fondo.src}"); --foto-posicion: center`}
+  style={`--foto: ${fondoCss(nombreFondo)}; --foto-posicion: center`}
   aria-labelledby="titulo-porque"
 >
   <div class="container-brand">
