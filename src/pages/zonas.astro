@@ -10,7 +10,8 @@ import CTASection from "@/components/sections/CTASection.astro";
 import { schemaMigas } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { agrupaciones, agrupacionDe, hrefZona, zonas, zonasPorComarca } from "@/content/zonas";
-import { site } from "@/content/site";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import { hrefWhatsApp, mensajeWhatsApp, site } from "@/content/site";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
 
 const migas = [{ label: "Zonas", href: "/zonas" }];
@@ -36,6 +37,15 @@ const meta = crearMetadata({
         igualmente: para un aviso corto muy lejos te diré con franqueza si te conviene
         alguien más cercano.
       </p>
+
+      <div class="mt-9 flex flex-wrap gap-3">
+        <EnlaceBoton href="/contacto" tamano="lg" data-evento="presupuesto_cta">
+          Solicitar presupuesto
+        </EnlaceBoton>
+        <EnlaceBoton href={hrefWhatsApp(mensajeWhatsApp)} variante="secundario" tamano="lg">
+          WhatsApp
+        </EnlaceBoton>
+      </div>
     </div>
   </header>
 
