@@ -352,9 +352,6 @@
     background-image: var(--foto);
     background-size: cover;
     background-position: var(--foto-posicion, center);
-    /* Fijo en escritorio para que la sección se sienta como una ventana.
-       En móvil `fixed` va mal en varios navegadores, así que se desactiva. */
-    background-attachment: var(--foto-anclaje, scroll);
   }
 
   .seccion-foto::after {
@@ -376,10 +373,6 @@
       color-mix(in srgb, var(--color-brand-blue-deep) 94%, transparent),
       color-mix(in srgb, var(--color-brand-blue-deep) 80%, transparent)
     );
-  }
-
-  @media (width >= 64rem) and (prefers-reduced-motion: no-preference) {
-    .seccion-foto { --foto-anclaje: fixed; }
   }
 
   /* Textura de retícula técnica, muy tenue, para romper los planos lisos. */
