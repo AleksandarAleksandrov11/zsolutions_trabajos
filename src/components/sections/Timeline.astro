@@ -6,6 +6,12 @@ import { trayectoria } from "@/content/trayectoria";
 
 type Props = { numero?: string };
 const { numero = "02" } = Astro.props;
+
+/*
+ * La línea de progreso se rellena con el scroll. Se dibuja con un degradado
+ * cuyo corte lo mueve una única variable, `--avance`, que actualiza el script
+ * de abajo: nada de un nodo por hito ni de medir alturas en cada fotograma.
+ */
 ---
 
 <section class="seccion-alterna py-section" aria-labelledby="titulo-trayectoria">
@@ -17,21 +23,54 @@ const { numero = "02" } = Astro.props;
       titulo="De peón de obra a instalador certificado"
     />
 
-    <RevealGroup as="ol" class="mt-12" stagger={0.06}>
-      {
-        trayectoria.map((hito) => (
-          <RevealItem
-            as="li"
-            class="hairline-t grid gap-3 py-7 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-10"
-          >
-            <span class="font-display text-2xl text-brand-orange">{hito.anio}</span>
-            <div>
-              <h3 class="text-xl">{hito.titulo}</h3>
-              <p class="mt-2 max-w-2xl text-fg-muted">{hito.detalle}</p>
-            </div>
-          </RevealItem>
-        ))
-      }
-    </RevealGroup>
+    <div class="relative mt-12 pl-6 sm:pl-8" data-trayectoria>
+      <span class="linea-trayectoria" aria-hidden="true"></span>
+
+      <RevealGroup as="ol" stagger={0.06}>
+        {
+          trayectoria.map((hito) => (
+            <RevealItem
+              as="li"
+              class="hairline-t grid gap-3 py-7 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-10"
+            >
+              <span class="font-display text-2xl text-brand-orange">{hito.anio}</span>
+              <div>
+                <h3 class="text-xl">{hito.titulo}</h3>
+                <p class="mt-2 max-w-2xl text-fg-muted">{hito.detalle}</p>
+              </div>
+            </RevealItem>
+          ))
+        }
+      </RevealGroup>
+    </div>
   </div>
 </section>
+
+<script>
+  const bloque = document.querySelector<HTMLElement>("[data-trayectoria]");
+  if (bloque && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    let pendiente = false;
+
+    const calcular = () => {
+      pendiente = false;
+      const r = bloque.getBoundingClientRect();
+      const alto = window.innerHeight;
+      /* 0 cuando el bloque asoma por abajo, 1 cuando su final cruza la mitad
+         de la ventana. Acotado, para que no se pase de ninguno de los dos
+         extremos al llegar al final de la página. */
+      const recorrido = r.height + alto * 0.5;
+      const avance = (alto - r.top - alto * 0.5) / recorrido;
+      bloque.style.setProperty("--avance", `${Math.min(Math.max(avance, 0), 1) * 100}%`);
+    };
+
+    const alScroll = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(calcular);
+    };
+
+    calcular();
+    window.addEventListener("scroll", alScroll, { passive: true });
+    window.addEventListener("resize", alScroll, { passive: true });
+  }
+</script>

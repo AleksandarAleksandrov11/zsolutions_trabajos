@@ -249,6 +249,96 @@ export const siluetaCataluna = {
  * Helpers
  * ----------------------------------------------------------------- */
 
+/**
+ * Agrupaciones de zona con página propia.
+ *
+ * No hay una página por municipio: veintiuna páginas competirían entre ellas
+ * por las mismas búsquedas. Se agrupan por comarca o conurbación, que es como
+ * se busca de verdad («electricista Baix Llobregat»), y solo se publica la
+ * agrupación que tenga algo propio que contar.
+ *
+ * `publicada: false` significa que la agrupación existe como concepto pero
+ * todavía no tiene página: sus municipios enlazan al listado de `/zonas`.
+ */
+export type Agrupacion = {
+  slug: string;
+  nombre: string;
+  /** Titular y descripción de la página, cuando la haya. */
+  titulo: string;
+  entradilla: string;
+  /** Municipios que la componen, por `slug` de zona. */
+  municipios: string[];
+  publicada: boolean;
+};
+
+export const agrupaciones: Agrupacion[] = [
+  {
+    slug: "barcelona-ciudad",
+    nombre: "Barcelona ciudad",
+    titulo: "Electricista y lampista en Barcelona ciudad",
+    entradilla:
+      "Los diez distritos, con el criterio que exige cada tipo de finca: del Eixample con patio de luces al bloque de los sesenta de Nou Barris.",
+    municipios: ["barcelona"],
+    publicada: false,
+  },
+  {
+    slug: "barcelones-nord",
+    nombre: "Barcelonès Nord",
+    titulo: "Instalaciones en el Barcelonès Nord",
+    entradilla:
+      "Badalona, Santa Coloma i Sant Adrià: bloque denso, mucha instalación de origen y comunidades con servicios generales que hay que poner al día.",
+    municipios: ["badalona", "santa-coloma-de-gramenet", "sant-adria-de-besos"],
+    publicada: false,
+  },
+  {
+    slug: "baix-llobregat",
+    nombre: "Baix Llobregat",
+    titulo: "Electricista y lampista en el Baix Llobregat",
+    entradilla:
+      "De L'Hospitalet a Castelldefels: vivienda de superficie, polígono y litoral, cada uno con su tipo de instalación.",
+    municipios: [
+      "hospitalet-de-llobregat",
+      "cornella-de-llobregat",
+      "sant-boi-de-llobregat",
+      "esplugues-de-llobregat",
+      "el-prat-de-llobregat",
+      "castelldefels",
+    ],
+    publicada: false,
+  },
+  {
+    slug: "valles-occidental",
+    nombre: "Vallès Occidental",
+    titulo: "Instalaciones en el Vallès Occidental",
+    entradilla:
+      "Sant Cugat, Cerdanyola, Sabadell i Terrassa: casa unifamiliar, nave industrial y casco antiguo en la misma comarca.",
+    municipios: [
+      "sant-cugat-del-valles",
+      "cerdanyola-del-valles",
+      "sabadell",
+      "terrassa",
+    ],
+    publicada: false,
+  },
+];
+
+/** Agrupación a la que pertenece un municipio, si está en alguna. */
+export function agrupacionDe(slugZona: string): Agrupacion | undefined {
+  return agrupaciones.find((a) => a.municipios.includes(slugZona));
+}
+
+/**
+ * A dónde lleva un municipio.
+ *
+ * Si su agrupación ya tiene página, allí. Si no, al ancla del listado de
+ * `/zonas`, que siempre existe. Así el mapa y los listados nunca enlazan a una
+ * página que todavía no está escrita.
+ */
+export function hrefZona(zona: Zona): string {
+  const grupo = agrupacionDe(zona.slug);
+  return grupo?.publicada ? `/zonas/${grupo.slug}` : `/zonas#zona-${zona.slug}`;
+}
+
 export const zonasDestacadas = zonas.filter((z) => z.destacada);
 
 /** Zonas agrupadas por comarca, para el listado y el pie de página. */

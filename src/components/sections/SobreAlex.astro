@@ -6,20 +6,11 @@ import Reveal from "@/components/ui/Reveal.astro";
 import AnimatedCounter from "@/components/ui/AnimatedCounter.astro";
 import Foto from "@/components/ui/Foto.astro";
 import { bioAlex } from "@/content/trayectoria";
-import { certificaciones } from "@/content/certificaciones";
 import { site } from "@/content/site";
+import { cifrasPortada } from "@/content/cifras";
 
 type Props = { numero?: string };
 const { numero = "04" } = Astro.props;
-
-const ANIO_INICIO = 2012;
-const anios = new Date().getFullYear() - ANIO_INICIO;
-
-const cifras = [
-  { valor: anios, sufijo: "", etiqueta: "años en obra" },
-  { valor: certificaciones.length, sufijo: "", etiqueta: "acreditaciones" },
-  { valor: 24, sufijo: " h", etiqueta: "para responderte" },
-];
 ---
 
 <section class="seccion-alterna py-section" aria-labelledby="titulo-alex">
@@ -48,9 +39,9 @@ const cifras = [
 
         <dl class="mt-10 grid grid-cols-3 gap-4">
           {
-            cifras.map((c) => (
+            cifrasPortada.map((c) => (
               <div class="tarjeta p-5">
-                <dd class="font-display text-3xl">
+                <dd class="font-display text-3xl text-brand-orange">
                   <AnimatedCounter valor={c.valor} sufijo={c.sufijo} />
                 </dd>
                 <dt class="mt-1.5 text-xs text-fg-dim">{c.etiqueta}</dt>

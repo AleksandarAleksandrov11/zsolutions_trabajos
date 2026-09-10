@@ -327,6 +327,267 @@
     color: var(--color-n-0);
   }
 
+  /* Carrusel.
+     El desplazamiento y el encaje los hace el navegador con `scroll-snap`;
+     el script solo añade botones e indicadores. Sin JavaScript sigue siendo
+     una tira deslizable con los ocho testimonios accesibles. */
+  .carrusel {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 86%;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    /* La barra de desplazamiento se oculta: los mandos y el arrastre ya
+       indican que hay más. */
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+  }
+
+  .carrusel::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (width >= 48rem) {
+    .carrusel { grid-auto-columns: calc(50% - 0.5rem); }
+  }
+
+  @media (width >= 72rem) {
+    .carrusel { grid-auto-columns: calc(33.333% - 0.667rem); }
+  }
+
+  .carrusel-diapo {
+    scroll-snap-align: start;
+    height: 100%;
+  }
+
+  .boton-carrusel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    color: var(--color-fg);
+    cursor: pointer;
+    transition:
+      border-color 0.2s var(--ease-brand),
+      background-color 0.2s var(--ease-brand);
+  }
+
+  @media (hover: hover) {
+    .boton-carrusel:hover {
+      border-color: var(--color-brand-blue);
+      background-color: color-mix(in srgb, var(--color-fg) 6%, transparent);
+    }
+  }
+
+  /* Un solo botón para pausar y reanudar: se enseña el icono que toca. */
+  .boton-carrusel .icono-play { display: none; }
+  .boton-carrusel[aria-pressed="false"] .icono-pausa { display: none; }
+  .boton-carrusel[aria-pressed="false"] .icono-play { display: block; }
+
+  /* Indicadores. El activo es el acento naranja; sobre claro pasa a azul,
+     porque el naranja sobre #F4F4F5 se queda en 2,4:1. */
+  .punto-carrusel {
+    /* 44 px de lado: ocho caben en 352 px, así que entran en la pantalla más
+       estrecha que se contempla (360 px) sin separación entre ellos. */
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .punto-carrusel::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0.5rem;
+    top: 50%;
+    height: 3px;
+    border-radius: 3px;
+    translate: 0 -50%;
+    background-color: var(--color-line);
+    transition: background-color 0.25s var(--ease-brand);
+  }
+
+  .punto-carrusel[aria-current="true"]::after {
+    background-color: var(--color-brand-orange);
+  }
+
+  .seccion-clara .punto-carrusel[aria-current="true"]::after {
+    background-color: var(--color-brand-blue);
+  }
+
+  /* Chip de filtro. El activo va en azul relleno, que es el papel del azul
+     en este sistema: superficie, no color de texto sobre oscuro. */
+  .chip-filtro {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-fg-muted);
+    background-color: transparent;
+    cursor: pointer;
+    transition:
+      background-color 0.2s var(--ease-brand),
+      border-color 0.2s var(--ease-brand),
+      color 0.2s var(--ease-brand);
+  }
+
+  .chip-filtro[aria-pressed="true"] {
+    background-color: var(--color-brand-blue);
+    border-color: var(--color-brand-blue);
+    color: var(--color-n-0);
+  }
+
+  @media (hover: hover) {
+    .chip-filtro:hover {
+      border-color: var(--color-fg-dim);
+      color: var(--color-fg);
+    }
+
+    .chip-filtro[aria-pressed="true"]:hover {
+      background-color: var(--color-brand-blue-hover);
+      border-color: var(--color-brand-blue-hover);
+      color: var(--color-n-0);
+    }
+  }
+
+  /* Galería en mampostería.
+     `columns` reparte las tarjetas por altura real sin JavaScript, que es lo
+     que hace que un mosaico se vea mosaico. `break-inside: avoid` impide que
+     una tarjeta se parta entre dos columnas. */
+  .galeria-trabajos {
+    columns: 1;
+    column-gap: 1rem;
+  }
+
+  @media (width >= 40rem) {
+    .galeria-trabajos { columns: 2; }
+  }
+
+  @media (width >= 64rem) {
+    .galeria-trabajos { columns: 3; }
+  }
+
+  .galeria-item {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+    /* La transición de entrada y salida al filtrar. La posición la recoloca
+       el propio `columns`, así que aquí solo hay que suavizar la aparición. */
+    transition:
+      opacity 0.28s var(--ease-brand),
+      transform 0.28s var(--ease-brand);
+  }
+
+  .galeria-item[data-filtrado] {
+    display: none;
+  }
+
+  /* Mapa de zonas navegable. El punto crece y se pone naranja al señalarlo,
+     y su etiqueta pasa a blanco. `paint-order` evita que el trazo se coma el
+     relleno cuando el punto es de 2 px. */
+  .punto-zona {
+    cursor: pointer;
+  }
+
+  .punto-zona-marca {
+    transition:
+      r 0.2s var(--ease-brand),
+      fill 0.2s var(--ease-brand),
+      opacity 0.2s var(--ease-brand);
+  }
+
+  .punto-zona.senalada .punto-zona-marca {
+    r: 6;
+    fill: var(--color-brand-orange);
+    opacity: 1;
+  }
+
+  .etiqueta-zona {
+    transition: fill 0.2s var(--ease-brand);
+  }
+
+  .etiqueta-zona.senalada {
+    fill: var(--color-n-0);
+  }
+
+  /* El anillo de foco del navegador no se ve bien sobre un SVG, así que el
+     punto enfocado se marca además con su propio halo. */
+  .punto-zona:focus-visible {
+    outline: none;
+  }
+
+  .punto-zona:focus-visible .punto-zona-marca {
+    r: 6;
+    fill: var(--color-brand-orange);
+    stroke: var(--color-n-0);
+    stroke-width: 2;
+  }
+
+  [data-fila-zona].senalada {
+    border-color: var(--color-brand-orange);
+  }
+
+  /* Línea de la trayectoria: el tramo recorrido va en naranja y el que
+     queda, en el gris de las líneas. Sin JavaScript se queda al 0 %, que es
+     una línea gris normal y corriente. */
+  .linea-trayectoria {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to bottom,
+      var(--color-brand-orange) 0,
+      var(--color-brand-orange) var(--avance, 0%),
+      var(--color-line) var(--avance, 0%),
+      var(--color-line) 100%
+    );
+  }
+
+  /* Detalle del carnet: colapsado con `grid-template-rows`, que es lo único
+     que anima una altura desconocida sin fijarla a mano. */
+  .detalle-carnet {
+    display: grid;
+    grid-template-rows: 0fr;
+    margin-top: 0;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.3s var(--ease-brand),
+      opacity 0.3s var(--ease-brand),
+      margin-top 0.3s var(--ease-brand);
+  }
+
+  .detalle-carnet > span {
+    overflow: hidden;
+  }
+
+  .tarjeta:focus-within .detalle-carnet {
+    grid-template-rows: 1fr;
+    margin-top: 0.25rem;
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .tarjeta:hover .detalle-carnet {
+      grid-template-rows: 1fr;
+      margin-top: 0.25rem;
+      opacity: 1;
+    }
+  }
+
   /* Filete de acento junto a la numeración de sección. */
   .regla-acento {
     display: inline-block;

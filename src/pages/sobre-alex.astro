@@ -13,6 +13,7 @@ import { crearMetadata } from "@/lib/seo";
 import { bioAlex } from "@/content/trayectoria";
 import { barraConfianza, site } from "@/content/site";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
+import Contadores from "@/components/sections/Contadores.astro";
 
 const migas = [{ label: "Sobre Alex", href: "/sobre-alex" }];
 
@@ -140,14 +141,26 @@ const meta = crearMetadata({
     </div>
   </section>
 
+  <section class="py-section" aria-labelledby="titulo-cifras">
+    <div class="container-brand">
+      <SectionHeading
+        numero="02"
+        eyebrow="En números"
+        tituloId="titulo-cifras"
+        titulo="La trayectoria, en cuatro cifras"
+      />
+      <Contadores class="mt-12" />
+    </div>
+  </section>
+
   <BandaContacto />
 
-  <Timeline numero="02" />
+  <Timeline numero="03" />
 
   <BandaContacto claim="Si prefieres hablarlo antes de rellenar nada, llámame o escríbeme." />
 
   <Certifications
-    numero="03"
+    numero="04"
     detallado
     titulo="Certificaciones y formación profesional"
     descripcion="Más de diez años formándome en el sector. Cada acreditación con lo que realmente habilita a hacer."

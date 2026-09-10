@@ -1,0 +1,41 @@
+---
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import AnimatedCounter from "@/components/ui/AnimatedCounter.astro";
+import { cifras, type Cifra } from "@/content/cifras";
+
+type Props = {
+  /** Por defecto salen las cuatro. */
+  lista?: Cifra[];
+  class?: string;
+};
+
+const { lista = cifras, class: clase } = Astro.props;
+
+/**
+ * Muro de cifras.
+ *
+ * La cifra sube desde cero al entrar en pantalla, una sola vez, y el número
+ * final ya está escrito en el HTML: si el JavaScript no llega, se lee igual.
+ */
+---
+
+<RevealGroup
+  as="div"
+  class:list={["grid gap-4 sm:grid-cols-2 lg:grid-cols-4", clase]}
+  stagger={0.06}
+>
+  {
+    lista.map((cifra) => (
+      <RevealItem class="tarjeta flex h-full flex-col p-6">
+        <dl>
+          <dd class="font-display text-4xl text-brand-orange">
+            <AnimatedCounter valor={cifra.valor} sufijo={cifra.sufijo} />
+          </dd>
+          <dt class="text-eyebrow mt-2 text-fg">{cifra.etiqueta}</dt>
+        </dl>
+        <p class="mt-2 text-sm text-fg-dim">{cifra.detalle}</p>
+      </RevealItem>
+    ))
+  }
+</RevealGroup>

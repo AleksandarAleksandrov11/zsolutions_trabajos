@@ -48,14 +48,25 @@ const {
               ]}
             >
               {certificacionesPorGrupo(grupo.id).map((c) => (
-                <RevealItem as="li" class="tarjeta flex flex-col gap-1.5 p-5">
+                <RevealItem
+                  as="li"
+                  class="tarjeta group/carnet flex flex-col gap-1.5 p-5"
+                  tabindex={detallado ? undefined : 0}
+                >
                   <span class="font-display text-xs tracking-wider text-fg">
                     {c.siglas}
                   </span>
                   <span class="text-sm font-bold">{c.nombre}</span>
                   {detallado ? (
                     <span class="mt-1 text-xs leading-relaxed text-fg-dim">{c.detalle}</span>
-                  ) : null}
+                  ) : (
+                    /* En el muro compacto, qué habilita cada carnet se
+                       despliega al pasar por encima o al enfocar con el
+                       teclado. La tarjeta es enfocable justamente para eso. */
+                    <span class="detalle-carnet text-xs leading-relaxed text-fg-dim">
+                      <span class="min-h-0">{c.detalle}</span>
+                    </span>
+                  )}
                 </RevealItem>
               ))}
             </RevealGroup>

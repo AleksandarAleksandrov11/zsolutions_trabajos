@@ -8,7 +8,7 @@ import MapaZonas from "@/components/sections/MapaZonas.astro";
 import CTASection from "@/components/sections/CTASection.astro";
 import { schemaMigas } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
-import { zonas, zonasPorComarca } from "@/content/zonas";
+import { agrupacionDe, hrefZona, zonas, zonasPorComarca } from "@/content/zonas";
 import { site } from "@/content/site";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
 
@@ -43,7 +43,8 @@ const meta = crearMetadata({
         <Reveal class="tarjeta p-5 sm:p-7 lg:sticky lg:top-28">
           <MapaZonas />
           <p class="mt-4 text-xs text-fg-dim">
-            Contorno real de Cataluña. Cada punto está en las coordenadas del municipio.
+            Contorno real de Cataluña. Cada punto está en las coordenadas de su municipio
+            y lleva a su zona.
           </p>
         </Reveal>
 
@@ -59,9 +60,21 @@ const meta = crearMetadata({
                 </h2>
                 <ul class="flex flex-col gap-3">
                   {grupo.zonas.map((zona) => (
-                    <li class="tarjeta p-5">
-                      <h3 class="text-lg font-bold">{zona.nombreLargo}</h3>
-                      <p class="mt-1.5 text-sm text-fg-muted">{zona.claim}</p>
+                    <li id={`zona-${zona.slug}`} class="scroll-mt-28">
+                      {/* Fila enlazada solo si su agrupación tiene página; si
+                          no, un enlace al propio ancla no llevaría a ninguna
+                          parte. El mapa apunta aquí en ese caso. */}
+                      {agrupacionDe(zona.slug)?.publicada ? (
+                        <a href={hrefZona(zona)} class="tarjeta block p-5" data-fila-zona={zona.slug}>
+                          <h3 class="text-lg font-bold">{zona.nombreLargo}</h3>
+                          <p class="mt-1.5 text-sm text-fg-muted">{zona.claim}</p>
+                        </a>
+                      ) : (
+                        <div class="tarjeta p-5" data-fila-zona={zona.slug}>
+                          <h3 class="text-lg font-bold">{zona.nombreLargo}</h3>
+                          <p class="mt-1.5 text-sm text-fg-muted">{zona.claim}</p>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
