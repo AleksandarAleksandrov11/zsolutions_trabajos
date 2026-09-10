@@ -1,5 +1,5 @@
 ---
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/ui/Reveal.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
@@ -20,6 +20,10 @@ const { numero = "03", conEncabezado = true } = Astro.props;
 /*
  * Galería filtrable.
  *
+ * Rejilla normal, no mampostería: todas las tarjetas miden lo mismo y las
+ * filas quedan alineadas. Con `columns` cada tarjeta medía según lo largo que
+ * fuese su pie y el mosaico quedaba escalonado.
+ *
  * Dos ejes de filtro, oficio y tipo de finca, que se combinan. El filtrado es
  * puro CSS: cada tarjeta lleva sus etiquetas en atributos y el script solo
  * cambia el `data-filtro` del contenedor. Nada de reconstruir el DOM, así que
@@ -33,6 +37,14 @@ const oficios = servicios
   .map((s) => ({ id: s.slug, nombre: s.nombre }));
 
 const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
+
+/* Dos desplegables propios, uno por eje de filtro, en vez de dos filas de
+   chips. Mismo dato en los dos (`{id, nombre}`) para poder recorrerlos con
+   una sola plantilla. */
+const gruposFiltro = [
+  { eje: "oficio", etiqueta: "Oficio", todos: "Todos", opciones: oficios },
+  { eje: "tipo", etiqueta: "Finca", todos: "Todas", opciones: tipos },
+];
 
 /* El visor usa el `<dialog>` nativo: accesible, cierra con Escape y bloquea el
    fondo sin una línea de CSS extra. */
@@ -59,30 +71,35 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
         }
 
         <Reveal>
-          <div class:list={["flex flex-col gap-4", conEncabezado && "mt-10"]} data-filtros>
-            <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar por oficio">
-              <span class="text-eyebrow mr-1 text-fg-dim">Oficio</span>
-              <button type="button" class="chip-filtro" data-eje="oficio" data-valor="" aria-pressed="true">
-                Todos
-              </button>
-              {oficios.map((o) => (
-                <button type="button" class="chip-filtro" data-eje="oficio" data-valor={o.id} aria-pressed="false">
-                  {o.nombre}
+          <div class:list={["flex flex-wrap items-center gap-3", conEncabezado && "mt-10"]} data-filtros>
+            {gruposFiltro.map((grupo) => (
+              <div class="menu-filtro" data-menu-filtro data-eje={grupo.eje}>
+                <button
+                  type="button"
+                  class="menu-filtro-boton"
+                  data-menu-boton
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                >
+                  <span class="text-eyebrow text-fg-dim">{grupo.etiqueta}</span>
+                  <span data-menu-etiqueta>{grupo.todos}</span>
+                  <ChevronDown className="menu-filtro-flecha h-4 w-4 shrink-0" aria-hidden="true" />
                 </button>
-              ))}
-            </div>
 
-            <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar por tipo de finca">
-              <span class="text-eyebrow mr-1 text-fg-dim">Finca</span>
-              <button type="button" class="chip-filtro" data-eje="tipo" data-valor="" aria-pressed="true">
-                Todas
-              </button>
-              {tipos.map((t) => (
-                <button type="button" class="chip-filtro" data-eje="tipo" data-valor={t.id} aria-pressed="false">
-                  {t.nombre}
-                </button>
-              ))}
-            </div>
+                <div class="menu-filtro-panel" data-menu-panel>
+                  <ul role="listbox" aria-label={`Filtrar por ${grupo.etiqueta.toLowerCase()}`}>
+                    <li role="option" tabindex="-1" data-valor="" aria-selected="true">
+                      {grupo.todos}
+                    </li>
+                    {grupo.opciones.map((o) => (
+                      <li role="option" tabindex="-1" data-valor={o.id} aria-selected="false">
+                        {o.nombre}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
           </div>
         </Reveal>
 
@@ -92,7 +109,7 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
 
         <RevealGroup
           as="ul"
-          class="galeria-trabajos mt-8"
+          class="galeria-trabajos rejilla-igual mt-8 sm:grid-cols-2 lg:grid-cols-3"
           stagger={0.05}
           data-galeria
         >
@@ -109,7 +126,7 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
                   visible, que es justo lo que el criterio 2.5.3 pide. */}
               <button
                 type="button"
-                class="tarjeta group flex w-full flex-col overflow-hidden p-0 text-left"
+                class="tarjeta group flex h-full w-full flex-col overflow-hidden p-0 text-left"
                 data-visor-abrir={i}
               >
                 <span class="sr-only">Ampliar imagen:</span>
@@ -130,6 +147,9 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
                 <span class="flex flex-1 flex-col p-6">
                   <span class="block text-lg font-bold">{trabajo.titulo}</span>
                   <span class="mt-2 block text-sm text-fg-muted">{trabajo.detalle}</span>
+                  <span class="text-eyebrow mt-auto flex items-center gap-1.5 pt-5 text-fg-dim transition-colors group-hover:text-fg">
+                    Ver ampliada
+                  </span>
                 </span>
               </button>
             </RevealItem>
@@ -184,13 +204,18 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
 
 <script is:inline define:vars={{ datos: trabajos.map((t) => ({ src: fotos[t.foto].src, alt: t.alt, titulo: t.titulo, detalle: t.detalle })) }}>
   (() => {
-    /* ---- Filtros ---- */
+    /* ---- Filtros ----
+       Dos desplegables propios (no `<select>`), uno por eje. Cada uno abre
+       su panel con la misma técnica de `grid-template-rows` que el detalle
+       de los carnets: nada de medir alturas a mano. Un solo listener por
+       grupo, delegado sobre las opciones, y una función `cerrar` compartida
+       para que abrir uno cierre el otro y para el clic fuera / Escape. */
     const galeria = document.querySelector("[data-galeria]");
-    const panel = document.querySelector("[data-filtros]");
+    const grupos = document.querySelectorAll("[data-menu-filtro]");
     const recuento = document.querySelector("[data-recuento-trabajos]");
     const vacio = document.querySelector("[data-sin-resultados]");
 
-    if (galeria && panel) {
+    if (galeria && grupos.length) {
       const estado = { oficio: "", tipo: "" };
 
       const aplicar = () => {
@@ -206,15 +231,95 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
         if (vacio) vacio.classList.toggle("hidden", visibles > 0);
       };
 
-      panel.addEventListener("click", (e) => {
-        const boton = e.target.closest(".chip-filtro");
-        if (!boton) return;
-        const eje = boton.dataset.eje;
-        estado[eje] = boton.dataset.valor;
-        for (const otro of panel.querySelectorAll(`.chip-filtro[data-eje="${eje}"]`)) {
-          otro.setAttribute("aria-pressed", String(otro === boton));
+      const piezas = [...grupos].map((grupo) => ({
+        grupo,
+        boton: grupo.querySelector("[data-menu-boton]"),
+        panel: grupo.querySelector("[data-menu-panel]"),
+        etiqueta: grupo.querySelector("[data-menu-etiqueta]"),
+      }));
+
+      const cerrar = (excepto) => {
+        for (const p of piezas) {
+          if (p.grupo === excepto) continue;
+          p.boton.setAttribute("aria-expanded", "false");
+          p.panel.classList.remove("abierto");
         }
-        aplicar();
+      };
+
+      for (const { grupo, boton, panel, etiqueta } of piezas) {
+        const eje = grupo.dataset.eje;
+        const opciones = [...panel.querySelectorAll("[role='option']")];
+
+        const abrir = () => {
+          cerrar(grupo);
+          boton.setAttribute("aria-expanded", "true");
+          panel.classList.add("abierto");
+        };
+
+        const cerrarEste = () => {
+          boton.setAttribute("aria-expanded", "false");
+          panel.classList.remove("abierto");
+        };
+
+        const elegir = (opcion) => {
+          estado[eje] = opcion.dataset.valor;
+          etiqueta.textContent = opcion.textContent.trim();
+          for (const o of opciones) o.setAttribute("aria-selected", String(o === opcion));
+          cerrarEste();
+          boton.focus();
+          aplicar();
+        };
+
+        boton.addEventListener("click", () => {
+          const expandido = boton.getAttribute("aria-expanded") === "true";
+          expandido ? cerrarEste() : abrir();
+        });
+
+        /* Con la lista cerrada, las flechas la abren directamente en el
+           primer o último elemento en vez de necesitar dos pulsaciones. */
+        boton.addEventListener("keydown", (e) => {
+          if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+          e.preventDefault();
+          abrir();
+          (e.key === "ArrowDown" ? opciones[0] : opciones[opciones.length - 1]).focus();
+        });
+
+        panel.addEventListener("click", (e) => {
+          const opcion = e.target.closest("[role='option']");
+          if (opcion) elegir(opcion);
+        });
+
+        panel.addEventListener("keydown", (e) => {
+          const actual = opciones.indexOf(document.activeElement);
+          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault();
+            const paso = e.key === "ArrowDown" ? 1 : -1;
+            const siguiente = actual === -1 ? 0 : (actual + paso + opciones.length) % opciones.length;
+            opciones[siguiente].focus();
+          } else if (e.key === "Home") {
+            e.preventDefault();
+            opciones[0].focus();
+          } else if (e.key === "End") {
+            e.preventDefault();
+            opciones[opciones.length - 1].focus();
+          } else if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (actual !== -1) elegir(opciones[actual]);
+          } else if (e.key === "Tab") {
+            cerrarEste();
+          }
+        });
+      }
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("[data-menu-filtro]")) cerrar(null);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        const abierto = document.activeElement?.closest("[data-menu-filtro]");
+        cerrar(null);
+        abierto?.querySelector("[data-menu-boton]")?.focus();
       });
     }
 

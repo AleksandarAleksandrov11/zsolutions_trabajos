@@ -85,6 +85,21 @@ const TAMANOS = "(max-width: 1024px) 100vw, 76rem";
           <span class="comparador-etiqueta comparador-etiqueta-antes" aria-hidden="true">Antes</span>
           <span class="comparador-etiqueta comparador-etiqueta-despues" aria-hidden="true">Después</span>
 
+          {
+            comparativa.provisional ? (
+              <span
+                class="comparador-credito"
+                title={comparativa.credito ?? "Foto de ejemplo, no es obra de ZSolutions"}
+              >
+                Foto de ejemplo
+                <span class="sr-only">
+                  {" "}
+                  {comparativa.credito ?? "No es obra de ZSolutions."}
+                </span>
+              </span>
+            ) : null
+          }
+
           <span class="comparador-linea" aria-hidden="true">
             <span class="comparador-tirador">
               {/* El rayo de la Z de la marca. */}
@@ -106,19 +121,9 @@ const TAMANOS = "(max-width: 1024px) 100vw, 76rem";
           />
         </div>
 
-        <figcaption class="mt-4 text-xs text-fg-dim">
-          Arrastra la barra, o muévela con las flechas del teclado.
-          {
-            comparativa.provisional ? (
-              <>
-                {" "}
-                <strong class="font-bold text-fg-muted">
-                  Ejemplo del tipo de intervención, no una obra concreta.
-                </strong>
-              </>
-            ) : null
-          }
-          {comparativa.credito ? <> {comparativa.credito}</> : null}
+        <figcaption class="sr-only">
+          Arrastra la barra o muévela con las flechas del teclado para
+          comparar el antes y el después.
         </figcaption>
       </figure>
     </Reveal>

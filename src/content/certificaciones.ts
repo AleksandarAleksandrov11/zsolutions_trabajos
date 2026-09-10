@@ -5,12 +5,35 @@ export type GrupoCertificacion =
   | "verticales"
   | "maquinaria";
 
+/** Nombres de icono de lucide-react. Se listan aquí para no importar toda
+    la librería en el contenido y para que el componente sepa qué esperar. */
+export type IconoCertificacion =
+  | "Zap"
+  | "Wind"
+  | "Snowflake"
+  | "Leaf"
+  | "Thermometer"
+  | "Droplets"
+  | "Flame"
+  | "HeartPulse"
+  | "DoorClosed"
+  | "Unplug"
+  | "Link2"
+  | "Anchor"
+  | "HardHat"
+  | "ArrowUpFromLine"
+  | "Forklift"
+  | "Weight";
+
 export type Certificacion = {
   id: string;
   nombre: string;
   siglas: string;
   grupo: GrupoCertificacion;
   detalle: string;
+  /** Icono identificativo. Da color al muro de acreditaciones, que antes
+      era una pared de texto plano. */
+  icono: IconoCertificacion;
 };
 
 export const gruposCertificacion: {
@@ -57,6 +80,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Carnet de Electricista Especialista",
     siglas: "REBT",
     grupo: "oficiales",
+    icono: "Zap",
     detalle:
       "Habilitación de instalador en baja tensión en categoría especialista. Permite ejecutar y firmar instalaciones eléctricas y emitir el certificado de instalación (CIE).",
   },
@@ -65,6 +89,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Carnet de Instalador RITE",
     siglas: "RITE",
     grupo: "oficiales",
+    icono: "Wind",
     detalle:
       "Habilitación para instalaciones térmicas en edificios: climatización, calefacción, ventilación y agua caliente sanitaria, incluido su mantenimiento.",
   },
@@ -73,6 +98,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Carnet de Gases Fluorados",
     siglas: "F-Gas",
     grupo: "oficiales",
+    icono: "Snowflake",
     detalle:
       "Habilitación legal para manipular refrigerantes: detección de fugas, recuperación y carga de gas en circuitos frigoríficos.",
   },
@@ -81,6 +107,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Asesor Energético Especializado",
     siglas: "Energía",
     grupo: "oficiales",
+    icono: "Leaf",
     detalle:
       "Formación en eficiencia energética aplicada a instalaciones: análisis de consumos, dimensionado y criterios reales de ahorro.",
   },
@@ -91,6 +118,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Sistemas de Aerotermia",
     siglas: "Aerotermia",
     grupo: "tecnica",
+    icono: "Thermometer",
     detalle:
       "Diseño, instalación y puesta en marcha de bombas de calor aerotérmicas para calefacción, refrigeración y agua caliente sanitaria.",
   },
@@ -99,6 +127,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Instalaciones de Fontanería y Agua",
     siglas: "Agua",
     grupo: "tecnica",
+    icono: "Droplets",
     detalle:
       "Formación específica en redes de agua fría y caliente, evacuación, presión y materiales de instalación.",
   },
@@ -107,6 +136,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Sistemas de Conductos y Ventilación",
     siglas: "Conductos",
     grupo: "tecnica",
+    icono: "Wind",
     detalle:
       "Dimensionado y montaje de redes de conductos, difusión de aire y ventilación mecánica.",
   },
@@ -115,6 +145,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Soldadura Blanda y Soldadura Fuerte",
     siglas: "Soldadura",
     grupo: "tecnica",
+    icono: "Flame",
     detalle:
       "Ejecución de uniones por soldadura blanda y fuerte, imprescindible en líneas frigoríficas y en instalaciones de cobre a presión.",
   },
@@ -125,6 +156,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "PHTLS",
     siglas: "NAEMT",
     grupo: "seguridad",
+    icono: "HeartPulse",
     detalle:
       "Soporte vital prehospitalario en trauma según el estándar de la NAEMT, aplicado a la atención al accidentado antes de la llegada de los servicios de emergencia.",
   },
@@ -133,6 +165,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "PHTLS",
     siglas: "IVSAS",
     grupo: "seguridad",
+    icono: "HeartPulse",
     detalle:
       "Formación en soporte vital prehospitalario en trauma acreditada por IVSAS, orientada a intervención en entornos de trabajo.",
   },
@@ -141,6 +174,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Rescate en Espacios Confinados",
     siglas: "IVSAS",
     grupo: "seguridad",
+    icono: "DoorClosed",
     detalle:
       "Procedimientos de entrada, vigilancia y rescate en recintos con atmósfera potencialmente peligrosa y salida limitada.",
   },
@@ -149,6 +183,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Agente de Descargo",
     siglas: "Descargo",
     grupo: "seguridad",
+    icono: "Unplug",
     detalle:
       "Habilitación para realizar maniobras de descargo y consignación de instalaciones eléctricas antes de intervenir sobre ellas.",
   },
@@ -159,6 +194,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "IRATA Level 3",
     siglas: "IRATA 3",
     grupo: "verticales",
+    icono: "Link2",
     detalle:
       "Nivel de técnico supervisor en acceso por cuerda: montaje de sistemas complejos, dirección de equipos y planificación y ejecución de rescate.",
   },
@@ -167,6 +203,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "ITRA Level 3",
     siglas: "ITRA 3",
     grupo: "verticales",
+    icono: "Link2",
     detalle:
       "Titulación internacional de acceso por cuerda de nivel supervisor, equivalente en alcance de responsabilidad al nivel 3 de IRATA.",
   },
@@ -175,6 +212,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "ITRA Confined Spaces Level 3",
     siglas: "ITRA CS3",
     grupo: "verticales",
+    icono: "Anchor",
     detalle:
       "Especialización de nivel supervisor en espacios confinados: acceso, aseguramiento, vigilancia y rescate en recintos cerrados.",
   },
@@ -185,6 +223,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Recurso Preventivo",
     siglas: "60 h",
     grupo: "maquinaria",
+    icono: "HardHat",
     detalle:
       "Formación de 60 horas que habilita para ejercer como recurso preventivo en obra, vigilando el cumplimiento de las medidas de seguridad.",
   },
@@ -193,6 +232,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Operador de PEMP",
     siglas: "PEMP",
     grupo: "maquinaria",
+    icono: "ArrowUpFromLine",
     detalle:
       "Manejo de plataformas elevadoras móviles de personal, alternativa al acceso por cuerda cuando el entorno lo permite.",
   },
@@ -201,6 +241,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Operador de Carretilla Elevadora",
     siglas: "Carretilla",
     grupo: "maquinaria",
+    icono: "Forklift",
     detalle:
       "Manejo de carretilla elevadora para movimiento de material en obra e industria.",
   },
@@ -209,6 +250,7 @@ export const certificaciones: Certificacion[] = [
     nombre: "Operador de Grúa",
     siglas: "Grúa",
     grupo: "maquinaria",
+    icono: "Weight",
     detalle:
       "Manejo de grúa para izado y posicionamiento de cargas en obra.",
   },

@@ -12,7 +12,6 @@ import { crearMetadata } from "@/lib/seo";
 import { agrupaciones, agrupacionDe, hrefZona, zonas, zonasPorComarca } from "@/content/zonas";
 import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import { hrefWhatsApp, mensajeWhatsApp, site } from "@/content/site";
-import BandaContacto from "@/components/sections/BandaContacto.astro";
 import { fondoCss } from "@/lib/fondos";
 
 const migas = [{ label: "Zonas", href: "/zonas" }];
@@ -137,8 +136,6 @@ const meta = crearMetadata({
       </RevealGroup>
     </div>
   </section>
-
-  <BandaContacto claim="¿No ves tu municipio? Pregúntame igualmente: casi siempre llego." />
 
   <CTASection
     titulo="¿Trabajas o vives en alguna de estas zonas?"
