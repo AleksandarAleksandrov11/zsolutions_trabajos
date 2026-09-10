@@ -6,23 +6,15 @@ import Reveal from "@/components/ui/Reveal.astro";
 import AnimatedCounter from "@/components/ui/AnimatedCounter.astro";
 import Foto from "@/components/ui/Foto.astro";
 import { bioAlex } from "@/content/trayectoria";
-import { certificaciones } from "@/content/certificaciones";
 import { site } from "@/content/site";
+import { cifrasPortada } from "@/content/cifras";
+import { secciones } from "@/content/secciones";
 
 type Props = { numero?: string };
 const { numero = "04" } = Astro.props;
-
-const ANIO_INICIO = 2012;
-const anios = new Date().getFullYear() - ANIO_INICIO;
-
-const cifras = [
-  { valor: anios, sufijo: "", etiqueta: "años en obra" },
-  { valor: certificaciones.length, sufijo: "", etiqueta: "acreditaciones" },
-  { valor: 24, sufijo: " h", etiqueta: "para responderte" },
-];
 ---
 
-<section class="py-section" aria-labelledby="titulo-alex">
+<section class="seccion-alterna py-section" aria-labelledby="titulo-alex">
   <div class="container-brand">
     <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1fr)] lg:gap-16">
       <Reveal>
@@ -39,7 +31,7 @@ const cifras = [
       <div>
         <SectionHeading
           numero={numero}
-          eyebrow="Quién está detrás"
+          eyebrow={secciones.alex.eyebrow}
           tituloId="titulo-alex"
           titulo={site.fundador}
         />
@@ -48,12 +40,12 @@ const cifras = [
 
         <dl class="mt-10 grid grid-cols-3 gap-4">
           {
-            cifras.map((c) => (
-              <div class="tarjeta p-5">
-                <dd class="font-display text-3xl">
+            cifrasPortada.map((c) => (
+              <div class="tarjeta flex flex-col p-5">
+                <dt class="order-2 mt-1.5 text-xs text-fg-dim">{c.etiqueta}</dt>
+                <dd class="font-display order-1 text-3xl text-brand-orange">
                   <AnimatedCounter valor={c.valor} sufijo={c.sufijo} />
                 </dd>
-                <dt class="mt-1.5 text-xs text-fg-dim">{c.etiqueta}</dt>
               </div>
             ))
           }

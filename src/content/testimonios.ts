@@ -14,6 +14,11 @@
  *
  * Si en algún momento este array queda vacío, la sección desaparece sola de
  * la web. No hace falta tocar ningún componente.
+ *
+ * REGLA QUE NO SE SALTA NADIE: mientras estos textos sean de ejemplo, la web
+ * NO emite `Review` ni `AggregateRating` en el JSON-LD. Reseñas inventadas
+ * dentro de datos estructurados pueden acarrear una acción manual de Google
+ * sobre el dominio entero, y eso no se arregla cambiando un archivo.
  */
 
 export type Testimonio = {
@@ -54,5 +59,33 @@ export const testimonios: Testimonio[] = [
     trabajo: "Fuga y sustitución de montante",
     texto:
       "Llamé un lunes por una fuga y vino el mismo día. Localizó el punto sin levantar media casa, cambió el tramo de tubería y me avisó de otro que estaba a punto de dar problemas. Sin prisas y sin sustos en la factura.",
+  },
+  {
+    autor: "Ramon T.",
+    lugar: "Badalona",
+    trabajo: "Sala de calderas de comunidad",
+    texto:
+      "Llevábamos dos años con averías cada invierno y nadie nos explicaba por qué. Hizo una revisión completa, nos pasó las lecturas por escrito y planteó un mantenimiento anual. Desde entonces no hemos vuelto a quedarnos sin agua caliente.",
+  },
+  {
+    autor: "Laia M.",
+    lugar: "Sitges",
+    trabajo: "Aire acondicionado por conductos",
+    texto:
+      "Quería climatizar toda la planta y me habían ofrecido un split por habitación. Me propuso conductos con rejillas por estancia y salió más barato de lo que esperaba. Explica las cosas sin hacerte sentir tonta.",
+  },
+  {
+    autor: "Administración de fincas",
+    lugar: "Sabadell",
+    trabajo: "Mantenimiento de varias fincas",
+    texto:
+      "Trabajamos con él en seis edificios. Responde el mismo día, avisa antes de subir el presupuesto si aparece algo y entrega la documentación sin que haya que pedirla tres veces. Para nosotros eso vale más que el precio.",
+  },
+  {
+    autor: "Pau i Cristina",
+    lugar: "Terrassa",
+    trabajo: "Instalación eléctrica de reforma",
+    texto:
+      "Reformamos la casa entera y él llevó toda la parte de electricidad y fontanería. Coordinó con el resto de gremios sin que tuviéramos que hacer de intermediarios, que era justo lo que más nos preocupaba.",
   },
 ];

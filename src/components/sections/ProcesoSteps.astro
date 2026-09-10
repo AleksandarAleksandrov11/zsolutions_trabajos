@@ -3,19 +3,20 @@ import SectionHeading from "@/components/ui/SectionHeading.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import type { PasoProceso } from "@/content/servicios";
+import { secciones } from "@/content/secciones";
 
 type Props = { pasos: PasoProceso[]; numero?: string; titulo?: string };
 const { pasos, numero = "03", titulo = "Cómo trabajo" } = Astro.props;
 ---
 
-<section class="py-section" aria-labelledby="titulo-proceso">
+<section class="seccion-azul py-section" aria-labelledby="titulo-proceso">
   <div class="container-brand">
     <SectionHeading
       numero={numero}
-      eyebrow="Proceso"
+      eyebrow={secciones.proceso.eyebrow}
       tituloId="titulo-proceso"
       titulo={titulo}
-      descripcion="Cuatro pasos, siempre los mismos. Sabes en todo momento en cuál estás y qué pasa después."
+      descripcion={secciones.proceso.descripcion}
     />
 
     <RevealGroup

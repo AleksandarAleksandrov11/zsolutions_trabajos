@@ -12,6 +12,8 @@ import { schemaMigas, schemaPersona } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { bioAlex } from "@/content/trayectoria";
 import { barraConfianza, site } from "@/content/site";
+import BandaContacto from "@/components/sections/BandaContacto.astro";
+import Contadores from "@/components/sections/Contadores.astro";
 
 const migas = [{ label: "Sobre Alex", href: "/sobre-alex" }];
 
@@ -20,6 +22,7 @@ const meta = crearMetadata({
   description:
     "De peón de obra en 2012 a instalador certificado con REBT, RITE, F-Gas e IRATA Nivel 3. Trayectoria, acreditaciones y forma de trabajar.",
   path: "/sobre-alex",
+  og: "/og/sobre-alex.jpg",
 });
 ---
 
@@ -30,7 +33,7 @@ const meta = crearMetadata({
 
       <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)] lg:items-end lg:gap-16">
         <div>
-          <p class="text-eyebrow text-brand-blue-soft">Quién está detrás</p>
+          <p class="text-eyebrow text-brand-orange">Quién está detrás</p>
           <h1 class="mt-5 text-6xl">{site.fundador}</h1>
           <p class="mt-6 max-w-xl text-lg text-fg-muted">{bioAlex}</p>
 
@@ -38,7 +41,7 @@ const meta = crearMetadata({
             {
               barraConfianza.map((item) => (
                 <li class="text-eyebrow flex items-center gap-2 text-fg-dim">
-                  <span class="h-1 w-1 rounded-full bg-brand-blue-soft" aria-hidden="true" />
+                  <span class="h-1 w-1 rounded-full bg-n-500" aria-hidden="true" />
                   {item}
                 </li>
               ))
@@ -139,10 +142,26 @@ const meta = crearMetadata({
     </div>
   </section>
 
-  <Timeline numero="02" />
+  <section class="py-section" aria-labelledby="titulo-cifras">
+    <div class="container-brand">
+      <SectionHeading
+        numero="02"
+        eyebrow="En números"
+        tituloId="titulo-cifras"
+        titulo="La trayectoria, en cuatro cifras"
+      />
+      <Contadores class="mt-12" />
+    </div>
+  </section>
+
+  <BandaContacto />
+
+  <Timeline numero="03" />
+
+  <BandaContacto claim="Si prefieres hablarlo antes de rellenar nada, llámame o escríbeme." />
 
   <Certifications
-    numero="03"
+    numero="04"
     detallado
     titulo="Certificaciones y formación profesional"
     descripcion="Más de diez años formándome en el sector. Cada acreditación con lo que realmente habilita a hacer."

@@ -89,7 +89,7 @@ export type EnlaceNav = { label: string; href: string };
 
 export const navPrincipal: EnlaceNav[] = [
   { label: "Servicios", href: "/servicios" },
-  { label: "Trabajos", href: "/#trabajos" },
+  { label: "Trabajos", href: "/proyectos" },
   { label: "Zonas", href: "/zonas" },
   { label: "Sobre Alex", href: "/sobre-alex" },
 ];

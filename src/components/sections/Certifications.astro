@@ -6,6 +6,7 @@ import {
   certificacionesPorGrupo,
   gruposCertificacion,
 } from "@/content/certificaciones";
+import { secciones } from "@/content/secciones";
 
 type Props = {
   numero?: string;
@@ -18,8 +19,8 @@ type Props = {
 const {
   numero = "06",
   detallado = false,
-  titulo = "Certificaciones y habilitaciones",
-  descripcion = "Las habilitaciones oficiales no son un adorno del presupuesto: son lo que permite ejecutar, firmar y legalizar una instalación.",
+  titulo = secciones.acreditaciones.titulo,
+  descripcion = secciones.acreditaciones.descripcion,
 } = Astro.props;
 ---
 
@@ -27,7 +28,7 @@ const {
   <div class="container-brand">
     <SectionHeading
       numero={numero}
-      eyebrow="Acreditaciones"
+      eyebrow={secciones.acreditaciones.eyebrow}
       tituloId="titulo-certificaciones"
       titulo={titulo}
       descripcion={descripcion}
@@ -48,14 +49,25 @@ const {
               ]}
             >
               {certificacionesPorGrupo(grupo.id).map((c) => (
-                <RevealItem as="li" class="tarjeta flex flex-col gap-1.5 p-5">
-                  <span class="font-display text-xs tracking-wider text-brand-blue-soft">
+                <RevealItem
+                  as="li"
+                  class="tarjeta group/carnet flex flex-col gap-1.5 p-5"
+                  tabindex={detallado ? undefined : 0}
+                >
+                  <span class="font-display text-xs tracking-wider text-fg">
                     {c.siglas}
                   </span>
                   <span class="text-sm font-bold">{c.nombre}</span>
                   {detallado ? (
                     <span class="mt-1 text-xs leading-relaxed text-fg-dim">{c.detalle}</span>
-                  ) : null}
+                  ) : (
+                    /* En el muro compacto, qué habilita cada carnet se
+                       despliega al pasar por encima o al enfocar con el
+                       teclado. La tarjeta es enfocable justamente para eso. */
+                    <span class="detalle-carnet text-xs leading-relaxed text-fg-dim">
+                      <span class="min-h-0">{c.detalle}</span>
+                    </span>
+                  )}
                 </RevealItem>
               ))}
             </RevealGroup>

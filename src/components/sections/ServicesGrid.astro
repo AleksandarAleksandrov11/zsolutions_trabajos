@@ -5,19 +5,20 @@ import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import { ServiceIcon } from "@/components/ui/ServiceIcon";
 import { servicios } from "@/content/servicios";
+import { secciones } from "@/content/secciones";
 
 type Props = { numero?: string };
 const { numero = "01" } = Astro.props;
 ---
 
-<section id="servicios" class="py-section" aria-labelledby="titulo-servicios">
+<section class="seccion-alterna py-section" aria-labelledby="titulo-servicios">
   <div class="container-brand">
     <SectionHeading
       numero={numero}
-      eyebrow="Qué hago"
+      eyebrow={secciones.servicios.eyebrow}
       tituloId="titulo-servicios"
-      titulo="Seis oficios, un solo responsable"
-      descripcion="Cada uno con su habilitación en regla. Cuando un trabajo toca dos disciplinas, no hay que coordinar a dos empresas ni esperar a que se pongan de acuerdo."
+      titulo={secciones.servicios.titulo}
+      descripcion={secciones.servicios.descripcion}
     />
 
     <RevealGroup
@@ -33,7 +34,7 @@ const { numero = "01" } = Astro.props;
               class="tarjeta group flex h-full flex-col justify-between gap-8 p-6 sm:p-7"
             >
               <div>
-                <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-brand-blue/12 text-brand-blue-soft transition-colors duration-300 group-hover:bg-brand-blue group-hover:text-white">
+                <span class="chip-icono h-11 w-11 duration-300">
                   <ServiceIcon nombre={servicio.icono} className="h-5 w-5" />
                 </span>
                 <h3 class="mt-6 text-2xl">{servicio.nombre}</h3>

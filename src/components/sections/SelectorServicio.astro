@@ -1,0 +1,221 @@
+---
+import { ArrowRight, RotateCcw } from "lucide-react";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/ui/Reveal.astro";
+import { lugares, sintomas } from "@/content/diagnostico";
+import { servicios } from "@/content/servicios";
+import { secciones } from "@/content/secciones";
+
+type Props = { numero?: string };
+const { numero = "01" } = Astro.props;
+
+/*
+ * Selector de servicio en dos pasos.
+ *
+ * Quien llega con una avería no sabe si lo suyo es «lampistería» o
+ * «climatización»: sabe que salta el diferencial. Esto traduce el síntoma en
+ * el oficio, y de ahí sale la página correcta y un enlace al formulario con
+ * el servicio ya elegido, para no volver a preguntárselo.
+ *
+ * Todo el contenido está en el HTML desde el principio, incluidos los enlaces
+ * a las seis páginas de servicio: el script solo enseña y esconde. Sin
+ * JavaScript se ve la lista completa de síntomas, cada uno enlazando a su
+ * página, que es exactamente lo que hacía la rejilla anterior.
+ */
+const porSlug = new Map(servicios.map((s) => [s.slug, s]));
+---
+
+<section id="servicios" class="py-section" aria-labelledby="titulo-selector">
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow={secciones.selector.eyebrow}
+      tituloId="titulo-selector"
+      titulo={secciones.selector.titulo}
+      descripcion={secciones.selector.descripcion}
+    />
+
+    <Reveal class="mt-12">
+      <div class="selector tarjeta p-6 sm:p-8" data-selector>
+        {/* ---- Paso 1 ---- */}
+        <div data-paso="1">
+          <p class="text-eyebrow flex items-center gap-2.5 text-fg-dim">
+            <span class="num-seccion">01</span>
+            <span class="regla-acento w-6" aria-hidden="true"></span>
+            ¿Qué te pasa?
+          </p>
+
+          <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+            {
+              sintomas.map((s) => (
+                <li>
+                  <a
+                    href={`/servicios/${s.servicio}`}
+                    class="opcion-selector"
+                    data-sintoma={s.id}
+                    data-servicio={s.servicio}
+                  >
+                    {s.texto}
+                    <ArrowRight className="h-4 w-4 shrink-0 opacity-60" aria-hidden="true" />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        {/* ---- Paso 2 ---- */}
+        <div data-paso="2" hidden>
+          <p class="text-eyebrow flex items-center gap-2.5 text-fg-dim">
+            <span class="num-seccion">02</span>
+            <span class="regla-acento w-6" aria-hidden="true"></span>
+            ¿Dónde?
+          </p>
+
+          <p class="mt-4 text-lg" data-eco-sintoma></p>
+
+          <ul class="mt-6 grid gap-3 sm:grid-cols-3">
+            {
+              lugares.map((l) => (
+                <li>
+                  <button type="button" class="opcion-selector w-full" data-lugar={l.id}>
+                    {l.texto}
+                    <ArrowRight className="h-4 w-4 shrink-0 opacity-60" aria-hidden="true" />
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+
+          <button type="button" class="enlace-volver mt-6" data-volver="1">
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+            Cambiar el problema
+          </button>
+        </div>
+
+        {/* ---- Resultado ---- */}
+        <div data-paso="3" hidden>
+          <p class="text-eyebrow flex items-center gap-2.5 text-fg-dim">
+            <span class="num-seccion">03</span>
+            <span class="regla-acento w-6" aria-hidden="true"></span>
+            Lo tuyo es
+          </p>
+
+          <h3 class="mt-4 text-3xl" data-resultado-titulo></h3>
+          <p class="mt-4 max-w-2xl text-fg-muted" data-resultado-texto></p>
+          <p class="mt-2 max-w-2xl text-fg-muted" data-resultado-matiz></p>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a class="boton-selector-primario" data-resultado-servicio>
+              Ver qué incluye
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+            <a class="boton-selector-secundario" data-resultado-presupuesto data-evento="presupuesto_cta" data-evento-origen="selector">
+              Pedir presupuesto
+            </a>
+          </div>
+
+          <button type="button" class="enlace-volver mt-8" data-volver="1">
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+            Empezar de nuevo
+          </button>
+        </div>
+
+        <p class="sr-only" role="status" data-selector-estado></p>
+      </div>
+    </Reveal>
+  </div>
+</section>
+
+<script is:inline type="application/json" data-selector-datos set:html={JSON.stringify({
+  sintomas: sintomas.map((s) => ({
+    id: s.id,
+    texto: s.texto,
+    servicio: s.servicio,
+    valorFormulario: s.valorFormulario,
+    respuesta: s.respuesta,
+    nombre: porSlug.get(s.servicio)?.nombre ?? s.servicio,
+  })),
+  sitios: lugares,
+})} />
+
+<script>
+  type SintomaDatos = {
+    id: string;
+    texto: string;
+    servicio: string;
+    valorFormulario: string;
+    respuesta: string;
+    nombre: string;
+  };
+  type SitioDatos = { id: string; texto: string; matiz: string };
+
+  const raiz = document.querySelector<HTMLElement>("[data-selector]");
+  const bloqueDatos = document.querySelector("[data-selector-datos]");
+
+  if (raiz && bloqueDatos) {
+    const { sintomas, sitios } = JSON.parse(bloqueDatos.textContent ?? "{}") as {
+      sintomas: SintomaDatos[];
+      sitios: SitioDatos[];
+    };
+
+    const pasos: Record<number, HTMLElement> = {
+      1: raiz.querySelector('[data-paso="1"]')!,
+      2: raiz.querySelector('[data-paso="2"]')!,
+      3: raiz.querySelector('[data-paso="3"]')!,
+    };
+    const estado = raiz.querySelector("[data-selector-estado]");
+    let elegido: SintomaDatos | undefined;
+
+    const texto = (sel: string, valor: string) => {
+      const nodo = raiz.querySelector(sel);
+      if (nodo) nodo.textContent = valor;
+    };
+
+    const mostrar = (n: number) => {
+      for (const clave of [1, 2, 3]) pasos[clave].hidden = clave !== n;
+      /* El foco va al primer control del paso nuevo: si no, quien navega con
+         teclado se queda donde estaba y no se entera de que ha cambiado. */
+      pasos[n].querySelector<HTMLElement>("a, button")?.focus({ preventScroll: true });
+    };
+
+    /* Paso 1. Los enlaces siguen siendo enlaces: con JavaScript se
+       interceptan para preguntar el sitio; sin él, llevan a su página. */
+    for (const enlace of pasos[1].querySelectorAll<HTMLAnchorElement>("[data-sintoma]")) {
+      enlace.addEventListener("click", (e) => {
+        const encontrado = sintomas.find((s) => s.id === enlace.dataset.sintoma);
+        if (!encontrado) return;
+        e.preventDefault();
+        elegido = encontrado;
+        texto("[data-eco-sintoma]", elegido.texto);
+        if (estado) estado.textContent = `Paso 2 de 3. ${elegido.texto}. ¿Dónde?`;
+        mostrar(2);
+      });
+    }
+
+    /* Paso 2 */
+    for (const boton of pasos[2].querySelectorAll<HTMLButtonElement>("[data-lugar]")) {
+      boton.addEventListener("click", () => {
+        if (!elegido) return;
+        const sitio = sitios.find((l) => l.id === boton.dataset.lugar);
+        texto("[data-resultado-titulo]", elegido.nombre);
+        texto("[data-resultado-texto]", elegido.respuesta);
+        texto("[data-resultado-matiz]", sitio?.matiz ?? "");
+        raiz.querySelector<HTMLAnchorElement>("[data-resultado-servicio]")!.href =
+          `/servicios/${elegido.servicio}`;
+        raiz.querySelector<HTMLAnchorElement>("[data-resultado-presupuesto]")!.href =
+          `/contacto?servicio=${encodeURIComponent(elegido.valorFormulario)}`;
+        if (estado) estado.textContent = `Lo tuyo es ${elegido.nombre}. ${elegido.respuesta}`;
+        mostrar(3);
+      });
+    }
+
+    for (const boton of raiz.querySelectorAll("[data-volver]")) {
+      boton.addEventListener("click", () => {
+        elegido = undefined;
+        if (estado) estado.textContent = "Paso 1 de 3. ¿Qué te pasa?";
+        mostrar(1);
+      });
+    }
+  }
+</script>

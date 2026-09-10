@@ -1,45 +1,119 @@
 ---
-import { Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/ui/Reveal.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import Foto from "@/components/ui/Foto.astro";
-import { trabajos } from "@/content/trabajos";
+import { tiposFinca, trabajos } from "@/content/trabajos";
+import { servicios } from "@/content/servicios";
 import { fotos } from "@/content/fotos";
+import { secciones } from "@/content/secciones";
 
-type Props = { numero?: string };
-const { numero = "03" } = Astro.props;
+type Props = {
+  numero?: string;
+  /** En `/proyectos` el H1 de la página ya hace de encabezado. */
+  conEncabezado?: boolean;
+};
+const { numero = "03", conEncabezado = true } = Astro.props;
+
+/*
+ * Galería filtrable.
+ *
+ * Dos ejes de filtro, oficio y tipo de finca, que se combinan. El filtrado es
+ * puro CSS: cada tarjeta lleva sus etiquetas en atributos y el script solo
+ * cambia el `data-filtro` del contenedor. Nada de reconstruir el DOM, así que
+ * la transición de posiciones la puede hacer el navegador.
+ *
+ * Sin JavaScript salen las once, que es el estado correcto: los filtros son
+ * una comodidad, no la única forma de ver el contenido.
+ */
+const oficios = servicios
+  .filter((s) => trabajos.some((t) => t.servicio === s.slug))
+  .map((s) => ({ id: s.slug, nombre: s.nombre }));
+
+const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
 
 /* El visor usa el `<dialog>` nativo: accesible, cierra con Escape y bloquea el
-   fondo sin una línea de CSS extra. El script solo abre, cierra y navega. */
+   fondo sin una línea de CSS extra. */
 ---
 
 {
   trabajos.length > 0 ? (
     <section id="trabajos" class="py-section" aria-labelledby="titulo-trabajos">
       <div class="container-brand">
-        <SectionHeading
-          numero={numero}
-          eyebrow="Trabajos"
-          tituloId="titulo-trabajos"
-          titulo="Lo que se ve cuando el trabajo está bien hecho"
-          descripcion="Cada tipo de intervención con lo que realmente incluye. Toca una imagen para verla completa."
-        />
+        {
+          conEncabezado ? (
+            <SectionHeading
+              numero={numero}
+              eyebrow={secciones.trabajos.eyebrow}
+              tituloId="titulo-trabajos"
+              titulo={secciones.trabajos.titulo}
+              descripcion={secciones.trabajos.descripcion}
+            />
+          ) : (
+            <h2 id="titulo-trabajos" class="sr-only">
+              Galería de trabajos
+            </h2>
+          )
+        }
+
+        <Reveal>
+          <div class:list={["flex flex-col gap-4", conEncabezado && "mt-10"]} data-filtros>
+            <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar por oficio">
+              <span class="text-eyebrow mr-1 text-fg-dim">Oficio</span>
+              <button type="button" class="chip-filtro" data-eje="oficio" data-valor="" aria-pressed="true">
+                Todos
+              </button>
+              {oficios.map((o) => (
+                <button type="button" class="chip-filtro" data-eje="oficio" data-valor={o.id} aria-pressed="false">
+                  {o.nombre}
+                </button>
+              ))}
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar por tipo de finca">
+              <span class="text-eyebrow mr-1 text-fg-dim">Finca</span>
+              <button type="button" class="chip-filtro" data-eje="tipo" data-valor="" aria-pressed="true">
+                Todas
+              </button>
+              {tipos.map((t) => (
+                <button type="button" class="chip-filtro" data-eje="tipo" data-valor={t.id} aria-pressed="false">
+                  {t.nombre}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        <p class="sr-only" role="status" data-recuento-trabajos>
+          {trabajos.length} trabajos
+        </p>
 
         <RevealGroup
           as="ul"
-          class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          class="galeria-trabajos mt-8"
           stagger={0.05}
+          data-galeria
         >
           {trabajos.map((trabajo, i) => (
-            <RevealItem as="li">
+            <RevealItem
+              as="li"
+              class="galeria-item"
+              data-oficio={trabajo.servicio}
+              data-tipo={trabajo.tipo}
+            >
+              {/* Sin `aria-label`: el nombre accesible sale del propio
+                  contenido, con un prefijo solo para lectores. Con etiqueta
+                  el nombre era «Ampliar: <título>» y no contenía el pie
+                  visible, que es justo lo que el criterio 2.5.3 pide. */}
               <button
                 type="button"
-                class="tarjeta group block w-full overflow-hidden p-0 text-left"
+                class="tarjeta group flex w-full flex-col overflow-hidden p-0 text-left"
                 data-visor-abrir={i}
-                aria-label={`Ampliar: ${trabajo.titulo}`}
               >
-                <span class="relative block">
+                <span class="sr-only">Ampliar imagen:</span>
+                <span class="relative block shrink-0">
                   <Foto
                     nombre={trabajo.foto}
                     alt={trabajo.alt}
@@ -53,7 +127,7 @@ const { numero = "03" } = Astro.props;
                     <Expand className="h-4 w-4" />
                   </span>
                 </span>
-                <span class="block p-6">
+                <span class="flex flex-1 flex-col p-6">
                   <span class="block text-lg font-bold">{trabajo.titulo}</span>
                   <span class="mt-2 block text-sm text-fg-muted">{trabajo.detalle}</span>
                 </span>
@@ -61,12 +135,16 @@ const { numero = "03" } = Astro.props;
             </RevealItem>
           ))}
         </RevealGroup>
+
+        <p class="mt-10 hidden text-fg-dim" data-sin-resultados>
+          No hay trabajos con esa combinación. Prueba a quitar uno de los dos filtros.
+        </p>
       </div>
 
       <dialog id="visor-trabajos" class="visor" aria-label="Visor de imágenes">
         <div class="flex h-full w-full flex-col">
           <div class="container-brand flex h-16 shrink-0 items-center justify-between">
-            <p class="text-eyebrow text-fg-dim" data-visor-contador></p>
+            <p class="text-eyebrow text-fg-dim" data-visor-contador />
             <button
               type="button"
               data-visor-cerrar
@@ -78,16 +156,26 @@ const { numero = "03" } = Astro.props;
           </div>
 
           <figure class="container-brand flex min-h-0 flex-1 flex-col items-center justify-center gap-5 pb-8">
-            <img
-              data-visor-img
-              alt=""
-              class="max-h-[62vh] w-auto max-w-full rounded-xl object-contain"
-            />
+            <img data-visor-img alt="" class="max-h-[62vh] w-auto max-w-full rounded-xl object-contain" />
             <figcaption class="max-w-xl text-center">
-              <span class="block text-lg font-bold" data-visor-titulo></span>
-              <span class="mt-1.5 block text-sm text-fg-muted" data-visor-detalle></span>
+              <span class="block text-lg font-bold" data-visor-titulo />
+              <span class="mt-1.5 block text-sm text-fg-muted" data-visor-detalle />
             </figcaption>
           </figure>
+
+          <div class="container-brand flex shrink-0 items-center justify-center gap-3 pb-8">
+            {/* Iconos y no «‹»/«›»: con texto visible, el nombre accesible
+                tiene que contener ese texto, y «‹» dentro de «Imagen
+                anterior» no encaja. Con un icono no hay texto que casar. */}
+            <button type="button" data-visor-anterior aria-label="Imagen anterior"
+              class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg">
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <button type="button" data-visor-siguiente aria-label="Imagen siguiente"
+              class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg">
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </dialog>
     </section>
@@ -96,6 +184,41 @@ const { numero = "03" } = Astro.props;
 
 <script is:inline define:vars={{ datos: trabajos.map((t) => ({ src: fotos[t.foto].src, alt: t.alt, titulo: t.titulo, detalle: t.detalle })) }}>
   (() => {
+    /* ---- Filtros ---- */
+    const galeria = document.querySelector("[data-galeria]");
+    const panel = document.querySelector("[data-filtros]");
+    const recuento = document.querySelector("[data-recuento-trabajos]");
+    const vacio = document.querySelector("[data-sin-resultados]");
+
+    if (galeria && panel) {
+      const estado = { oficio: "", tipo: "" };
+
+      const aplicar = () => {
+        let visibles = 0;
+        for (const item of galeria.querySelectorAll(".galeria-item")) {
+          const encaja =
+            (!estado.oficio || item.dataset.oficio === estado.oficio) &&
+            (!estado.tipo || item.dataset.tipo === estado.tipo);
+          item.toggleAttribute("data-filtrado", !encaja);
+          if (encaja) visibles++;
+        }
+        if (recuento) recuento.textContent = `${visibles} ${visibles === 1 ? "trabajo" : "trabajos"}`;
+        if (vacio) vacio.classList.toggle("hidden", visibles > 0);
+      };
+
+      panel.addEventListener("click", (e) => {
+        const boton = e.target.closest(".chip-filtro");
+        if (!boton) return;
+        const eje = boton.dataset.eje;
+        estado[eje] = boton.dataset.valor;
+        for (const otro of panel.querySelectorAll(`.chip-filtro[data-eje="${eje}"]`)) {
+          otro.setAttribute("aria-pressed", String(otro === boton));
+        }
+        aplicar();
+      });
+    }
+
+    /* ---- Visor ---- */
     const visor = document.getElementById("visor-trabajos");
     if (!visor || !datos.length) return;
 
@@ -103,7 +226,15 @@ const { numero = "03" } = Astro.props;
     const titulo = visor.querySelector("[data-visor-titulo]");
     const detalle = visor.querySelector("[data-visor-detalle]");
     const contador = visor.querySelector("[data-visor-contador]");
+    const cerrar = visor.querySelector("[data-visor-cerrar]");
     let indice = 0;
+    let devolverFoco = null;
+
+    /* Solo se recorren las imágenes que el filtro deja a la vista. */
+    const visibles = () =>
+      [...document.querySelectorAll("[data-visor-abrir]")]
+        .filter((b) => !b.closest(".galeria-item")?.hasAttribute("data-filtrado"))
+        .map((b) => Number(b.dataset.visorAbrir));
 
     const pintar = () => {
       const t = datos[indice];
@@ -111,18 +242,31 @@ const { numero = "03" } = Astro.props;
       img.alt = t.alt;
       titulo.textContent = t.titulo;
       detalle.textContent = t.detalle;
-      contador.textContent = `${indice + 1} / ${datos.length}`;
+      const lista = visibles();
+      contador.textContent = `${lista.indexOf(indice) + 1} / ${lista.length}`;
+    };
+
+    const mover = (paso) => {
+      const lista = visibles();
+      if (lista.length < 2) return;
+      const actual = lista.indexOf(indice);
+      indice = lista[(actual + paso + lista.length) % lista.length];
+      pintar();
     };
 
     document.querySelectorAll("[data-visor-abrir]").forEach((boton) => {
       boton.addEventListener("click", () => {
         indice = Number(boton.dataset.visorAbrir) || 0;
+        devolverFoco = boton;
         pintar();
         visor.showModal();
+        cerrar.focus();
       });
     });
 
-    visor.querySelector("[data-visor-cerrar]").addEventListener("click", () => visor.close());
+    cerrar.addEventListener("click", () => visor.close());
+    visor.querySelector("[data-visor-anterior]").addEventListener("click", () => mover(-1));
+    visor.querySelector("[data-visor-siguiente]").addEventListener("click", () => mover(1));
 
     /* Clic fuera de la figura: cerrar. */
     visor.addEventListener("click", (e) => {
@@ -130,9 +274,11 @@ const { numero = "03" } = Astro.props;
     });
 
     visor.addEventListener("keydown", (e) => {
-      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-      indice = (indice + (e.key === "ArrowRight" ? 1 : -1) + datos.length) % datos.length;
-      pintar();
+      if (e.key === "ArrowRight") mover(1);
+      else if (e.key === "ArrowLeft") mover(-1);
     });
+
+    /* Al cerrar, el foco vuelve a la tarjeta desde la que se abrió. */
+    visor.addEventListener("close", () => devolverFoco?.focus());
   })();
 </script>

@@ -1,0 +1,47 @@
+---
+import { MessageCircle, Phone } from "lucide-react";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import Reveal from "@/components/ui/Reveal.astro";
+import { hrefTelefono, hrefWhatsApp, mensajeWhatsApp, site } from "@/content/site";
+
+type Props = { claim?: string };
+
+/**
+ * Franja fina de contacto para intercalar entre secciones.
+ *
+ * Las páginas largas llegaban a tener diez pantallas seguidas sin un solo
+ * punto de contacto en el contenido. La barra fija de móvil cubre parte del
+ * problema, pero en escritorio no existe y, sobre todo, un enlace dentro del
+ * texto se lee como una invitación y una barra flotante no.
+ *
+ * Es deliberadamente estrecha: no compite con el cierre de página, que sigue
+ * siendo el bloque azul con el botón naranja.
+ */
+const {
+  claim = `Si ya sabes lo que necesitas, el camino corto es este. Respondo en ${site.respuesta}.`,
+} = Astro.props;
+---
+
+<section class="seccion-alterna py-10" aria-label="Contacto rápido">
+  <div class="container-brand">
+    <Reveal>
+      <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between md:gap-8">
+        <p class="flex items-start gap-3 text-sm text-fg-muted md:text-base">
+          <span class="regla-acento mt-2.5 w-6 shrink-0" aria-hidden="true"></span>
+          {claim}
+        </p>
+
+        <div class="flex shrink-0 flex-wrap gap-3">
+          <EnlaceBoton href={hrefTelefono()} variante="secundario">
+            <Phone className="h-4 w-4" aria-hidden="true" />
+            {site.nap.telefono}
+          </EnlaceBoton>
+          <EnlaceBoton href={hrefWhatsApp(mensajeWhatsApp)} variante="secundario">
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            WhatsApp
+          </EnlaceBoton>
+        </div>
+      </div>
+    </Reveal>
+  </div>
+</section>

@@ -1,0 +1,261 @@
+---
+import { ArrowUpRight, Check, MapPin } from "lucide-react";
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import Reveal from "@/components/ui/Reveal.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import BandaContacto from "@/components/sections/BandaContacto.astro";
+import FAQ from "@/components/sections/FAQ.astro";
+import CTASection from "@/components/sections/CTASection.astro";
+import { ServiceIcon } from "@/components/ui/ServiceIcon";
+import { schemaFaq, schemaMigas } from "@/lib/schema";
+import { crearMetadata } from "@/lib/seo";
+import { agrupaciones, zonas, type Agrupacion } from "@/content/zonas";
+import { servicios } from "@/content/servicios";
+
+/*
+ * Página de agrupación de zona.
+ *
+ * No hay una página por municipio: veintiuna páginas competirían entre ellas
+ * por las mismas búsquedas y ninguna tendría nada propio que contar. Se agrupa
+ * por comarca o conurbación, que es como se busca de verdad, y solo se publica
+ * la agrupación que tenga contenido diferenciado escrito. Las que no lo tengan
+ * llevan `publicada: false` en `zonas.ts` y sus municipios siguen apuntando al
+ * listado de `/zonas`.
+ */
+export function getStaticPaths() {
+  return agrupaciones
+    .filter((a) => a.publicada)
+    .map((agrupacion) => ({
+      params: { slug: agrupacion.slug },
+      props: { agrupacion },
+    }));
+}
+
+type Props = { agrupacion: Agrupacion };
+const { agrupacion } = Astro.props;
+
+const migas = [
+  { label: "Zonas", href: "/zonas" },
+  { label: agrupacion.nombre, href: `/zonas/${agrupacion.slug}` },
+];
+
+const meta = crearMetadata({
+  title: agrupacion.metaTitulo,
+  description: agrupacion.metaDescripcion,
+  path: `/zonas/${agrupacion.slug}`,
+  og: `/og/zonas-${agrupacion.slug}.jpg`,
+});
+
+const municipios = agrupacion.municipios
+  .map((slug) => zonas.find((z) => z.slug === slug))
+  .filter((z): z is (typeof zonas)[number] => Boolean(z));
+
+const otras = agrupaciones.filter((a) => a.publicada && a.slug !== agrupacion.slug);
+const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
+---
+
+<Base meta={meta} schema={[schemaFaq(preguntas), schemaMigas(migas)]}>
+  <header class="pt-32 pb-12 sm:pt-40 sm:pb-16">
+    <div class="container-brand">
+      <Breadcrumbs migas={migas} />
+
+      <p class="text-eyebrow mt-7 flex items-center gap-2.5 text-brand-orange">
+        <span class="regla-acento w-6" aria-hidden="true"></span>
+        Zona de actuación
+      </p>
+      <h1 class="mt-5 max-w-3xl text-5xl">{agrupacion.titulo}</h1>
+      <p class="mt-6 max-w-2xl text-xl text-fg-muted">{agrupacion.entradilla}</p>
+
+      <ul class="hairline-t mt-9 flex flex-wrap gap-x-5 gap-y-2 pt-5">
+        {
+          municipios.map((m) => (
+            <li class="text-eyebrow flex items-center gap-2 text-fg-dim">
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              {m.nombreLargo}
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="mt-9 flex flex-wrap gap-3">
+        <EnlaceBoton href="/contacto" tamano="lg" data-evento="presupuesto_cta">
+          Solicitar presupuesto
+        </EnlaceBoton>
+        <EnlaceBoton href="/proyectos" variante="secundario" tamano="lg">
+          Ver trabajos
+        </EnlaceBoton>
+      </div>
+    </div>
+  </header>
+
+  {/* Cuerpo editorial: por qué el trabajo es distinto aquí */}
+  <section class="pb-section" aria-labelledby="titulo-contexto">
+    <div class="container-brand">
+      <Reveal>
+        <h2 id="titulo-contexto" class="sr-only">
+          Cómo es trabajar en {agrupacion.nombre}
+        </h2>
+        <div class="prosa max-w-2xl text-lg">
+          {agrupacion.cuerpo.map((parrafo) => <p>{parrafo}</p>)}
+        </div>
+      </Reveal>
+    </div>
+  </section>
+
+  {
+    agrupacion.distritos ? (
+      <section class="seccion-alterna py-section" aria-labelledby="titulo-distritos">
+        <div class="container-brand">
+          <SectionHeading
+            numero="01"
+            eyebrow="Cobertura"
+            tituloId="titulo-distritos"
+            titulo="Los diez distritos"
+            descripcion="Se trabaja en toda la ciudad. El criterio cambia según la finca, no según el barrio."
+          />
+
+          <RevealGroup as="ul" class="mt-10 flex flex-wrap gap-2.5" stagger={0.03}>
+            {agrupacion.distritos.map((d) => (
+              <RevealItem as="li" class="hairline rounded-full px-4 py-2 text-sm text-fg-muted">
+                {d}
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
+    ) : null
+  }
+
+  {/* Casos típicos de la zona */}
+  <section class="seccion-clara py-section" aria-labelledby="titulo-casos">
+    <div class="container-brand">
+      <SectionHeading
+        numero={agrupacion.distritos ? "02" : "01"}
+        eyebrow="Lo que más sale aquí"
+        tituloId="titulo-casos"
+        titulo="Los casos que se repiten en la zona"
+        descripcion="No son encargos concretos: son el tipo de trabajo que aparece una y otra vez por cómo está construida la zona."
+      />
+
+      <RevealGroup as="ul" class="mt-12 grid gap-4 md:grid-cols-2" stagger={0.05}>
+        {
+          agrupacion.casos.map((caso) => (
+            <RevealItem as="li" class="tarjeta p-6">
+              <h3 class="flex items-start gap-3 font-sans text-lg font-bold">
+                <span class="chip-icono mt-0.5 h-6 w-6" aria-hidden="true">
+                  <Check className="h-3.5 w-3.5" />
+                </span>
+                {caso.titulo}
+              </h3>
+              <p class="mt-2 pl-9 text-sm text-fg-muted">{caso.detalle}</p>
+            </RevealItem>
+          ))
+        }
+      </RevealGroup>
+    </div>
+  </section>
+
+  {/* Municipio a municipio: cada uno con lo que lo caracteriza, que ya está
+      escrito en `zonas.ts` y aquí es donde de verdad se lee. */}
+  {
+    municipios.length > 1 ? (
+      <section class="py-section" aria-labelledby="titulo-municipios">
+        <div class="container-brand">
+          <SectionHeading
+            numero={agrupacion.distritos ? "03" : "02"}
+            eyebrow="Municipio a municipio"
+            tituloId="titulo-municipios"
+            titulo={`Qué tiene de particular cada municipio`}
+          />
+
+          <RevealGroup as="ul" class="mt-12 flex flex-col gap-3" stagger={0.04}>
+            {municipios.map((m) => (
+              <RevealItem as="li" class="tarjeta flex flex-col gap-2 p-5 sm:flex-row sm:items-baseline sm:gap-6">
+                <span class="shrink-0 text-lg font-bold sm:w-64">{m.nombreLargo}</span>
+                <span class="text-sm text-fg-muted">{m.claim}</span>
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </div>
+      </section>
+    ) : null
+  }
+
+  <BandaContacto claim={`¿Estás en ${agrupacion.nombre} y quieres una valoración? Cuéntamelo y te respondo hoy.`} />
+
+  {/* Servicios, para enlazar la zona con el oficio */}
+  <section class="py-section" aria-labelledby="titulo-servicios-zona">
+    <div class="container-brand">
+      <SectionHeading
+        numero={agrupacion.distritos ? "04" : "03"}
+        eyebrow="Servicios"
+        tituloId="titulo-servicios-zona"
+        titulo={`Qué se puede resolver en ${agrupacion.nombre}`}
+      />
+
+      <RevealGroup as="ul" class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" stagger={0.04}>
+        {
+          servicios.map((s) => (
+            <RevealItem as="li">
+              <a href={`/servicios/${s.slug}`} class="tarjeta group flex h-full flex-col gap-4 p-6">
+                <span class="chip-icono h-11 w-11">
+                  <ServiceIcon nombre={s.icono} className="h-5 w-5" />
+                </span>
+                <span>
+                  <span class="block text-xl font-bold">{s.nombre}</span>
+                  <span class="mt-2 block text-sm text-fg-muted">{s.resumenHome}</span>
+                </span>
+                <span class="text-eyebrow mt-auto flex items-center gap-1.5 text-fg-dim transition-colors group-hover:text-fg">
+                  Ver servicio
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+              </a>
+            </RevealItem>
+          ))
+        }
+      </RevealGroup>
+    </div>
+  </section>
+
+  <FAQ
+    preguntas={preguntas}
+    numero={agrupacion.distritos ? "05" : "04"}
+    titulo={`Preguntas sobre ${agrupacion.nombre}`}
+  />
+
+  {
+    otras.length > 0 ? (
+      <section class="pb-section" aria-labelledby="titulo-otras-zonas">
+        <div class="container-brand">
+          <h2 id="titulo-otras-zonas" class="text-eyebrow hairline-b pb-3 text-fg-dim">
+            Otras zonas
+          </h2>
+          <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {otras.map((o) => (
+              <li>
+                <a href={`/zonas/${o.slug}`} class="tarjeta block p-5">
+                  <span class="block text-lg font-bold">{o.nombre}</span>
+                  <span class="mt-1.5 block text-sm text-fg-muted">{o.entradilla}</span>
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href="/zonas" class="tarjeta block p-5">
+                <span class="block text-lg font-bold">Todas las zonas</span>
+                <span class="mt-1.5 block text-sm text-fg-muted">
+                  El mapa y los {zonas.length} municipios donde trabajo.
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+    ) : null
+  }
+
+  <CTASection titulo={`¿Necesitas un instalador en ${agrupacion.nombre}?`} />
+</Base>

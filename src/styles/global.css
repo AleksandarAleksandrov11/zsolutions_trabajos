@@ -31,25 +31,58 @@
 }
 
 @theme {
-  /* ---- Color ----
-     El manual define dos tintas: azul corporativo y negro. El azul se usa
-     aquí en tres intensidades (profunda para fondos, corporativa para acción
-     y clara para texto de acento sobre oscuro) y el naranja queda como único
-     acento de atención, muy medido: nunca más de un uso protagonista por
-     pantalla. */
+  /* ============================================================
+     COLOR
+
+     Dos familias y nada más. Cualquier color que no salga de aquí es un
+     error, no una excepción.
+
+     1. MARCA. El azul es color de MARCA, no de superficie: se usa en
+        relleno (bloques, botones, iconos sobre fondo propio), nunca como
+        color de texto sobre fondo oscuro, donde da 2,3:1. El naranja es el
+        acento: de uno a tres por pantalla completa, y nunca cero.
+
+     2. RAMPA NEUTRA. Once escalones sin una gota de azul dentro. La versión
+        anterior de esta hoja usaba grises teñidos (#0E0F12 tenía el canal
+        azul cuatro puntos por encima del rojo, #262A33 trece), y de ahí
+        salía la sensación de que toda la web era azul aunque el azul de
+        marca ocupase menos del 3 % de la superficie.
+     ============================================================ */
+
+  /* ---- Marca ---- */
   --color-brand-blue: #2f4aa0;
   --color-brand-blue-hover: #3d5fc4;
   --color-brand-blue-deep: #23366f;
-  --color-brand-blue-soft: #8fa4e8;
   --color-brand-orange: #ff7a1a;
+  --color-brand-orange-hover: #ff9247;
 
-  --color-bg: #0e0f12;
-  --color-surface: #16181d;
-  --color-surface-2: #1c1f26;
-  --color-line: #262a33;
-  --color-fg: #ffffff;
-  --color-fg-muted: #c6cad4;
-  --color-fg-dim: #878d9b;
+  /* ---- Rampa neutra ---- */
+  --color-n-950: #0f0f10;
+  --color-n-900: #151517;
+  --color-n-850: #1c1c1f;
+  --color-n-800: #26262a;
+  --color-n-700: #3a3a3f;
+  --color-n-500: #6b6b72;
+  --color-n-400: #9c9ca3;
+  --color-n-300: #c7c7cc;
+  --color-n-200: #e6e6e6;
+  --color-n-0: #ffffff;
+  --color-claro: #f4f4f5;
+
+  /* ---- Alias semánticos ----
+     Son los que usa el marcado. Los redefinen `.seccion-clara` y
+     `.seccion-azul`, así que una sola clase cambia el tema de un bloque
+     entero sin tocar ni una utilidad de dentro. */
+  --color-bg: var(--color-n-950);
+  --color-surface: var(--color-n-900);
+  --color-surface-2: var(--color-n-850);
+  --color-line: var(--color-n-800);
+  --color-fg: var(--color-n-0);
+  --color-fg-muted: var(--color-n-300);
+  --color-fg-dim: var(--color-n-400);
+
+  /* Anillo de foco. Naranja sobre oscuro (7,3:1), azul sobre claro (7,3:1). */
+  --color-foco: var(--color-brand-orange);
 
   /* ---- Tipografía ---- */
   --font-display: "Righteous", "Arial Black", Impact, sans-serif;
@@ -117,6 +150,13 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Hueco para la barra de contacto fija, que si no tapa el final del pie. */
+  @media (width < 64rem) {
+    body {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
+  }
+
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 400;
@@ -132,11 +172,13 @@
 
   ::selection {
     background-color: var(--color-brand-blue);
-    color: #fff;
+    color: var(--color-n-0);
   }
 
+  /* El anillo de foco es un token, no un color fijo: los bloques claros lo
+     cambian a azul porque el naranja sobre #F4F4F5 se queda en 2,4:1. */
   :focus-visible {
-    outline: 2px solid var(--color-brand-blue-soft);
+    outline: 2px solid var(--color-foco);
     outline-offset: 3px;
     border-radius: 4px;
   }
@@ -145,7 +187,7 @@
   input:-webkit-autofill,
   textarea:-webkit-autofill {
     -webkit-text-fill-color: var(--color-fg);
-    -webkit-box-shadow: 0 0 0 1000px #14161b inset;
+    -webkit-box-shadow: 0 0 0 1000px var(--color-n-850) inset;
     caret-color: var(--color-fg);
   }
 
@@ -201,12 +243,569 @@
    ============================================================ */
 
 @layer components {
-  /* Numeración de sección 01. / 02. / 03. como en el manual */
+  /* ------------------------------------------------------------
+     Temas de bloque
+
+     Cada una de estas clases redefine los alias semánticos para todo lo que
+     cuelga de ella. Las utilidades de dentro (`text-fg-muted`, `bg-surface`,
+     `hairline`…) no se enteran: siguen resolviendo la misma variable, que
+     ahora vale otra cosa. Así una sección entera cambia de tema con una sola
+     clase y sin duplicar marcado.
+     ------------------------------------------------------------ */
+
+  /* Bloque alterno: un escalón por encima del fondo, para dar ritmo vertical
+     sin cambiar de color. Sube también las superficies, porque si no las
+     tarjetas quedarían del mismo tono que la sección y desaparecerían. */
+  .seccion-alterna {
+    --color-bg: var(--color-n-900);
+    --color-surface: var(--color-n-850);
+    --color-surface-2: var(--color-n-800);
+    background-color: var(--color-bg);
+  }
+
+  /* Bloque claro. El manual pide una o dos secciones así en toda la web;
+     antes no había ninguna y el sitio era un bloque oscuro continuo. */
+  .seccion-clara {
+    --color-bg: var(--color-claro);
+    --color-surface: var(--color-n-0);
+    --color-surface-2: var(--color-n-200);
+    --color-line: var(--color-n-200);
+    --color-fg: var(--color-n-950);
+    --color-fg-muted: var(--color-n-700);
+    --color-fg-dim: var(--color-n-500);
+    /* Sobre claro el naranja da 2,4:1: no puede marcar el foco ni llevar
+       información por sí solo. Aquí el acento pasa a azul, que da 7,3:1. */
+    --color-foco: var(--color-brand-blue);
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  /* Bloque de marca. Es el que devuelve al azul su papel de superficie. */
+  .seccion-azul {
+    --color-bg: var(--color-brand-blue-deep);
+    --color-surface: var(--color-brand-blue);
+    --color-surface-2: var(--color-brand-blue-hover);
+    --color-line: color-mix(in srgb, var(--color-n-0) 18%, transparent);
+    --color-fg: var(--color-n-0);
+    /* Sobre azul profundo, `--n-400` se queda en 4,2:1. Se sube a `--n-300`,
+       que da 6,8:1 sobre el fondo y 4,8:1 sobre las tarjetas. */
+    --color-fg-muted: var(--color-n-300);
+    --color-fg-dim: var(--color-n-300);
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  /* Numeración de sección 01. / 02. / 03. como en el manual.
+     Es el acento naranja de cabecera: uno por sección, siempre presente. */
   .num-seccion {
     font-family: var(--font-display);
-    color: var(--color-brand-blue-soft);
+    color: var(--color-brand-orange);
     font-size: var(--text-xs);
     letter-spacing: 0.08em;
+  }
+
+  /* Sobre claro el naranja no llega a 3:1, así que la numeración pasa a azul. */
+  .seccion-clara .num-seccion {
+    color: var(--color-brand-blue);
+  }
+
+  /* Sobre azul profundo el naranja base se queda en 4,4:1, justo por debajo
+     del mínimo. El naranja claro da 5,2:1 y sigue siendo el mismo acento. */
+  .seccion-azul .num-seccion,
+  .seccion-azul .text-brand-orange {
+    color: var(--color-brand-orange-hover);
+  }
+
+  .seccion-azul .regla-acento {
+    background-color: var(--color-brand-orange-hover);
+  }
+
+  /* Dentro de una tarjeta del bloque azul el fondo sube a `--blue`, donde ni
+     siquiera el naranja claro llega a 4,5:1. Ahí el acento es el blanco (8:1)
+     y el naranja se queda para el titular de la sección. */
+  .seccion-azul .tarjeta .num-seccion {
+    color: var(--color-n-0);
+  }
+
+  /* Comparador antes / después.
+     El recorte lo hace `clip-path` sobre la cara de «antes»; el control es un
+     `<input type="range">` invisible estirado sobre toda la caja, que es lo
+     que da arrastre, teclado y anuncio del valor sin reimplementar nada. */
+  .comparador {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--color-line);
+    aspect-ratio: 4 / 3;
+    background-color: var(--color-surface);
+  }
+
+  @media (width >= 48rem) {
+    .comparador { aspect-ratio: 16 / 9; }
+  }
+
+  .comparador-foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .comparador-antes {
+    position: absolute;
+    inset: 0;
+    display: block;
+    clip-path: inset(0 calc(100% - var(--corte, 50%)) 0 0);
+  }
+
+  .comparador-etiqueta {
+    position: absolute;
+    top: 1rem;
+    z-index: 2;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--color-n-950) 72%, transparent);
+    color: var(--color-n-0);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+  }
+
+  .comparador-etiqueta-antes { left: 1rem; }
+  .comparador-etiqueta-despues { right: 1rem; }
+
+  .comparador-linea {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--corte, 50%);
+    z-index: 3;
+    width: 2px;
+    translate: -1px 0;
+    background-color: var(--color-brand-orange);
+    pointer-events: none;
+  }
+
+  .comparador-tirador {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background-color: var(--color-brand-orange);
+    color: var(--color-n-950);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+  }
+
+  /* El rango cubre toda la caja: se puede arrastrar desde cualquier punto de
+     la imagen, no solo desde el tirador. */
+  .comparador-rango {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    appearance: none;
+    background: transparent;
+  }
+
+  .comparador-rango::-webkit-slider-thumb {
+    appearance: none;
+    width: 3rem;
+    height: 100%;
+  }
+
+  .comparador-rango::-moz-range-thumb {
+    width: 3rem;
+    height: 100%;
+    border: 0;
+    background: transparent;
+  }
+
+  /* El foco se ve en el tirador, porque el control en sí es invisible. */
+  .comparador-rango:focus-visible {
+    outline: none;
+  }
+
+  .comparador:has(.comparador-rango:focus-visible) .comparador-tirador {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 3px;
+  }
+
+  /* Selector de servicio. Las opciones son enlaces o botones grandes: se
+     tocan sin apuntar y el estado activo se ve sin depender del color. */
+  .opcion-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.5rem;
+    height: 100%;
+    padding: 0.875rem 1.125rem;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    text-align: left;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition:
+      border-color 0.2s var(--ease-brand),
+      background-color 0.2s var(--ease-brand);
+  }
+
+  @media (hover: hover) {
+    .opcion-selector:hover {
+      border-color: var(--color-brand-blue);
+      background-color: var(--color-surface-2);
+    }
+  }
+
+  .enlace-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-fg-dim);
+    cursor: pointer;
+    transition: color 0.2s var(--ease-brand);
+  }
+
+  @media (hover: hover) {
+    .enlace-volver:hover { color: var(--color-fg); }
+  }
+
+  .boton-selector-primario,
+  .boton-selector-secundario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 1.25rem;
+    border-radius: 999px;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition:
+      background-color 0.2s var(--ease-brand),
+      border-color 0.2s var(--ease-brand);
+  }
+
+  .boton-selector-primario {
+    background-color: var(--color-brand-blue);
+    color: var(--color-n-0);
+  }
+
+  .boton-selector-secundario {
+    border: 1px solid var(--color-line);
+    color: var(--color-fg);
+  }
+
+  @media (hover: hover) {
+    .boton-selector-primario:hover { background-color: var(--color-brand-blue-hover); }
+    .boton-selector-secundario:hover { border-color: var(--color-fg-dim); }
+  }
+
+  /* Carrusel.
+     El desplazamiento y el encaje los hace el navegador con `scroll-snap`;
+     el script solo añade botones e indicadores. Sin JavaScript sigue siendo
+     una tira deslizable con los ocho testimonios accesibles. */
+  .carrusel {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 86%;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    /* La barra de desplazamiento se oculta: los mandos y el arrastre ya
+       indican que hay más. */
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+  }
+
+  .carrusel::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (width >= 48rem) {
+    .carrusel { grid-auto-columns: calc(50% - 0.5rem); }
+  }
+
+  @media (width >= 72rem) {
+    .carrusel { grid-auto-columns: calc(33.333% - 0.667rem); }
+  }
+
+  .carrusel-diapo {
+    scroll-snap-align: start;
+    height: 100%;
+  }
+
+  .boton-carrusel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    color: var(--color-fg);
+    cursor: pointer;
+    transition:
+      border-color 0.2s var(--ease-brand),
+      background-color 0.2s var(--ease-brand);
+  }
+
+  @media (hover: hover) {
+    .boton-carrusel:hover {
+      border-color: var(--color-brand-blue);
+      background-color: color-mix(in srgb, var(--color-fg) 6%, transparent);
+    }
+  }
+
+  /* Un solo botón para pausar y reanudar: se enseña el icono que toca. */
+  .boton-carrusel .icono-play { display: none; }
+  .boton-carrusel[aria-pressed="false"] .icono-pausa { display: none; }
+  .boton-carrusel[aria-pressed="false"] .icono-play { display: block; }
+
+  /* Indicadores. El activo es el acento naranja; sobre claro pasa a azul,
+     porque el naranja sobre #F4F4F5 se queda en 2,4:1. */
+  .punto-carrusel {
+    /* 44 px de lado: ocho caben en 352 px, así que entran en la pantalla más
+       estrecha que se contempla (360 px) sin separación entre ellos. */
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .punto-carrusel::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0.5rem;
+    top: 50%;
+    height: 3px;
+    border-radius: 3px;
+    translate: 0 -50%;
+    background-color: var(--color-line);
+    transition: background-color 0.25s var(--ease-brand);
+  }
+
+  .punto-carrusel[aria-current="true"]::after {
+    background-color: var(--color-brand-orange);
+  }
+
+  .seccion-clara .punto-carrusel[aria-current="true"]::after {
+    background-color: var(--color-brand-blue);
+  }
+
+  /* Chip de filtro. El activo va en azul relleno, que es el papel del azul
+     en este sistema: superficie, no color de texto sobre oscuro. */
+  .chip-filtro {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.9rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-fg-muted);
+    background-color: transparent;
+    cursor: pointer;
+    transition:
+      background-color 0.2s var(--ease-brand),
+      border-color 0.2s var(--ease-brand),
+      color 0.2s var(--ease-brand);
+  }
+
+  .chip-filtro[aria-pressed="true"] {
+    background-color: var(--color-brand-blue);
+    border-color: var(--color-brand-blue);
+    color: var(--color-n-0);
+  }
+
+  @media (hover: hover) {
+    .chip-filtro:hover {
+      border-color: var(--color-fg-dim);
+      color: var(--color-fg);
+    }
+
+    .chip-filtro[aria-pressed="true"]:hover {
+      background-color: var(--color-brand-blue-hover);
+      border-color: var(--color-brand-blue-hover);
+      color: var(--color-n-0);
+    }
+  }
+
+  /* Galería en mampostería.
+     `columns` reparte las tarjetas por altura real sin JavaScript, que es lo
+     que hace que un mosaico se vea mosaico. `break-inside: avoid` impide que
+     una tarjeta se parta entre dos columnas. */
+  .galeria-trabajos {
+    columns: 1;
+    column-gap: 1rem;
+  }
+
+  @media (width >= 40rem) {
+    .galeria-trabajos { columns: 2; }
+  }
+
+  @media (width >= 64rem) {
+    .galeria-trabajos { columns: 3; }
+  }
+
+  .galeria-item {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+    /* La transición de entrada y salida al filtrar. La posición la recoloca
+       el propio `columns`, así que aquí solo hay que suavizar la aparición. */
+    transition:
+      opacity 0.28s var(--ease-brand),
+      transform 0.28s var(--ease-brand);
+  }
+
+  .galeria-item[data-filtrado] {
+    display: none;
+  }
+
+  /* Mapa de zonas navegable. El punto crece y se pone naranja al señalarlo,
+     y su etiqueta pasa a blanco. `paint-order` evita que el trazo se coma el
+     relleno cuando el punto es de 2 px. */
+  .punto-zona {
+    cursor: pointer;
+  }
+
+  .punto-zona-marca {
+    transition:
+      r 0.2s var(--ease-brand),
+      fill 0.2s var(--ease-brand),
+      opacity 0.2s var(--ease-brand);
+  }
+
+  .punto-zona.senalada .punto-zona-marca {
+    r: 6;
+    fill: var(--color-brand-orange);
+    opacity: 1;
+  }
+
+  .etiqueta-zona {
+    transition: fill 0.2s var(--ease-brand);
+  }
+
+  .etiqueta-zona.senalada {
+    fill: var(--color-n-0);
+  }
+
+  /* El anillo de foco del navegador no se ve bien sobre un SVG, así que el
+     punto enfocado se marca además con su propio halo. */
+  .punto-zona:focus-visible {
+    outline: none;
+  }
+
+  .punto-zona:focus-visible .punto-zona-marca {
+    r: 6;
+    fill: var(--color-brand-orange);
+    stroke: var(--color-n-0);
+    stroke-width: 2;
+  }
+
+  [data-fila-zona].senalada {
+    border-color: var(--color-brand-orange);
+  }
+
+  /* Línea de la trayectoria: el tramo recorrido va en naranja y el que
+     queda, en el gris de las líneas. Sin JavaScript se queda al 0 %, que es
+     una línea gris normal y corriente. */
+  .linea-trayectoria {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to bottom,
+      var(--color-brand-orange) 0,
+      var(--color-brand-orange) var(--avance, 0%),
+      var(--color-line) var(--avance, 0%),
+      var(--color-line) 100%
+    );
+  }
+
+  /* Detalle del carnet: colapsado con `grid-template-rows`, que es lo único
+     que anima una altura desconocida sin fijarla a mano. */
+  .detalle-carnet {
+    display: grid;
+    grid-template-rows: 0fr;
+    margin-top: 0;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.3s var(--ease-brand),
+      opacity 0.3s var(--ease-brand),
+      margin-top 0.3s var(--ease-brand);
+  }
+
+  .detalle-carnet > span {
+    overflow: hidden;
+  }
+
+  .tarjeta:focus-within .detalle-carnet {
+    grid-template-rows: 1fr;
+    margin-top: 0.25rem;
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .tarjeta:hover .detalle-carnet {
+      grid-template-rows: 1fr;
+      margin-top: 0.25rem;
+      opacity: 1;
+    }
+  }
+
+  /* Filete de acento junto a la numeración de sección. */
+  .regla-acento {
+    display: inline-block;
+    height: 1px;
+    background-color: var(--color-brand-orange);
+  }
+
+  .seccion-clara .regla-acento {
+    background-color: var(--color-brand-blue);
+  }
+
+  /* Chip de icono: relleno azul con el glifo en blanco (8:1). Es la forma de
+     dar presencia real al azul sin usarlo como color de texto sobre oscuro. */
+  .chip-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    border-radius: 999px;
+    background-color: var(--color-brand-blue);
+    color: var(--color-n-0);
+    transition: background-color 0.25s var(--ease-brand);
   }
 
   .prosa p {
@@ -242,10 +841,26 @@
       transform 0.25s var(--ease-brand);
   }
 
-  a.tarjeta:hover,
+  /* El hover va dentro de `@media (hover: hover)` para que en una pantalla
+     táctil no se quede pegado después de tocar la tarjeta. */
+  @media (hover: hover) {
+    a.tarjeta:hover {
+      border-color: var(--color-brand-blue);
+      background-color: var(--color-surface-2);
+    }
+
+    /* El chip de icono es lo que se pone naranja al pasar por encima: un
+       acento de un solo elemento, no un bloque de color. */
+    a.tarjeta:hover .chip-icono,
+    button.tarjeta:hover .chip-icono {
+      background-color: var(--color-brand-orange);
+      color: var(--color-n-950);
+    }
+  }
+
   a.tarjeta:focus-visible,
   .tarjeta:has(a:focus-visible) {
-    border-color: color-mix(in srgb, var(--color-brand-blue) 70%, transparent);
+    border-color: var(--color-brand-blue);
     background-color: var(--color-surface-2);
   }
 
@@ -276,6 +891,24 @@
   transition: opacity 0.3s var(--ease-brand), visibility 0s;
 }
 
+/* Barra de contacto y botón flotante: entran desde abajo tras el primer
+   scroll. `visibility` evita que sigan siendo enfocables mientras están
+   ocultos, que es lo que pasaba antes con la opacidad sola. */
+.barra-contacto {
+  transition:
+    opacity 0.3s var(--ease-brand),
+    transform 0.3s var(--ease-brand),
+    visibility 0s linear 0s;
+}
+
+.barra-contacto[data-oculta] {
+  opacity: 0;
+  transform: translateY(0.75rem);
+  visibility: hidden;
+  pointer-events: none;
+  transition-delay: 0s, 0s, 0.3s;
+}
+
 .banner-cookies {
   opacity: 0;
   transform: translateY(16px);
@@ -302,7 +935,7 @@
 }
 
 .visor::backdrop {
-  background: rgba(8, 9, 11, 0.94);
+  background: rgba(10, 10, 11, 0.94);
   backdrop-filter: blur(6px);
 }
 
@@ -354,8 +987,17 @@
     scroll-behavior: auto !important;
   }
 
-  .js [data-revelar] { transform: none; }
-  .js [data-revelar].visible { transition-delay: 0s; }
+  /* Con movimiento reducido el contenido no se oculta ni espera al
+     observador: aparece ya visible y no hay nada que revelar. */
+  .js [data-revelar] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js [data-revelar].visible {
+    transition: none;
+    transition-delay: 0s;
+  }
 
   ::view-transition-group(*),
   ::view-transition-old(root),

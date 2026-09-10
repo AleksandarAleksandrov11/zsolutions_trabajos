@@ -1,0 +1,68 @@
+---
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import Trabajos from "@/components/sections/Trabajos.astro";
+import Comparador from "@/components/sections/Comparador.astro";
+import BandaContacto from "@/components/sections/BandaContacto.astro";
+import CTASection from "@/components/sections/CTASection.astro";
+import { schemaMigas } from "@/lib/schema";
+import { crearMetadata } from "@/lib/seo";
+import { comparativas } from "@/content/comparativas";
+import { trabajos } from "@/content/trabajos";
+
+/*
+ * Galería de trabajos con página propia.
+ *
+ * Es el mejor argumento de venta que hay y un nodo de enlazado interno
+ * fuerte: entra desde cada página de servicio y de zona, y sale hacia ellas.
+ * La sección de la portada y esta comparten componente, así que solo hay una
+ * galería que mantener.
+ */
+const migas = [{ label: "Trabajos", href: "/proyectos" }];
+
+const meta = crearMetadata({
+  title: "Trabajos realizados en Barcelona y Cataluña | ZSolutions",
+  description:
+    "Galería de intervenciones de electricidad, fontanería, climatización, aerotermia y trabajos verticales, filtrable por oficio y por tipo de finca.",
+  path: "/proyectos",
+  og: "/og/proyectos.jpg",
+});
+---
+
+<Base meta={meta} schema={schemaMigas(migas)}>
+  <header class="pt-32 pb-4 sm:pt-40">
+    <div class="container-brand">
+      <Breadcrumbs migas={migas} />
+
+      <p class="text-eyebrow mt-7 flex items-center gap-2.5 text-brand-orange">
+        <span class="regla-acento w-6" aria-hidden="true"></span>
+        Trabajos
+      </p>
+      <h1 class="mt-5 max-w-3xl text-5xl">Lo que se ve cuando el trabajo está bien hecho</h1>
+      <p class="mt-6 max-w-2xl text-xl text-fg-muted">
+        {trabajos.length} tipos de intervención con lo que realmente incluye cada uno.
+        Filtra por oficio o por tipo de finca para ver solo lo que se parece a lo tuyo.
+      </p>
+
+      <div class="mt-9 flex flex-wrap gap-3">
+        <EnlaceBoton href="/contacto" tamano="lg" data-evento="presupuesto_cta">
+          Solicitar presupuesto
+        </EnlaceBoton>
+        <EnlaceBoton href="/servicios" variante="secundario" tamano="lg">
+          Ver los servicios
+        </EnlaceBoton>
+      </div>
+    </div>
+  </header>
+
+  <Trabajos conEncabezado={false} />
+
+  <BandaContacto claim="¿Tu caso se parece a alguno de estos? Cuéntamelo y te digo en el día si es trabajo mío." />
+
+  {comparativas.map((c, i) => (
+    <Comparador comparativa={c} numero={String(i + 1).padStart(2, "0")} />
+  ))}
+
+  <CTASection titulo="¿Quieres algo así en tu casa o tu finca?" />
+</Base>

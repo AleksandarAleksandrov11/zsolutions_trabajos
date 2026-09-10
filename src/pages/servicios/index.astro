@@ -19,6 +19,7 @@ const meta = crearMetadata({
   description:
     "Electricidad, fontanería, climatización, aerotermia, trabajos verticales y lampistería en Barcelona y Cataluña, con las habilitaciones en regla.",
   path: "/servicios",
+  og: "/og/servicios.jpg",
 });
 ---
 
@@ -54,7 +55,7 @@ const meta = crearMetadata({
                 <span class="flex flex-1 flex-col p-6 sm:p-7">
                   <span class="flex items-start justify-between gap-4">
                     <span class="flex items-center gap-3">
-                      <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-blue/12 text-brand-blue-soft transition-colors group-hover:bg-brand-blue group-hover:text-white">
+                      <span class="chip-icono h-10 w-10">
                         <ServiceIcon nombre={servicio.icono} className="h-5 w-5" />
                       </span>
                       <span class="font-display text-2xl">{servicio.nombre}</span>
@@ -74,6 +75,6 @@ const meta = crearMetadata({
     </div>
   </section>
 
-  <Metodo numero="02" />
+  <Metodo numero="02" tema="alterna" />
   <CTASection />
 </Base>

@@ -11,7 +11,26 @@
  * Los dos listados tienen que coincidir; `scripts/auditar-contenido.mjs` lo
  * comprueba en cada auditoría para que no se queden descolgados.
  */
+import { agrupacionDe, zonas } from "./zonas.ts";
+
 export type Redireccion = { desde: string; hacia: string };
+
+/**
+ * Las páginas por municipio que existieron y ya no.
+ *
+ * Antes esto era una sola regla con patrón, `/zonas/:ciudad → /zonas`, que
+ * mandaba todo al listado. Con las páginas de agrupación publicadas esa regla
+ * se las comería a todas, así que ahora cada municipio redirige a la
+ * agrupación que le corresponde, y solo al listado si su agrupación todavía
+ * no tiene página.
+ */
+const redireccionesDeZona: Redireccion[] = zonas.map((zona) => {
+  const grupo = agrupacionDe(zona.slug);
+  return {
+    desde: `/zonas/${zona.slug}`,
+    hacia: grupo?.publicada ? `/zonas/${grupo.slug}` : "/zonas",
+  };
+});
 
 export const redirecciones: Redireccion[] = [
   { desde: "/presupuesto", hacia: "/contacto" },
@@ -19,7 +38,9 @@ export const redirecciones: Redireccion[] = [
   { desde: "/servicios/lampista", hacia: "/servicios/lampisteria" },
   { desde: "/servicios/aire-acondicionado", hacia: "/servicios/climatizacion" },
   { desde: "/servicios/trabajos-en-altura", hacia: "/servicios/trabajos-verticales" },
-  /* La galería de trabajos y la formación dejaron de tener página propia. */
-  { desde: "/proyectos", hacia: "/#trabajos" },
+  /* La formación va dirigida a instaladores y esta web va dirigida a clientes
+     con una avería: son dos intenciones de búsqueda distintas y mezclarlas
+     diluye las dos. La formación vive en otra propiedad. */
   { desde: "/formacion", hacia: "/sobre-alex" },
+  ...redireccionesDeZona,
 ];

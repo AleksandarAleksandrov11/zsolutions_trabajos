@@ -1,0 +1,136 @@
+---
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/ui/Reveal.astro";
+import { fotos } from "@/content/fotos";
+import type { Comparativa } from "@/content/comparativas";
+
+type Props = {
+  comparativa: Comparativa;
+  numero?: string;
+  eyebrow?: string;
+};
+
+const { comparativa, numero, eyebrow = "Antes y después" } = Astro.props;
+
+const antes = fotos[comparativa.antes];
+const despues = fotos[comparativa.despues];
+const id = `comparador-${comparativa.servicio}`;
+
+/* `fotos.ts` guarda las variantes por formato; aquí se arman las dos cadenas
+   de `srcset` que necesita cada `<picture>`. */
+const srcset = (v: { ancho: number; src: string }[]) =>
+  v.map((x) => `${x.src} ${x.ancho}w`).join(", ");
+
+const TAMANOS = "(max-width: 1024px) 100vw, 76rem";
+
+/*
+ * Comparador antes / después.
+ *
+ * El control es un `<input type="range">` de verdad, no un `div` con eventos
+ * de puntero. Eso trae gratis lo que cuesta reimplementar bien: arrastre con
+ * ratón y con dedo, flechas del teclado, Inicio y Fin, anuncio del valor por
+ * el lector de pantalla y el respeto por la configuración del sistema. El
+ * script solo traslada su valor a una variable CSS.
+ *
+ * Sin JavaScript el control sigue funcionando: el recorte lo hace el CSS a
+ * partir de `--corte`, que el propio navegador actualiza al mover el rango
+ * porque se lee del atributo `value`. En el peor caso se ve la foto de
+ * «después» al 50 %, que es un estado correcto.
+ */
+---
+
+<section class="py-section" aria-labelledby={`${id}-titulo`}>
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow={eyebrow}
+      tituloId={`${id}-titulo`}
+      titulo={comparativa.titulo}
+      descripcion={comparativa.descripcion}
+    />
+
+    <Reveal class="mt-12">
+      <figure class="m-0">
+        <div class="comparador" data-comparador style="--corte: 50%">
+          <picture>
+            <source type="image/avif" srcset={srcset(despues.variantes.avif)} sizes={TAMANOS} />
+            <source type="image/webp" srcset={srcset(despues.variantes.webp)} sizes={TAMANOS} />
+            <img
+              src={despues.src}
+              width={despues.ancho}
+              height={despues.alto}
+              alt={comparativa.altDespues}
+              loading="lazy"
+              decoding="async"
+              class="comparador-foto"
+            />
+          </picture>
+
+          {/* La cara «antes» se recorta con `clip-path`, así que las dos fotos
+              están siempre a tamaño completo y no hay saltos al arrastrar. */}
+          <picture class="comparador-antes">
+            <source type="image/avif" srcset={srcset(antes.variantes.avif)} sizes={TAMANOS} />
+            <source type="image/webp" srcset={srcset(antes.variantes.webp)} sizes={TAMANOS} />
+            <img
+              src={antes.src}
+              width={antes.ancho}
+              height={antes.alto}
+              alt={comparativa.altAntes}
+              loading="lazy"
+              decoding="async"
+              class="comparador-foto"
+            />
+          </picture>
+
+          <span class="comparador-etiqueta comparador-etiqueta-antes" aria-hidden="true">Antes</span>
+          <span class="comparador-etiqueta comparador-etiqueta-despues" aria-hidden="true">Después</span>
+
+          <span class="comparador-linea" aria-hidden="true">
+            <span class="comparador-tirador">
+              {/* El rayo de la Z de la marca. */}
+              <svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
+                <path d="M13.6 2 5 13.2h5.1L9.2 22l9.4-11.6h-5.4L13.6 2Z" fill="currentColor" />
+              </svg>
+            </span>
+          </span>
+
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="50"
+            step="1"
+            class="comparador-rango"
+            aria-label={`Comparar antes y después: ${comparativa.titulo}`}
+            data-comparador-rango
+          />
+        </div>
+
+        <figcaption class="mt-4 text-xs text-fg-dim">
+          Arrastra la barra, o muévela con las flechas del teclado.
+          {
+            comparativa.provisional ? (
+              <>
+                {" "}
+                <strong class="font-bold text-fg-muted">
+                  Ejemplo del tipo de intervención, no una obra concreta.
+                </strong>
+              </>
+            ) : null
+          }
+          {comparativa.credito ? <> {comparativa.credito}</> : null}
+        </figcaption>
+      </figure>
+    </Reveal>
+  </div>
+</section>
+
+<script>
+  for (const caja of document.querySelectorAll<HTMLElement>("[data-comparador]")) {
+    const rango = caja.querySelector<HTMLInputElement>("[data-comparador-rango]");
+    if (!rango) continue;
+    const pintar = () => caja.style.setProperty("--corte", `${rango.value}%`);
+    rango.addEventListener("input", pintar);
+    pintar();
+  }
+</script>

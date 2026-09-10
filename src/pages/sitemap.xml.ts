@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { BASE_URL } from "@/lib/seo";
 import { servicios } from "@/content/servicios";
+import { agrupaciones } from "@/content/zonas";
 
 type Entrada = { url: string; frecuencia: string; prioridad: number };
 
@@ -11,6 +12,7 @@ export const GET: APIRoute = () => {
     { url: "", frecuencia: "monthly", prioridad: 1 },
     { url: "/servicios", frecuencia: "monthly", prioridad: 0.9 },
     { url: "/zonas", frecuencia: "monthly", prioridad: 0.8 },
+    { url: "/proyectos", frecuencia: "monthly", prioridad: 0.8 },
     { url: "/sobre-alex", frecuencia: "yearly", prioridad: 0.7 },
     { url: "/contacto", frecuencia: "yearly", prioridad: 0.9 },
     { url: "/aviso-legal", frecuencia: "yearly", prioridad: 0.2 },
@@ -24,7 +26,15 @@ export const GET: APIRoute = () => {
     prioridad: 0.9,
   }));
 
-  const entradas = [...estaticas, ...paginasServicio];
+  const paginasZona: Entrada[] = agrupaciones
+    .filter((a) => a.publicada)
+    .map((agrupacion) => ({
+      url: `/zonas/${agrupacion.slug}`,
+      frecuencia: "monthly",
+      prioridad: 0.8,
+    }));
+
+  const entradas = [...estaticas, ...paginasServicio, ...paginasZona];
 
   const cuerpo = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

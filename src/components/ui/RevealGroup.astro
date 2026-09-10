@@ -4,9 +4,11 @@ type Props = {
   /** Separación entre elementos, en segundos. */
   stagger?: number;
   as?: "div" | "ul" | "ol";
+  /** Cualquier otro atributo pasa tal cual al elemento. */
+  [clave: string]: unknown;
 };
 
-const { class: clase, stagger = 0.08, as: Como = "div" }: Props = Astro.props;
+const { class: clase, stagger = 0.08, as: Como = "div", ...resto }: Props = Astro.props;
 
 /**
  * Contenedor de entrada escalonada.
@@ -17,6 +19,6 @@ const { class: clase, stagger = 0.08, as: Como = "div" }: Props = Astro.props;
  */
 ---
 
-<Como class={clase} data-grupo-revelar={String(stagger)}>
+<Como class={clase} data-grupo-revelar={String(stagger)} {...resto}>
   <slot />
 </Como>

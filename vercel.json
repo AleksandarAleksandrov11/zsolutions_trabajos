@@ -32,17 +32,112 @@
       "permanent": true
     },
     {
-      "source": "/proyectos",
-      "destination": "/#trabajos",
-      "permanent": true
-    },
-    {
       "source": "/formacion",
       "destination": "/sobre-alex",
       "permanent": true
     },
     {
-      "source": "/zonas/:ciudad",
+      "source": "/zonas/barcelona",
+      "destination": "/zonas/barcelona-ciudad",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/hospitalet-de-llobregat",
+      "destination": "/zonas/baix-llobregat",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/badalona",
+      "destination": "/zonas/barcelones-nord",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/santa-coloma-de-gramenet",
+      "destination": "/zonas/barcelones-nord",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/sant-adria-de-besos",
+      "destination": "/zonas/barcelones-nord",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/cornella-de-llobregat",
+      "destination": "/zonas/baix-llobregat",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/sant-boi-de-llobregat",
+      "destination": "/zonas/baix-llobregat",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/esplugues-de-llobregat",
+      "destination": "/zonas/baix-llobregat",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/el-prat-de-llobregat",
+      "destination": "/zonas/baix-llobregat",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/castelldefels",
+      "destination": "/zonas/baix-llobregat",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/sitges",
+      "destination": "/zonas",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/vilanova-i-la-geltru",
+      "destination": "/zonas",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/sant-cugat-del-valles",
+      "destination": "/zonas/valles-occidental",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/cerdanyola-del-valles",
+      "destination": "/zonas/valles-occidental",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/sabadell",
+      "destination": "/zonas/valles-occidental",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/terrassa",
+      "destination": "/zonas/valles-occidental",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/mollet-del-valles",
+      "destination": "/zonas",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/granollers",
+      "destination": "/zonas",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/mataro",
+      "destination": "/zonas",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/manresa",
+      "destination": "/zonas",
+      "permanent": true
+    },
+    {
+      "source": "/zonas/girona",
       "destination": "/zonas",
       "permanent": true
     }

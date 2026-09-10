@@ -10,7 +10,7 @@ Barcelona, el área metropolitana y Cataluña.
 **Stack:** Astro 7 en estático · TypeScript estricto · Tailwind CSS v4 · React 19
 solo en el formulario · Zod · Resend · Vercel.
 
-La web entera se compila a HTML: 15 páginas que Vercel sirve desde la CDN sin
+La web entera se compila a HTML: 20 páginas que Vercel sirve desde la CDN sin
 ejecutar nada. La única parte dinámica es el envío del formulario, que vive en
 `api/presupuesto.ts` como función independiente, fuera del build del framework.
 
@@ -51,27 +51,35 @@ desplegar.
 
 | Variable | Para qué sirve | Obligatoria |
 |---|---|---|
-| `PUBLIC_SITE_URL` | Dominio definitivo. **Déjala vacía mientras no lo tengas** | No |
-| `PUBLIC_PERMITIR_INDEXACION` | `true` para que Google indexe la URL provisional | No |
+| `PUBLIC_SITE_URL` | Dominio definitivo, cuando lo tengas. Sin ella, en producción se usa el dominio del proyecto en Vercel | No |
+| `PUBLIC_PERMITIR_INDEXACION` | Interruptor manual: `true` fuerza la indexación, `false` la corta. Sin definir, decide el automatismo | No |
 | `RESEND_API_KEY` | Clave de API de [Resend](https://resend.com/api-keys) | Sí, para que el formulario envíe |
 | `EMAIL_REMITENTE` | Remitente. Sin dominio propio: `ZSolutions <onboarding@resend.dev>` | Sí |
 | `EMAIL_DESTINATARIO` | Dirección de Alex que recibe las solicitudes | Sí |
 
-Los nombres antiguos `NEXT_PUBLIC_SITE_URL` y `NEXT_PUBLIC_PERMITIR_INDEXACION`
-se siguen leyendo, para que un proyecto ya configurado en Vercel no deje de
-funcionar de golpe. Los nuevos tienen prioridad.
+### Cuándo se abre la web a Google
 
-### Todavía no hay dominio
+No hace falta configurar nada para que se indexe. **No hay ninguna dirección
+escrita a fuego en el código:** las canonicals, el sitemap, el JSON-LD y las
+miniaturas sociales se resuelven en tiempo de compilación a partir del entorno
+(`src/lib/seo.ts`).
 
-No hace falta para publicar. **No hay ninguna dirección escrita a fuego en el
-código:** las canonicals, el sitemap, el JSON-LD y las miniaturas sociales se
-resuelven en tiempo de compilación a partir del entorno (`src/lib/seo.ts`).
+La regla es automática, para que un despliegue correcto no se quede invisible
+porque nadie recordase definir una variable:
 
-Mientras `PUBLIC_SITE_URL` esté vacía, la web se publica en `noindex`. Es
-deliberado: indexar una dirección provisional de Vercel obliga después a
-limpiarla a base de redirecciones cuando llegue el dominio bueno. Con la web en
-`noindex`, Lighthouse baja el apartado de SEO a unos 69 puntos; no es un fallo,
-es exactamente lo que se le ha pedido. Con el dominio puesto vuelve a 100.
+| Situación | ¿Se indexa? | Dirección que se usa |
+|---|---|---|
+| Producción en Vercel | **Sí** | `PUBLIC_SITE_URL`, o el dominio de producción del proyecto |
+| Previsualización de Vercel | No, nunca | La URL única de la preview |
+| Cualquier build sin dirección conocida | No | `http://localhost:4321` |
+| `PUBLIC_PERMITIR_INDEXACION=false` | No | La que tocase |
+
+Las previsualizaciones no se indexan **aunque se fuerce el interruptor**:
+indexarlas deja copias compitiendo con el dominio bueno por las mismas
+búsquedas, y limpiarlas después cuesta redirecciones y reindexación.
+
+El interruptor `PUBLIC_PERMITIR_INDEXACION=false` está para sacar la web del
+índice sin tener que tocar código ni esperar a un despliegue.
 
 ### Probar el formulario hoy, sin dominio
 
@@ -99,7 +107,7 @@ en un componente.** Todo vive en `src/content/`, en archivos TypeScript tipados.
 |---|---|
 | `site.ts` | Nombre, NAP, teléfono, WhatsApp, email, redes, navegación |
 | `servicios.ts` | Los 6 servicios completos: textos, FAQ, proceso, palabras clave |
-| `zonas.ts` | Las 21 zonas, con su comarca y su punto en el mapa |
+| `zonas.ts` | Los 21 municipios con su comarca y su punto en el mapa, y las agrupaciones con página propia |
 | `trabajos.ts` | Galería de tipos de intervención |
 | `testimonios.ts` | Opiniones de clientes (**hay que sustituirlas**, ver §5) |
 | `certificaciones.ts` | Las 19 acreditaciones agrupadas |
@@ -177,17 +185,28 @@ scripts/           generación de imágenes, iconos y miniatura, y auditorías
 
 | Ruta | Qué es |
 |---|---|
-| `/` | Portada: servicios, método, trabajos, Alex, testimonios, zonas y FAQ |
+| `/` | Portada: selector de servicio, método, trabajos, comparador, Alex, testimonios, zonas y FAQ |
 | `/servicios` | Índice de los seis servicios |
 | `/servicios/<slug>` | Seis páginas, una por oficio. Es el núcleo del SEO |
-| `/zonas` | Mapa real de Cataluña y las 21 zonas por comarca |
-| `/sobre-alex` | Trayectoria y acreditaciones completas |
+| `/proyectos` | Galería filtrable por oficio y por tipo de finca |
+| `/zonas` | Mapa navegable de Cataluña y los 21 municipios por comarca |
+| `/zonas/<agrupación>` | Cuatro páginas por comarca o conurbación, con contenido propio |
+| `/sobre-alex` | Trayectoria, cifras y acreditaciones completas |
 | `/contacto` | Formulario de presupuesto |
 | Tres páginas legales y el 404 | |
 
-No hay página por municipio ni página de formación: se quitaron a propósito
-para que la navegación no compita consigo misma. Las direcciones antiguas
-siguen funcionando con un 301 (ver §3).
+**No hay página por municipio.** Veintiuna páginas competirían entre ellas por
+las mismas búsquedas y ninguna tendría nada propio que contar. Se agrupa por
+comarca o conurbación, que es como se busca de verdad, y solo se publica la
+agrupación que tenga contenido diferenciado escrito: hoy Barcelona ciudad,
+Barcelonès Nord, Baix Llobregat y Vallès Occidental. Las demás llevan
+`publicada: false` en `src/content/zonas.ts` y sus municipios apuntan al
+listado. Cada dirección antigua de municipio redirige con un 301 a su
+agrupación, o al listado si todavía no tiene página (ver §3).
+
+**No hay página de formación.** Va dirigida a instaladores y esta web va
+dirigida a clientes con una avería: son dos intenciones de búsqueda distintas
+y mezclarlas diluye las dos. `/formacion` redirige a `/sobre-alex`.
 
 ### Qué se ejecuta en el navegador
 
@@ -295,16 +314,17 @@ salen del mismo isotipo con `pnpm iconos`.
   logotipo oficial y de la foto de portada.
 - JSON-LD: `LocalBusiness` (`Electrician` + `HVACBusiness` + `Plumber`),
   `Person`, `WebSite`, `Service`, `FAQPage` y `BreadcrumbList`.
-- `sitemap.xml` y `robots.txt` generados en la compilación con las 14 rutas
+- `sitemap.xml` y `robots.txt` generados en la compilación con las 19 rutas
   indexables.
 - URLs limpias en español, sin barra final, breadcrumbs visibles y enlazado
   interno denso.
 
 ### Antes de publicar
 
-0. **Definir `PUBLIC_SITE_URL`** con el dominio definitivo. Hasta que no lo
-   hagas, la web se publica en `noindex` y Google no la indexará: es deliberado,
-   para no ensuciar el índice con una dirección provisional.
+0. **Definir `PUBLIC_SITE_URL`** con el dominio definitivo, cuando lo haya. No
+   es obligatorio para que la web se indexe: en producción se abre sola usando
+   el dominio del proyecto en Vercel. Definirla sirve para que las canonicals
+   apunten al dominio bueno desde el primer día.
 1. **Rellenar el NAP** en `src/content/site.ts` y los datos fiscales en
    `src/content/legal.ts`. El schema `LocalBusiness` omite a propósito los
    campos vacíos: es mejor un schema incompleto que uno con datos inventados
@@ -379,9 +399,9 @@ pnpm auditar:instalar
 
 Si el Chromium de tu máquina está en otra ruta, exporta `CHROMIUM_PATH`.
 
-Estado actual con el dominio definido, en Lighthouse móvil sobre portada,
-servicio, zonas, sobre Alex y contacto: **rendimiento 99-100 · accesibilidad
-100 · buenas prácticas 100 · SEO 100**, con LCP entre 1,1 y 1,8 s y CLS 0.
+Estado actual en Lighthouse móvil sobre portada, servicio, zonas y contacto:
+**rendimiento 95-100 · accesibilidad 100 · buenas prácticas 100 · SEO 100**, con
+LCP entre 1,1 y 1,7 s y CLS 0. En escritorio, 100 en las cuatro categorías.
 
 ---
 
@@ -392,8 +412,28 @@ servicio, zonas, sobre Alex y contacto: **rendimiento 99-100 · accesibilidad
 - [ ] Proyecto importado en Vercel con la rama de producción en `main`
 - [ ] `RESEND_API_KEY`, `EMAIL_REMITENTE` y `EMAIL_DESTINATARIO` definidas
 - [ ] Prueba de envío del formulario contra tu propio correo
-- [ ] `PUBLIC_SITE_URL` vacía: la web queda en `noindex` a propósito
-      (o `PUBLIC_PERMITIR_INDEXACION=true` si quieres que Google la vea ya)
+- [ ] En producción la web se indexa sola; comprobar `robots.txt` y la etiqueta
+      `robots` de la home después del primer despliegue
+
+### Bloqueantes: contenido provisional que hay que sustituir
+
+Nada de esto puede darse por hecho. Los archivos afectados están listados en la
+constante `CONTENIDO_PROVISIONAL` de `src/content/provisional.ts`, y cada uno
+lleva una cabecera que lo advierte.
+
+- [ ] Sustituir los testimonios provisionales por reseñas reales de Google
+- [ ] **Solo entonces**, añadir `Review` y `AggregateRating` al JSON-LD. Publicar
+      reseñas inventadas dentro de datos estructurados puede acarrear una acción
+      manual de Google sobre el dominio entero
+- [ ] Sustituir las cifras provisionales de los contadores por las reales
+- [ ] Sustituir las fotos de banco por reportaje propio, o verificar la licencia
+      comercial de cada una antes de publicar
+- [ ] Sustituir los pares antes/después por obra real: misma obra, mismo
+      encuadre. El cuadro eléctrico de «después» es británico y se le ven las
+      etiquetas en inglés; es el primero que conviene cambiar
+- [ ] Confirmar el horario de atención y actualizarlo en `src/content/site.ts`,
+      de donde lo toma el `LocalBusiness` que alimenta la ficha de Google
+- [ ] Confirmar teléfono, WhatsApp y correo de producción
 
 ### Antes de abrirla a Google
 
@@ -401,11 +441,11 @@ servicio, zonas, sobre Alex y contacto: **rendimiento 99-100 · accesibilidad
 - [ ] Dominio verificado en Resend (SPF y DKIM)
 - [ ] Prueba real de envío del formulario, con autorespuesta incluida
 - [ ] Dominio `zsolutions.es` apuntando a Vercel, con `www` redirigido
-- [ ] Redirección 301 de `contacto.zsolutions.es` a `/contacto`
+- [ ] Decidir qué hacer con `contacto.zsolutions.es`: redirección 301 a
+      `/contacto`, o canonical apuntando aquí, para que no compita con la web
 - [ ] Google Search Console verificado y sitemap enviado
-- [ ] Perfil de Empresa de Google creado u optimizado, con el mismo NAP
-- [ ] Testimonios reales en lugar de los de ejemplo
-- [ ] Fotos de obra propias en lugar de las de banco
+- [ ] Perfil de Empresa de Google creado u optimizado, con el mismo NAP. Para un
+      negocio local pesa tanto como la web entera
 - [ ] `pnpm auditar` en verde
 
 ---
@@ -427,7 +467,7 @@ servicio, zonas, sobre Alex y contacto: **rendimiento 99-100 · accesibilidad
 
 ### Qué sube exactamente a Vercel
 
-- **`dist/`**, con 15 páginas HTML, el CSS, las fuentes, el logotipo, las
+- **`dist/`**, con 20 páginas HTML, el CSS, las fuentes, el logotipo, las
   imágenes y unos pocos kilobytes de JavaScript. Se sirve desde la CDN.
 - **`api/presupuesto.ts`**, la única función. Vercel la detecta por estar en el
   directorio `api/` de la raíz, no a través del framework.

@@ -11,7 +11,7 @@ type BaseProps = {
 };
 
 const claseControl =
-  "min-h-12 w-full rounded-xl border bg-white/[0.03] px-4 py-3 text-base text-fg placeholder:text-fg-dim/70 transition-colors focus:outline-none focus-visible:border-brand-blue";
+  "min-h-12 w-full rounded-xl border bg-fg/[0.04] px-4 py-3 text-base text-fg placeholder:text-fg-dim/70 transition-colors focus:outline-none focus-visible:border-brand-blue";
 
 function Mensajes({
   error,
@@ -191,7 +191,7 @@ export function OpcionRadio({
         "group flex min-h-16 cursor-pointer items-start gap-4 rounded-xl border p-4 transition-colors",
         seleccionado
           ? "border-brand-blue bg-brand-blue/12"
-          : "border-line bg-white/[0.02] hover:border-white/30",
+          : "border-line bg-fg/[0.03] hover:border-fg/30",
       )}
     >
       <input
@@ -206,14 +206,14 @@ export function OpcionRadio({
         className={cn(
           "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition-colors",
           seleccionado
-            ? "border-brand-blue bg-brand-blue text-white"
+            ? "border-brand-blue bg-brand-blue text-n-0"
             : "border-line text-fg-dim",
         )}
         aria-hidden="true"
       >
         {icono ?? (
           <span
-            className={cn("h-2 w-2", seleccionado ? "bg-white" : "bg-transparent")}
+            className={cn("h-2 w-2", seleccionado ? "bg-n-0" : "bg-transparent")}
           />
         )}
       </span>

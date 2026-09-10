@@ -2,11 +2,13 @@
 type Props = {
   class?: string;
   as?: "div" | "li" | "article";
+  /** Cualquier otro atributo pasa tal cual al elemento. */
+  [clave: string]: unknown;
 };
 
-const { class: clase, as: Como = "div" }: Props = Astro.props;
+const { class: clase, as: Como = "div", ...resto }: Props = Astro.props;
 ---
 
-<Como class={clase} data-revelar>
+<Como class={clase} data-revelar {...resto}>
   <slot />
 </Como>

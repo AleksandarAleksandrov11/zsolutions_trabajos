@@ -1,7 +1,7 @@
 ---
 import Header from "@/components/layout/Header.astro";
 import CookieBanner from "@/components/layout/CookieBanner.astro";
-import WhatsAppFloat from "@/components/layout/WhatsAppFloat.astro";
+import BarraContacto from "@/components/layout/BarraContacto.astro";
 import JsonLd from "@/components/seo/JsonLd.astro";
 import Footer from "@/components/layout/Footer.astro";
 import { schemaNegocioLocal, schemaPersona, schemaWebSite } from "@/lib/schema";
@@ -22,10 +22,29 @@ const robots = meta.indexable
   ? "index, follow, max-image-preview:large"
   : "noindex, follow";
 
-/* Los scripts de analítica los sirve la propia plataforma bajo `/_vercel/`.
-   Fuera de Vercel esas rutas no existen, así que solo se emiten cuando el
-   build se ejecuta allí: en local no hay peticiones fallidas ni ruido en la
-   consola. */
+/*
+ * Analítica.
+ *
+ * Los scripts los sirve la propia plataforma bajo `/_vercel/`. Fuera de
+ * Vercel esas rutas no existen, así que solo se emiten cuando el build se
+ * ejecuta allí: en local no hay peticiones fallidas ni ruido en la consola.
+ *
+ * DECISIÓN, y es deliberada: se cargan ANTES del aviso de cookies, no
+ * detrás. El artículo 22.2 de la LSSI y la guía de cookies de la AEPD exigen
+ * consentimiento para almacenar información en el equipo del usuario o
+ * acceder a ella. Vercel Web Analytics y Speed Insights no lo hacen: no
+ * escriben cookies, no generan identificadores persistentes y no siguen a
+ * nadie entre sitios ni entre sesiones. Queda fuera de lo que ese artículo
+ * somete a consentimiento.
+ *
+ * Lo que sí hace falta, y está hecho, es declararlo: la política de cookies
+ * lo explica en su apartado 3 y el aviso lo menciona en la primera línea.
+ *
+ * Si en algún momento se añade una herramienta que sí instale cookies
+ * (Google Analytics, píxel de Meta), el sistema de consentimiento ya tiene
+ * la categoría preparada y no debe cargarse ni un script hasta que se
+ * autorice. Eso NO es lo que pasa aquí.
+ */
 const enVercel = Boolean(process.env.VERCEL);
 ---
 
@@ -34,7 +53,7 @@ const enVercel = Boolean(process.env.VERCEL);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0E0F12" />
+    <meta name="theme-color" content="#0F0F10" />
     <meta name="color-scheme" content="dark" />
 
     <title>{meta.title}</title>
@@ -54,6 +73,7 @@ const enVercel = Boolean(process.env.VERCEL);
     <meta property="og:title" content={meta.title} />
     <meta property="og:description" content={meta.description} />
     <meta property="og:image" content={meta.imagen} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={meta.title} />
@@ -81,14 +101,21 @@ const enVercel = Boolean(process.env.VERCEL);
 
     {/* TODO (Alex): pegar aquí la etiqueta de verificación de Search Console. */}
 
-    <JsonLd datos={[schemaNegocioLocal(), schemaPersona(), schemaWebSite()]} />
+    {/* El grafo de negocio local solo tiene sentido en páginas indexables: en
+        la 404 y en cualquier otra marcada `noindex` es peso muerto que además
+        confunde a quien lee el marcado. */}
+    {
+      meta.indexable ? (
+        <JsonLd datos={[schemaNegocioLocal(), schemaPersona(), schemaWebSite()]} />
+      ) : null
+    }
     {schema ? <JsonLd datos={schema} /> : null}
   </head>
 
   <body class="flex min-h-dvh flex-col bg-bg text-fg antialiased">
     <a
       href="#contenido"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200 focus:rounded-full focus:bg-brand-blue focus:px-5 focus:py-3 focus:text-sm focus:text-white"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200 focus:rounded-full focus:bg-brand-blue focus:px-5 focus:py-3 focus:text-sm focus:text-n-0"
     >
       Saltar al contenido principal
     </a>
@@ -99,7 +126,7 @@ const enVercel = Boolean(process.env.VERCEL);
     </main>
     <Footer />
 
-    <WhatsAppFloat />
+    <BarraContacto />
     <CookieBanner />
 
     {/*
@@ -128,6 +155,8 @@ const enVercel = Boolean(process.env.VERCEL);
    * contenido visible, de modo que si el script no llega a ejecutarse la
    * página se lee igual, sin bloques en blanco.
    */
+  import { evento, type NombreEvento } from "@/lib/analitica";
+
   const raiz = document.documentElement;
   raiz.classList.add("js");
 
@@ -214,4 +243,34 @@ const enVercel = Boolean(process.env.VERCEL);
 
     contadores.forEach((nodo) => observadorContadores.observe(nodo));
   }
+
+  /* --- Eventos de conversión ------------------------------------------- */
+  /* Un solo oyente delegado para toda la web. Reconoce por sí mismo los
+     enlaces de teléfono, WhatsApp y correo estén donde estén, así que no hay
+     que acordarse de marcar cada uno; `data-evento` sirve para lo que no se
+     deduce del `href`, como el botón de presupuesto. `data-evento-origen`
+     dice desde qué pieza se pulsó, para poder comparar la barra móvil con el
+     cierre de página o la cabecera. */
+  document.addEventListener("click", (e) => {
+    const enlace = (e.target as Element | null)?.closest?.("a[href]");
+    if (!enlace) return;
+
+    const href = enlace.getAttribute("href") ?? "";
+    const declarado = enlace.getAttribute("data-evento");
+    const nombre =
+      declarado ??
+      (href.startsWith("tel:")
+        ? "llamada"
+        : href.includes("wa.me")
+          ? "whatsapp"
+          : href.startsWith("mailto:")
+            ? "correo"
+            : null);
+
+    if (!nombre) return;
+    evento(nombre as NombreEvento, {
+      origen: enlace.getAttribute("data-evento-origen") ?? "enlace",
+      ruta: window.location.pathname,
+    });
+  });
 </script>
