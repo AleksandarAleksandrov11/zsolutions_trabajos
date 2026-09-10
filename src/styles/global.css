@@ -701,13 +701,16 @@
      ancho fijo en vez de `%`, porque aquí el contenido no es un texto corto
      sino una tarjeta completa con cita y pie. */
   .cinta-testimonios {
+    display: flex;
     overflow: hidden;
     mask-image: linear-gradient(to right, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
   }
 
   .cinta-testimonios-pista {
     display: flex;
+    flex: none;
     gap: 1.25rem;
+    min-width: 100%;
     padding-inline: var(--spacing-gutter);
     animation: cinta-desplaza var(--cinta-duracion, 55s) linear infinite;
   }
