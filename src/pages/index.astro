@@ -7,11 +7,8 @@ import Servicios from "@/components/sections/Servicios.astro";
 import Sectores from "@/components/sections/Sectores.astro";
 import PorQue from "@/components/sections/PorQue.astro";
 import ProcesoSteps from "@/components/sections/ProcesoSteps.astro";
-import Trabajos from "@/components/sections/Trabajos.astro";
-import SobreAlex from "@/components/sections/SobreAlex.astro";
 import Testimonios from "@/components/sections/Testimonios.astro";
 import Zonas from "@/components/sections/Zonas.astro";
-import Certifications from "@/components/sections/Certifications.astro";
 import FAQ from "@/components/sections/FAQ.astro";
 import CTASection from "@/components/sections/CTASection.astro";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
@@ -50,13 +47,9 @@ const meta = crearMetadata({
 
   <PorQue numero="03" />
   <ProcesoSteps pasos={procesoGeneral} numero="04" titulo="Cómo funciona, paso a paso" />
-  <Trabajos numero="05" />
+  <Testimonios numero="05" />
 
-  <SobreAlex numero="06" />
-  <Testimonios numero="07" />
-
-  <Zonas numero="08" />
-  <Certifications numero="09" />
-  <FAQ preguntas={faqHome} numero="10" />
+  <Zonas numero="06" />
+  <FAQ preguntas={faqHome} numero="07" />
   <CTASection />
 </Base>
