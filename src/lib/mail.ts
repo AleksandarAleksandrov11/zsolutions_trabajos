@@ -25,24 +25,24 @@ function escapar(texto: string): string {
 
 function fila(etiqueta: string, valor: string): string {
   return `<tr>
-    <td style="padding:10px 16px;border-bottom:1px solid #e6e6e6;color:#23366F;font-weight:bold;width:34%;vertical-align:top;">${escapar(etiqueta)}</td>
-    <td style="padding:10px 16px;border-bottom:1px solid #e6e6e6;color:#111;vertical-align:top;">${escapar(valor).replace(/\n/g, "<br>")}</td>
+    <td style="padding:10px 16px;border-bottom:1px solid #E6E6E6;color:#23366F;font-weight:bold;width:34%;vertical-align:top;">${escapar(etiqueta)}</td>
+    <td style="padding:10px 16px;border-bottom:1px solid #E6E6E6;color:#0F0F10;vertical-align:top;">${escapar(valor).replace(/\n/g, "<br>")}</td>
   </tr>`;
 }
 
 function envoltorio(titulo: string, cuerpo: string): string {
   return `<!doctype html>
-<html lang="es"><body style="margin:0;padding:24px;background:#f4f5f8;font-family:Arial,Helvetica,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#fff;border:1px solid #e0e2e8;">
+<html lang="es"><body style="margin:0;padding:24px;background:#F4F4F5;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#FFFFFF;border:1px solid #E6E6E6;">
     <tr>
-      <td style="background:#23366F;padding:22px 24px;color:#fff;">
+      <td style="background:#23366F;padding:22px 24px;color:#FFFFFF;">
         <div style="font-size:20px;font-weight:bold;letter-spacing:.5px;">${escapar(site.nombre)}</div>
         <div style="font-size:13px;opacity:.85;margin-top:4px;">${escapar(titulo)}</div>
       </td>
     </tr>
     <tr><td style="padding:8px 0;">${cuerpo}</td></tr>
     <tr>
-      <td style="padding:18px 24px;border-top:1px solid #e6e6e6;color:#666;font-size:12px;">
+      <td style="padding:18px 24px;border-top:1px solid #E6E6E6;color:#6B6B72;font-size:12px;">
         ${escapar(site.nombre)} · ${escapar(site.fundador)} · ${escapar(site.nap.ciudad)}
       </td>
     </tr>
@@ -107,7 +107,7 @@ export async function enviarSolicitud(
   /* Autorespuesta al cliente. Si falla, no se invalida la solicitud: el aviso
      importante, el de Alex, ya ha salido. */
   if (datos.email) {
-    const cuerpo = `<div style="padding:24px;color:#111;line-height:1.6;">
+    const cuerpo = `<div style="padding:24px;color:#0F0F10;line-height:1.6;">
       <p>Hola ${escapar(datos.nombre)},</p>
       <p>He recibido tu solicitud sobre <strong>${escapar(etiquetasServicio[datos.servicio])}</strong> en ${escapar(datos.ubicacion)}.</p>
       <p>La reviso y te contacto en <strong>${escapar(site.respuesta)}</strong> con una primera valoración. Sin compromiso.</p>

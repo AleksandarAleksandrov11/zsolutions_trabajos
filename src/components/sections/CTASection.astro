@@ -12,20 +12,20 @@ const {
 } = Astro.props;
 ---
 
-<section class="pb-section" aria-labelledby="titulo-cta">
-  <div class="container-brand">
+{/* El único bloque de marca a sangre de cada página: es aquí donde el azul
+    corporativo funciona como superficie y no como tinte del gris. También es
+    el único sitio de la página donde el botón principal va en naranja. */}
+<section class="seccion-azul relative overflow-hidden py-section" aria-labelledby="titulo-cta">
+  <div class="plano absolute inset-0 opacity-40" aria-hidden="true"></div>
+  <div class="container-brand relative">
     <Reveal>
-      <div
-        class="relative overflow-hidden rounded-2xl border border-brand-blue/35 bg-brand-blue-deep/30 px-6 py-12 sm:px-10 md:px-14 md:py-16"
-      >
-        <div class="plano absolute inset-0 opacity-50" aria-hidden="true"></div>
-
-        <div class="relative max-w-xl">
+      <div>
+        <div class="max-w-xl">
           <h2 id="titulo-cta" class="text-4xl">{titulo}</h2>
           <p class="mt-4 text-lg text-fg-muted">{descripcion}</p>
 
           <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <EnlaceBoton href="/contacto" tamano="lg">
+            <EnlaceBoton href="/contacto" variante="acento" tamano="lg">
               Solicitar presupuesto
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </EnlaceBoton>

@@ -280,7 +280,7 @@ export function QuoteWizard() {
       >
         <div className="plano absolute inset-0 opacity-50" aria-hidden="true" />
         <div className="relative">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-white">
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-n-0">
             <Check className="h-7 w-7" aria-hidden="true" />
           </span>
           <h2 className="mt-7 text-4xl">Gracias.</h2>

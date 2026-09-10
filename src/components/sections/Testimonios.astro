@@ -8,12 +8,16 @@ import { testimonios } from "@/content/testimonios";
 type Props = { numero?: string };
 const { numero = "05" } = Astro.props;
 
-/* Si algún día el array queda vacío, la sección desaparece sola. */
+/* Si algún día el array queda vacío, la sección desaparece sola.
+
+   Es una de las dos secciones claras de la web: corta el bloque oscuro
+   continuo justo donde el contenido cambia de registro, de lo que cuenta Alex
+   a lo que cuentan sus clientes. */
 ---
 
 {
   testimonios.length > 0 ? (
-    <section class="py-section" aria-labelledby="titulo-testimonios">
+    <section class="seccion-clara py-section" aria-labelledby="titulo-testimonios">
       <div class="container-brand">
         <SectionHeading
           numero={numero}
@@ -29,7 +33,7 @@ const { numero = "05" } = Astro.props;
         >
           {testimonios.map((t) => (
             <RevealItem as="li" class="tarjeta flex h-full flex-col p-6 sm:p-7">
-              <Quote className="h-5 w-5 shrink-0 text-brand-blue-soft" aria-hidden="true" />
+              <Quote className="h-5 w-5 shrink-0 text-brand-blue" aria-hidden="true" />
               <blockquote class="mt-4 flex-1 text-fg-muted">{t.texto}</blockquote>
               <footer class="hairline-t mt-6 pt-4">
                 <p class="text-sm font-bold">{t.autor}</p>

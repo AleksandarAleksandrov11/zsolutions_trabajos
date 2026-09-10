@@ -15,7 +15,7 @@ export function ProgressBar({ paso, total, titulos }: Props) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4">
-        <p className="text-eyebrow text-brand-blue-soft">
+        <p className="text-eyebrow text-brand-orange">
           Paso {paso + 1} de {total}
         </p>
         <p className="text-eyebrow text-fg-dim">{titulos[paso]}</p>
@@ -33,8 +33,14 @@ export function ProgressBar({ paso, total, titulos }: Props) {
         {titulos.map((titulo, i) => (
           <span
             key={titulo}
-            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              i <= paso ? "bg-brand-blue" : "bg-white/10"
+            /* La línea de progreso es uno de los usos canónicos del naranja:
+               el segmento en curso lo marca, los ya hechos quedan en azul. */
+            className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
+              i === paso
+                ? "bg-brand-orange"
+                : i < paso
+                  ? "bg-brand-blue"
+                  : "bg-fg/10"
             }`}
           />
         ))}

@@ -54,7 +54,11 @@ const activo = (href: string) => {
                 aria-current={activo(enlace.href) ? "page" : undefined}
                 class:list={[
                   "flex min-h-11 items-center px-3.5 text-sm transition-colors",
-                  activo(enlace.href) ? "text-fg" : "text-fg-dim hover:text-fg",
+                  /* `--n-300` y no `--n-400`: la cabecera es transparente y se
+                     apoya sobre lo que haya debajo, que puede ser la franja
+                     azul de `/contacto`. Sobre #23366F el tono tenue se queda
+                     en 4,2:1 y este da 6,8:1. */
+                  activo(enlace.href) ? "text-fg" : "text-fg-muted hover:text-fg",
                 ]}
               >
                 {enlace.label}
@@ -86,7 +90,7 @@ const activo = (href: string) => {
         aria-expanded="false"
         aria-controls="menu-movil"
         aria-label="Abrir menú"
-        class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg transition-colors hover:border-white/35 lg:hidden"
+        class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg transition-colors hover:border-fg/35 lg:hidden"
       >
         <Menu className="h-5 w-5" aria-hidden="true" />
       </button>

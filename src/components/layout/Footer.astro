@@ -31,7 +31,7 @@ const redes = [
 
         <address class="mt-6 flex flex-col gap-3 text-sm not-italic text-fg-muted">
           <span class="flex items-start gap-3">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-blue-soft" aria-hidden="true" />
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-n-400" aria-hidden="true" />
             <span>
               {site.nap.calle}<br />
               {site.nap.codigoPostal} {site.nap.ciudad}
@@ -39,12 +39,12 @@ const redes = [
           </span>
 
           <a href={hrefTelefono()} class="flex min-h-11 items-center gap-3 hover:text-fg">
-            <Phone className="h-4 w-4 shrink-0 text-brand-blue-soft" aria-hidden="true" />
+            <Phone className="h-4 w-4 shrink-0 text-n-400" aria-hidden="true" />
             {site.nap.telefono}
           </a>
 
           <a href={hrefEmail()} class="flex min-h-11 items-center gap-3 hover:text-fg">
-            <Mail className="h-4 w-4 shrink-0 text-brand-blue-soft" aria-hidden="true" />
+            <Mail className="h-4 w-4 shrink-0 text-n-400" aria-hidden="true" />
             {site.nap.email}
           </a>
         </address>
@@ -57,7 +57,7 @@ const redes = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={enlace.etiqueta}
-                class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg-dim transition-colors hover:border-white/35 hover:text-fg"
+                class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg-dim transition-colors hover:border-fg/35 hover:text-fg"
               >
                 <SocialIcon red={enlace.red} />
               </a>

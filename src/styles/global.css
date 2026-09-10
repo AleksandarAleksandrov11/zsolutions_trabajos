@@ -31,25 +31,58 @@
 }
 
 @theme {
-  /* ---- Color ----
-     El manual define dos tintas: azul corporativo y negro. El azul se usa
-     aquí en tres intensidades (profunda para fondos, corporativa para acción
-     y clara para texto de acento sobre oscuro) y el naranja queda como único
-     acento de atención, muy medido: nunca más de un uso protagonista por
-     pantalla. */
+  /* ============================================================
+     COLOR
+
+     Dos familias y nada más. Cualquier color que no salga de aquí es un
+     error, no una excepción.
+
+     1. MARCA. El azul es color de MARCA, no de superficie: se usa en
+        relleno (bloques, botones, iconos sobre fondo propio), nunca como
+        color de texto sobre fondo oscuro, donde da 2,3:1. El naranja es el
+        acento: de uno a tres por pantalla completa, y nunca cero.
+
+     2. RAMPA NEUTRA. Once escalones sin una gota de azul dentro. La versión
+        anterior de esta hoja usaba grises teñidos (#0E0F12 tenía el canal
+        azul cuatro puntos por encima del rojo, #262A33 trece), y de ahí
+        salía la sensación de que toda la web era azul aunque el azul de
+        marca ocupase menos del 3 % de la superficie.
+     ============================================================ */
+
+  /* ---- Marca ---- */
   --color-brand-blue: #2f4aa0;
   --color-brand-blue-hover: #3d5fc4;
   --color-brand-blue-deep: #23366f;
-  --color-brand-blue-soft: #8fa4e8;
   --color-brand-orange: #ff7a1a;
+  --color-brand-orange-hover: #ff9247;
 
-  --color-bg: #0e0f12;
-  --color-surface: #16181d;
-  --color-surface-2: #1c1f26;
-  --color-line: #262a33;
-  --color-fg: #ffffff;
-  --color-fg-muted: #c6cad4;
-  --color-fg-dim: #878d9b;
+  /* ---- Rampa neutra ---- */
+  --color-n-950: #0f0f10;
+  --color-n-900: #151517;
+  --color-n-850: #1c1c1f;
+  --color-n-800: #26262a;
+  --color-n-700: #3a3a3f;
+  --color-n-500: #6b6b72;
+  --color-n-400: #9c9ca3;
+  --color-n-300: #c7c7cc;
+  --color-n-200: #e6e6e6;
+  --color-n-0: #ffffff;
+  --color-claro: #f4f4f5;
+
+  /* ---- Alias semánticos ----
+     Son los que usa el marcado. Los redefinen `.seccion-clara` y
+     `.seccion-azul`, así que una sola clase cambia el tema de un bloque
+     entero sin tocar ni una utilidad de dentro. */
+  --color-bg: var(--color-n-950);
+  --color-surface: var(--color-n-900);
+  --color-surface-2: var(--color-n-850);
+  --color-line: var(--color-n-800);
+  --color-fg: var(--color-n-0);
+  --color-fg-muted: var(--color-n-300);
+  --color-fg-dim: var(--color-n-400);
+
+  /* Anillo de foco. Naranja sobre oscuro (7,3:1), azul sobre claro (7,3:1). */
+  --color-foco: var(--color-brand-orange);
 
   /* ---- Tipografía ---- */
   --font-display: "Righteous", "Arial Black", Impact, sans-serif;
@@ -132,11 +165,13 @@
 
   ::selection {
     background-color: var(--color-brand-blue);
-    color: #fff;
+    color: var(--color-n-0);
   }
 
+  /* El anillo de foco es un token, no un color fijo: los bloques claros lo
+     cambian a azul porque el naranja sobre #F4F4F5 se queda en 2,4:1. */
   :focus-visible {
-    outline: 2px solid var(--color-brand-blue-soft);
+    outline: 2px solid var(--color-foco);
     outline-offset: 3px;
     border-radius: 4px;
   }
@@ -145,7 +180,7 @@
   input:-webkit-autofill,
   textarea:-webkit-autofill {
     -webkit-text-fill-color: var(--color-fg);
-    -webkit-box-shadow: 0 0 0 1000px #14161b inset;
+    -webkit-box-shadow: 0 0 0 1000px var(--color-n-850) inset;
     caret-color: var(--color-fg);
   }
 
@@ -201,12 +236,111 @@
    ============================================================ */
 
 @layer components {
-  /* Numeración de sección 01. / 02. / 03. como en el manual */
+  /* ------------------------------------------------------------
+     Temas de bloque
+
+     Cada una de estas clases redefine los alias semánticos para todo lo que
+     cuelga de ella. Las utilidades de dentro (`text-fg-muted`, `bg-surface`,
+     `hairline`…) no se enteran: siguen resolviendo la misma variable, que
+     ahora vale otra cosa. Así una sección entera cambia de tema con una sola
+     clase y sin duplicar marcado.
+     ------------------------------------------------------------ */
+
+  /* Bloque alterno: un escalón por encima del fondo, para dar ritmo vertical
+     sin cambiar de color. Sube también las superficies, porque si no las
+     tarjetas quedarían del mismo tono que la sección y desaparecerían. */
+  .seccion-alterna {
+    --color-bg: var(--color-n-900);
+    --color-surface: var(--color-n-850);
+    --color-surface-2: var(--color-n-800);
+    background-color: var(--color-bg);
+  }
+
+  /* Bloque claro. El manual pide una o dos secciones así en toda la web;
+     antes no había ninguna y el sitio era un bloque oscuro continuo. */
+  .seccion-clara {
+    --color-bg: var(--color-claro);
+    --color-surface: var(--color-n-0);
+    --color-surface-2: var(--color-n-200);
+    --color-line: var(--color-n-200);
+    --color-fg: var(--color-n-950);
+    --color-fg-muted: var(--color-n-700);
+    --color-fg-dim: var(--color-n-500);
+    /* Sobre claro el naranja da 2,4:1: no puede marcar el foco ni llevar
+       información por sí solo. Aquí el acento pasa a azul, que da 7,3:1. */
+    --color-foco: var(--color-brand-blue);
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  /* Bloque de marca. Es el que devuelve al azul su papel de superficie. */
+  .seccion-azul {
+    --color-bg: var(--color-brand-blue-deep);
+    --color-surface: var(--color-brand-blue);
+    --color-surface-2: var(--color-brand-blue-hover);
+    --color-line: color-mix(in srgb, var(--color-n-0) 18%, transparent);
+    --color-fg: var(--color-n-0);
+    /* Sobre azul profundo, `--n-400` se queda en 4,2:1. Se sube a `--n-300`,
+       que da 6,8:1 sobre el fondo y 4,8:1 sobre las tarjetas. */
+    --color-fg-muted: var(--color-n-300);
+    --color-fg-dim: var(--color-n-300);
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  /* Numeración de sección 01. / 02. / 03. como en el manual.
+     Es el acento naranja de cabecera: uno por sección, siempre presente. */
   .num-seccion {
     font-family: var(--font-display);
-    color: var(--color-brand-blue-soft);
+    color: var(--color-brand-orange);
     font-size: var(--text-xs);
     letter-spacing: 0.08em;
+  }
+
+  /* Sobre claro el naranja no llega a 3:1, así que la numeración pasa a azul. */
+  .seccion-clara .num-seccion {
+    color: var(--color-brand-blue);
+  }
+
+  /* Sobre azul profundo el naranja base se queda en 4,4:1, justo por debajo
+     del mínimo. El naranja claro da 5,2:1 y sigue siendo el mismo acento. */
+  .seccion-azul .num-seccion,
+  .seccion-azul .text-brand-orange {
+    color: var(--color-brand-orange-hover);
+  }
+
+  .seccion-azul .regla-acento {
+    background-color: var(--color-brand-orange-hover);
+  }
+
+  /* Dentro de una tarjeta del bloque azul el fondo sube a `--blue`, donde ni
+     siquiera el naranja claro llega a 4,5:1. Ahí el acento es el blanco (8:1)
+     y el naranja se queda para el titular de la sección. */
+  .seccion-azul .tarjeta .num-seccion {
+    color: var(--color-n-0);
+  }
+
+  /* Filete de acento junto a la numeración de sección. */
+  .regla-acento {
+    display: inline-block;
+    background-color: var(--color-brand-orange);
+  }
+
+  .seccion-clara .regla-acento {
+    background-color: var(--color-brand-blue);
+  }
+
+  /* Chip de icono: relleno azul con el glifo en blanco (8:1). Es la forma de
+     dar presencia real al azul sin usarlo como color de texto sobre oscuro. */
+  .chip-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    border-radius: 999px;
+    background-color: var(--color-brand-blue);
+    color: var(--color-n-0);
+    transition: background-color 0.25s var(--ease-brand);
   }
 
   .prosa p {
@@ -242,10 +376,26 @@
       transform 0.25s var(--ease-brand);
   }
 
-  a.tarjeta:hover,
+  /* El hover va dentro de `@media (hover: hover)` para que en una pantalla
+     táctil no se quede pegado después de tocar la tarjeta. */
+  @media (hover: hover) {
+    a.tarjeta:hover {
+      border-color: var(--color-brand-blue);
+      background-color: var(--color-surface-2);
+    }
+
+    /* El chip de icono es lo que se pone naranja al pasar por encima: un
+       acento de un solo elemento, no un bloque de color. */
+    a.tarjeta:hover .chip-icono,
+    button.tarjeta:hover .chip-icono {
+      background-color: var(--color-brand-orange);
+      color: var(--color-n-950);
+    }
+  }
+
   a.tarjeta:focus-visible,
   .tarjeta:has(a:focus-visible) {
-    border-color: color-mix(in srgb, var(--color-brand-blue) 70%, transparent);
+    border-color: var(--color-brand-blue);
     background-color: var(--color-surface-2);
   }
 
@@ -302,7 +452,7 @@
 }
 
 .visor::backdrop {
-  background: rgba(8, 9, 11, 0.94);
+  background: rgba(10, 10, 11, 0.94);
   backdrop-filter: blur(6px);
 }
 
@@ -354,8 +504,17 @@
     scroll-behavior: auto !important;
   }
 
-  .js [data-revelar] { transform: none; }
-  .js [data-revelar].visible { transition-delay: 0s; }
+  /* Con movimiento reducido el contenido no se oculta ni espera al
+     observador: aparece ya visible y no hay nada que revelar. */
+  .js [data-revelar] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js [data-revelar].visible {
+    transition: none;
+    transition-delay: 0s;
+  }
 
   ::view-transition-group(*),
   ::view-transition-old(root),

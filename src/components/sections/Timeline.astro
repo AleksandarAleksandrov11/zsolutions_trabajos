@@ -8,7 +8,7 @@ type Props = { numero?: string };
 const { numero = "02" } = Astro.props;
 ---
 
-<section class="py-section" aria-labelledby="titulo-trayectoria">
+<section class="seccion-alterna py-section" aria-labelledby="titulo-trayectoria">
   <div class="container-brand">
     <SectionHeading
       numero={numero}
@@ -24,7 +24,7 @@ const { numero = "02" } = Astro.props;
             as="li"
             class="hairline-t grid gap-3 py-7 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-10"
           >
-            <span class="font-display text-2xl text-brand-blue-soft">{hito.anio}</span>
+            <span class="font-display text-2xl text-brand-orange">{hito.anio}</span>
             <div>
               <h3 class="text-xl">{hito.titulo}</h3>
               <p class="mt-2 max-w-2xl text-fg-muted">{hito.detalle}</p>

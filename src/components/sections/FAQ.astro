@@ -22,7 +22,7 @@ const {
 const idTitulo = `faq-${slugify(titulo)}`;
 ---
 
-<section class="py-section" aria-labelledby={idTitulo}>
+<section class="seccion-alterna py-section" aria-labelledby={idTitulo}>
   <div class="container-brand">
     <div class="grid gap-10 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] lg:gap-20">
       <SectionHeading
@@ -37,10 +37,10 @@ const idTitulo = `faq-${slugify(titulo)}`;
         {
           preguntas.map((par, i) => (
             <details class="faq-item group hairline-b" open={i === 0}>
-              <summary class="flex cursor-pointer list-none items-start justify-between gap-6 py-5 transition-colors hover:text-brand-blue-soft">
+              <summary class="flex cursor-pointer list-none items-start justify-between gap-6 py-5 transition-colors hover:text-brand-orange">
                 <h3 class="font-sans text-lg font-bold">{par.p}</h3>
                 <span
-                  class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-brand-blue-soft transition-transform duration-300 group-open:rotate-45"
+                  class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-fg/[0.08] text-brand-orange transition-transform duration-300 group-open:rotate-45"
                   aria-hidden="true"
                 >
                   <Plus className="h-3.5 w-3.5" />

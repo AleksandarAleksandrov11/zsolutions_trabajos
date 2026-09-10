@@ -36,6 +36,9 @@ const {
         )}
       >
         {numero ? <span class="num-seccion">{numero}</span> : null}
+        {/* El filete de acento: junto con la numeración, es lo que garantiza
+            que ninguna pantalla se quede sin naranja. */}
+        <span class="regla-acento h-px w-6" aria-hidden="true" />
         {eyebrow ? <span class="text-eyebrow text-fg-dim">{eyebrow}</span> : null}
       </p>
     ) : null

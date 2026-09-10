@@ -58,7 +58,7 @@ const enMinusculas = servicio.nombre.toLowerCase();
 
       <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-center lg:gap-14">
         <div>
-          <p class="text-eyebrow flex items-center gap-2.5 text-brand-blue-soft">
+          <p class="text-eyebrow flex items-center gap-2.5 text-brand-orange">
             <ServiceIcon nombre={servicio.icono} className="h-4 w-4" />
             {servicio.nombre}
           </p>
@@ -81,7 +81,7 @@ const enMinusculas = servicio.nombre.toLowerCase();
             {
               acreditaciones.slice(0, 5).map((a) => (
                 <li class="text-eyebrow flex items-center gap-2 text-fg-dim">
-                  <span class="h-1 w-1 rounded-full bg-brand-blue-soft" aria-hidden="true" />
+                  <span class="h-1 w-1 rounded-full bg-n-500" aria-hidden="true" />
                   {a.siglas}
                 </li>
               ))
@@ -118,7 +118,9 @@ const enMinusculas = servicio.nombre.toLowerCase();
   </section>
 
   {/* Qué incluye */}
-  <section class="py-section" aria-labelledby="titulo-incluye">
+  {/* Segunda sección clara de la web: el listado de trabajos concretos es lo
+      que más se lee de estas páginas, y sobre claro se lee mejor. */}
+  <section class="seccion-clara py-section" aria-labelledby="titulo-incluye">
     <div class="container-brand">
       <SectionHeading
         numero="01"
@@ -132,10 +134,12 @@ const enMinusculas = servicio.nombre.toLowerCase();
           servicio.incluye.map((item) => (
             <RevealItem as="li" class="tarjeta p-6">
               <h3 class="flex items-start gap-3 font-sans text-lg font-bold">
-                <Check className="mt-1 h-4 w-4 shrink-0 text-brand-blue-soft" aria-hidden="true" />
+                <span class="chip-icono mt-0.5 h-6 w-6" aria-hidden="true">
+                  <Check className="h-3.5 w-3.5" />
+                </span>
                 {item.titulo}
               </h3>
-              <p class="mt-2 pl-7 text-sm text-fg-muted">{item.detalle}</p>
+              <p class="mt-2 pl-9 text-sm text-fg-muted">{item.detalle}</p>
             </RevealItem>
           ))
         }
@@ -173,7 +177,7 @@ const enMinusculas = servicio.nombre.toLowerCase();
   <ProcesoSteps pasos={servicio.proceso} numero="03" />
 
   {/* Acreditaciones aplicables */}
-  <section class="py-section" aria-labelledby="titulo-acreditaciones">
+  <section class="seccion-alterna py-section" aria-labelledby="titulo-acreditaciones">
     <div class="container-brand">
       <SectionHeading
         numero="04"
@@ -190,7 +194,7 @@ const enMinusculas = servicio.nombre.toLowerCase();
         {
           acreditaciones.map((a) => (
             <RevealItem as="li" class="tarjeta p-5">
-              <span class="font-display text-xs tracking-wider text-brand-blue-soft">
+              <span class="font-display text-xs tracking-wider text-fg">
                 {a.siglas}
               </span>
               <h3 class="mt-1.5 font-sans text-base font-bold">{a.nombre}</h3>
