@@ -1,0 +1,98 @@
+---
+import { ArrowUpRight } from "lucide-react";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import Foto from "@/components/ui/Foto.astro";
+import { ServiceIcon } from "@/components/ui/ServiceIcon";
+import { servicios } from "@/content/servicios";
+import { secciones } from "@/content/secciones";
+
+type Props = {
+  numero?: string;
+  titulo?: string;
+  descripcion?: string;
+  /** Sin encabezado cuando la página ya tiene su H1 encima. */
+  conEncabezado?: boolean;
+};
+
+const {
+  numero = "01",
+  titulo = secciones.servicios.titulo,
+  descripcion = secciones.servicios.descripcion,
+  conEncabezado = true,
+} = Astro.props;
+
+/*
+ * Rejilla de servicios.
+ *
+ * Seis tarjetas exactamente iguales: misma foto en 3:2, mismo chip, mismo
+ * hueco entre elementos y el pie anclado abajo con `mt-auto`. Da igual que
+ * un resumen tenga dos líneas y otro cuatro; la tarjeta mide lo mismo.
+ */
+---
+
+<section id="servicios" class="py-section" aria-labelledby="titulo-servicios">
+  <div class="container-brand">
+    {
+      conEncabezado ? (
+        <SectionHeading
+          numero={numero}
+          eyebrow={secciones.servicios.eyebrow}
+          tituloId="titulo-servicios"
+          titulo={titulo}
+          descripcion={descripcion}
+        />
+      ) : (
+        <h2 id="titulo-servicios" class="sr-only">
+          Servicios
+        </h2>
+      )
+    }
+
+    <RevealGroup
+      as="ul"
+      class:list={["rejilla-igual sm:grid-cols-2 lg:grid-cols-3", conEncabezado && "mt-12"]}
+      stagger={0.05}
+    >
+      {
+        servicios.map((servicio) => (
+          <RevealItem as="li">
+            <a
+              href={`/servicios/${servicio.slug}`}
+              class="tarjeta group flex h-full flex-col overflow-hidden"
+            >
+              <span class="relative block shrink-0">
+                <Foto
+                  nombre={servicio.foto.nombre}
+                  alt={servicio.foto.alt}
+                  ratio="3 / 2"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  objectPosition={servicio.foto.posicion}
+                />
+                <span
+                  class="chip-icono absolute bottom-4 left-4 h-12 w-12 shadow-lg shadow-black/40"
+                  aria-hidden="true"
+                >
+                  <ServiceIcon nombre={servicio.icono} className="h-5 w-5" />
+                </span>
+              </span>
+
+              <span class="flex flex-1 flex-col p-6">
+                <span class="block text-2xl font-display">{servicio.nombre}</span>
+                <span class="mt-2.5 block text-sm text-fg-muted">{servicio.resumenHome}</span>
+                <span class="text-eyebrow mt-auto flex items-center gap-1.5 pt-6 text-fg-dim transition-colors group-hover:text-fg">
+                  Ver servicio
+                  <ArrowUpRight
+                    className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    aria-hidden="true"
+                  />
+                </span>
+              </span>
+            </a>
+          </RevealItem>
+        ))
+      }
+    </RevealGroup>
+  </div>
+</section>

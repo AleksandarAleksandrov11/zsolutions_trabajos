@@ -1,0 +1,58 @@
+---
+/**
+ * Cortina de entrada.
+ *
+ * Se pinta encima de la página mientras carga la primera vista y se retira
+ * sola en menos de segundo y medio. Toda la animación es CSS: si el
+ * JavaScript no llegase, la cortina se va igual, y con `prefers-reduced-motion`
+ * ni siquiera aparece.
+ *
+ * Solo se monta en la portada. En el resto de páginas sería un peaje para
+ * quien ya está navegando por la web.
+ */
+---
+
+<div class="cortina" data-cortina aria-hidden="true">
+  <svg class="cortina-marca" viewBox="0 0 240 78" fill="none" role="presentation">
+    {/* Rayo de la Z */}
+    <path
+      class="cortina-rayo"
+      d="M46 8 20 46h15.5L31 70l26-38H41.5L46 8Z"
+      fill="currentColor"
+      fill-opacity="0"
+      stroke="var(--color-brand-orange)"
+      stroke-width="2.5"
+      stroke-linejoin="round"
+      style="color: var(--color-brand-orange)"
+    />
+    {/* Líneas de velocidad del isotipo */}
+    <g style="color: var(--color-n-0)">
+      <rect class="cortina-linea" x="62" y="54" width="30" height="2.5" rx="1.25" fill="currentColor" />
+      <rect class="cortina-linea" x="70" y="61" width="22" height="2.5" rx="1.25" fill="currentColor" style="animation-delay: 0.62s" />
+    </g>
+    <text
+      x="100"
+      y="52"
+      fill="var(--color-n-0)"
+      font-family="Righteous, Arial Black, sans-serif"
+      font-size="30"
+      letter-spacing="1.5"
+    >SOLUTIONS</text>
+  </svg>
+</div>
+
+<script>
+  /* La cortina se quita del DOM al acabar su animación: si se quedase, sus
+     hijos seguirían en el árbol de accesibilidad y el `z-index` seguiría
+     ahí para siempre. */
+  const cortina = document.querySelector<HTMLElement>("[data-cortina]");
+  if (cortina) {
+    const quitar = () => cortina.remove();
+    cortina.addEventListener("animationend", (e) => {
+      if ((e as AnimationEvent).animationName === "cortina-sale") quitar();
+    });
+    /* Red de seguridad: si la animación no llega a dispararse (pestaña en
+       segundo plano al cargar), se retira igualmente. */
+    window.setTimeout(quitar, 2500);
+  }
+</script>

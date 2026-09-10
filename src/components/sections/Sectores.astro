@@ -1,0 +1,97 @@
+---
+import { Check } from "lucide-react";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import Foto from "@/components/ui/Foto.astro";
+import { sectores } from "@/content/sectores";
+
+type Props = { numero?: string };
+const { numero = "02" } = Astro.props;
+
+/*
+ * Sectores.
+ *
+ * Quien busca no piensa «necesito un instalador»: piensa «tengo un local» o
+ * «soy administrador de fincas». Ver su caso en la lista es lo que le hace
+ * seguir leyendo. Es la sección que tienen todas las webs del gremio bien
+ * posicionadas y la que le faltaba a esta.
+ *
+ * Las cinco tarjetas son idénticas: misma foto en 3:2, mismo bloque de
+ * texto y la misma lista de cuatro puntos anclada abajo.
+ */
+---
+
+<section id="sectores" class="seccion-alterna py-section" aria-labelledby="titulo-sectores">
+  <div class="container-brand">
+    <SectionHeading
+      numero={numero}
+      eyebrow="Dónde trabajo"
+      tituloId="titulo-sectores"
+      titulo="Vivienda, comunidad, local, oficina y nave"
+      descripcion="Cada tipo de finca pide otra cosa: otros materiales, otra planificación y otra documentación al terminar."
+    />
+
+    <RevealGroup
+      as="ul"
+      class="rejilla-igual mt-12 sm:grid-cols-2 lg:grid-cols-3"
+      stagger={0.05}
+    >
+      {
+        sectores.map((sector) => (
+          <RevealItem as="li">
+            <article class="tarjeta flex h-full flex-col overflow-hidden">
+              <span class="relative block shrink-0">
+                <Foto
+                  nombre={sector.foto}
+                  alt={sector.alt}
+                  ratio="3 / 2"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                <span class="text-eyebrow absolute top-4 left-4 rounded-full bg-bg/80 px-3 py-1.5 text-fg backdrop-blur">
+                  {sector.nombre}
+                </span>
+              </span>
+
+              <div class="flex flex-1 flex-col p-6">
+                <h3 class="text-xl">{sector.titular}</h3>
+                <p class="mt-2.5 text-sm text-fg-muted">{sector.detalle}</p>
+
+                <ul class="hairline-t mt-auto flex flex-col gap-2 pt-5">
+                  {sector.puntos.map((punto) => (
+                    <li class="flex items-start gap-2.5 text-sm text-fg-muted">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" aria-hidden="true" />
+                      {punto}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          </RevealItem>
+        ))
+      }
+
+      {/* Sexta celda: cierra la rejilla de tres columnas y da salida. */}
+      <RevealItem as="li">
+        <a
+          href="/contacto"
+          class="tarjeta group flex h-full flex-col justify-between gap-6 p-7"
+          data-evento="presupuesto_cta"
+          data-evento-origen="sectores"
+        >
+          <span>
+            <span class="text-eyebrow block text-brand-orange">¿Y si no encaja?</span>
+            <span class="mt-4 block text-2xl font-display">Cuéntamelo igualmente</span>
+            <span class="mt-2.5 block text-sm text-fg-muted">
+              Si el trabajo no me corresponde, te lo digo y te oriento hacia quien
+              sí lo hace. Cuesta lo mismo preguntar.
+            </span>
+          </span>
+          <span class="text-eyebrow flex items-center gap-1.5 text-fg-dim transition-colors group-hover:text-fg">
+            Pedir presupuesto
+          </span>
+        </a>
+      </RevealItem>
+    </RevealGroup>
+  </div>
+</section>

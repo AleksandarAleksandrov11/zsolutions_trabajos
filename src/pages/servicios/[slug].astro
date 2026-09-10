@@ -20,6 +20,9 @@ import { hrefWhatsApp, site } from "@/content/site";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
 import Comparador from "@/components/sections/Comparador.astro";
 import { comparativaDe } from "@/content/comparativas";
+import CintaConfianza from "@/components/sections/CintaConfianza.astro";
+import Sectores from "@/components/sections/Sectores.astro";
+import { fondoCss } from "@/lib/fondos";
 
 /* Conjunto cerrado de slugs: se generan todas sus páginas en la compilación y
    cualquier otra dirección da 404. */
@@ -58,7 +61,12 @@ const comparativa = comparativaDe(servicio.slug);
   meta={meta}
   schema={[schemaServicio(servicio), schemaFaq(servicio.faq), schemaMigas(migas)]}
 >
-  <header class="pt-32 pb-12 sm:pt-40 sm:pb-16">
+  {/* La cabecera lleva de fondo la propia foto del servicio, muy velada:
+      sitúa de qué se está hablando antes de leer una palabra. */}
+  <header
+    class="seccion-foto pt-32 pb-14 sm:pt-40 sm:pb-20"
+    style={`--foto: ${fondoCss(servicio.foto.nombre)}`}
+  >
     <div class="container-brand">
       <Breadcrumbs migas={migas} />
 
@@ -70,10 +78,12 @@ const comparativa = comparativaDe(servicio.slug);
           </p>
 
           <h1 class="mt-5 text-5xl">{servicio.h1}</h1>
-          <p class="mt-5 max-w-xl text-lg text-fg-muted">{servicio.claim}</p>
+          <p class="mt-5 max-w-xl text-xl text-fg-muted">{servicio.claim}</p>
 
           <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <EnlaceBoton href="/contacto" tamano="lg">Solicitar presupuesto</EnlaceBoton>
+            <EnlaceBoton href="/contacto" tamano="lg" data-evento="presupuesto_cta" data-evento-origen="servicio">
+              Pedir presupuesto
+            </EnlaceBoton>
             <EnlaceBoton
               href={hrefWhatsApp(`Hola Alex, me interesa el servicio de ${enMinusculas}.`)}
               variante="secundario"
@@ -107,6 +117,10 @@ const comparativa = comparativaDe(servicio.slug);
       </div>
     </div>
   </header>
+
+  <div class="hairline-y bg-surface">
+    <CintaConfianza tipo="frases" />
+  </div>
 
   {/* Cuerpo editorial */}
   <section class="pb-section" aria-labelledby="titulo-detalle">
@@ -204,10 +218,12 @@ const comparativa = comparativaDe(servicio.slug);
   {/* Acreditaciones aplicables */}
   <BandaContacto claim="¿Dudas de si tu caso entra aquí? Cuéntamelo y te digo en el día si es trabajo mío." />
 
+  <Sectores numero="04" />
+
   <section class="seccion-alterna py-section" aria-labelledby="titulo-acreditaciones">
     <div class="container-brand">
       <SectionHeading
-        numero="04"
+        numero="05"
         eyebrow="Acreditaciones aplicables"
         tituloId="titulo-acreditaciones"
         titulo="Lo que habilita para firmar este trabajo"
@@ -235,7 +251,7 @@ const comparativa = comparativaDe(servicio.slug);
 
   <FAQ
     preguntas={servicio.faq}
-    numero="05"
+    numero="06"
     titulo={`Preguntas sobre ${enMinusculas}`}
     eyebrow="Dudas habituales"
   />

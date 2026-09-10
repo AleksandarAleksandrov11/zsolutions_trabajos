@@ -10,7 +10,7 @@ Barcelona, el área metropolitana y Cataluña.
 **Stack:** Astro 7 en estático · TypeScript estricto · Tailwind CSS v4 · React 19
 solo en el formulario · Zod · Resend · Vercel.
 
-La web entera se compila a HTML: 20 páginas que Vercel sirve desde la CDN sin
+La web entera se compila a HTML: 21 páginas que Vercel sirve desde la CDN sin
 ejecutar nada. La única parte dinámica es el envío del formulario, que vive en
 `api/presupuesto.ts` como función independiente, fuera del build del framework.
 
@@ -185,12 +185,13 @@ scripts/           generación de imágenes, iconos y miniatura, y auditorías
 
 | Ruta | Qué es |
 |---|---|
-| `/` | Portada: selector de servicio, método, trabajos, comparador, Alex, testimonios, zonas y FAQ |
+| `/` | Portada: héroe, cinta de confianza, servicios, sectores, por qué, proceso, trabajos, marcas, Alex, opiniones, zonas, acreditaciones y FAQ |
 | `/servicios` | Índice de los seis servicios |
 | `/servicios/<slug>` | Seis páginas, una por oficio. Es el núcleo del SEO |
 | `/proyectos` | Galería filtrable por oficio y por tipo de finca |
 | `/zonas` | Mapa navegable de Cataluña y los 21 municipios por comarca |
 | `/zonas/<agrupación>` | Cuatro páginas por comarca o conurbación, con contenido propio |
+| `/testimonios` | Todas las opiniones a rejilla, con las cifras |
 | `/sobre-alex` | Trayectoria, cifras y acreditaciones completas |
 | `/contacto` | Formulario de presupuesto |
 | Tres páginas legales y el 404 | |
@@ -207,6 +208,31 @@ agrupación, o al listado si todavía no tiene página (ver §3).
 **No hay página de formación.** Va dirigida a instaladores y esta web va
 dirigida a clientes con una avería: son dos intenciones de búsqueda distintas
 y mezclarlas diluye las dos. `/formacion` redirige a `/sobre-alex`.
+
+### De dónde sale esta estructura
+
+La arquitectura no se inventó: se sacó de las cinco webs del gremio mejor
+posicionadas en Google para «instalaciones Barcelona» (Europa Instalaciones,
+SB Instalaciones, Instalnova, Instal·lacions Espuñes y Z2 Instalaciones).
+Todas comparten el mismo esqueleto, y era el que faltaba aquí:
+
+| Patrón común | Dónde está aquí |
+|---|---|
+| Teléfono y botón de presupuesto siempre a la vista | Cabecera fija y barra inferior de móvil |
+| Héroe con foto real y dos o tres llamadas | `Hero.astro` |
+| Cinta de marcas y argumentos | `CintaConfianza.astro` |
+| Rejilla de servicios con foto | `Servicios.astro` y `/servicios` |
+| Sectores en los que se trabaja | `Sectores.astro`, con `src/content/sectores.ts` |
+| Proceso en cuatro pasos | `ProcesoSteps.astro` |
+| Galería de trabajos | `Trabajos.astro` y `/proyectos` |
+| Cobertura geográfica citando municipios | `Zonas.astro` y `/zonas` |
+| Opiniones con estrellas | `Testimonios.astro` y `/testimonios` |
+| Contadores | `Contadores.astro` |
+| Preguntas frecuentes | `FAQ.astro` |
+| Formulario con selector de servicio | `/contacto` |
+
+Lo que NO se copió: el blog (necesita contenido que solo puede escribir Alex)
+y el widget de reseñas de Google (necesita reseñas reales).
 
 ### Qué se ejecuta en el navegador
 
@@ -314,7 +340,7 @@ salen del mismo isotipo con `pnpm iconos`.
   logotipo oficial y de la foto de portada.
 - JSON-LD: `LocalBusiness` (`Electrician` + `HVACBusiness` + `Plumber`),
   `Person`, `WebSite`, `Service`, `FAQPage` y `BreadcrumbList`.
-- `sitemap.xml` y `robots.txt` generados en la compilación con las 19 rutas
+- `sitemap.xml` y `robots.txt` generados en la compilación con las 20 rutas
   indexables.
 - URLs limpias en español, sin barra final, breadcrumbs visibles y enlazado
   interno denso.
@@ -467,7 +493,7 @@ lleva una cabecera que lo advierte.
 
 ### Qué sube exactamente a Vercel
 
-- **`dist/`**, con 20 páginas HTML, el CSS, las fuentes, el logotipo, las
+- **`dist/`**, con 21 páginas HTML, el CSS, las fuentes, el logotipo, las
   imágenes y unos pocos kilobytes de JavaScript. Se sirve desde la CDN.
 - **`api/presupuesto.ts`**, la única función. Vercel la detecta por estar en el
   directorio `api/` de la raíz, no a través del framework.

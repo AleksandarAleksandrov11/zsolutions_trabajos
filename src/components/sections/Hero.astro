@@ -1,121 +1,152 @@
 ---
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, MessageCircle, Phone, ShieldCheck, Clock, MapPin } from "lucide-react";
 import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import Foto from "@/components/ui/Foto.astro";
+import { hrefTelefono, hrefWhatsApp, mensajeWhatsApp, site } from "@/content/site";
 import type { NombreFoto } from "@/content/fotos";
-import { barraConfianza, hrefWhatsApp, mensajeWhatsApp } from "@/content/site";
 
 type Props = {
-  eyebrow: string;
-  titulo: string;
-  descripcion: string;
-  foto: {
-    nombre: NombreFoto;
-    alt: string;
-    /** Encuadre en móvil y en pantalla ancha: el sujeto no cae igual. */
-    posicionMovil?: string;
-    posicion?: string;
-  };
-  /** Solo la portada ocupa la pantalla completa. */
+  /** La portada usa el héroe alto; el resto de páginas, el corto. */
   portada?: boolean;
-  conBarraConfianza?: boolean;
+  eyebrow?: string;
+  titulo: string;
+  destacado?: string;
+  entradilla: string;
+  foto?: NombreFoto;
+  altFoto?: string;
+  posicionFoto?: string;
 };
 
 const {
-  eyebrow,
-  titulo,
-  descripcion,
-  foto,
   portada = false,
-  conBarraConfianza = false,
+  eyebrow = "Instalaciones en Barcelona",
+  titulo,
+  destacado,
+  entradilla,
+  foto = "alex-cubierta-barcelona",
+  altFoto = "",
+  posicionFoto = "50% 30%",
 } = Astro.props;
 
-/* Tailwind busca las clases escritas literalmente en el código, así que no
-   valen las construidas al vuelo: el encuadre se elige entre estos pares. */
-const encuadres = {
-  "62% 18%": {
-    movil: "[&_img]:object-[62%_18%]",
-    ancho: "lg:[&_img]:object-[62%_18%]",
-  },
-  "55% 25%": {
-    movil: "[&_img]:object-[55%_25%]",
-    ancho: "lg:[&_img]:object-[55%_25%]",
-  },
-  "50% 30%": {
-    movil: "[&_img]:object-[50%_30%]",
-    ancho: "lg:[&_img]:object-[50%_30%]",
-  },
-  "70% 25%": {
-    movil: "[&_img]:object-[70%_25%]",
-    ancho: "lg:[&_img]:object-[70%_25%]",
-  },
-} as const;
-
-type Encuadre = keyof typeof encuadres;
-const movil = encuadres[(foto.posicionMovil ?? "50% 30%") as Encuadre].movil;
-const ancho = encuadres[(foto.posicion ?? "50% 30%") as Encuadre].ancho;
+/* Tres pruebas cortas debajo del titular. No son adornos: son las tres
+   preguntas que hace todo el mundo antes de llamar. */
+const pruebas = [
+  { icono: ShieldCheck, texto: "Instalador certificado" },
+  { icono: Clock, texto: `Respuesta en ${site.respuesta}` },
+  { icono: MapPin, texto: "Barcelona y área metropolitana" },
+];
 ---
 
 <section
   class:list={[
     "relative isolate flex flex-col justify-end overflow-hidden",
     portada
-      ? "min-h-[88svh] pt-32 pb-14 sm:min-h-[92svh] sm:pb-20"
-      : "pt-32 pb-14 sm:pt-40 sm:pb-20",
+      ? "min-h-[92svh] pt-32 pb-16 sm:pb-24"
+      : "min-h-[62svh] pt-32 pb-14 sm:pt-40 sm:pb-20",
   ]}
 >
-  {/* Fondo decorativo. El bloque entero es `aria-hidden`, así que la foto va
-      con `alt` vacío a propósito: lo que cuenta el héroe lo dice el titular,
-      y anunciar la imagen antes que él solo añadiría ruido. La descripción de
-      esta misma foto sí se usa donde es contenido, en `/sobre-alex`. */}
-  <div class="absolute inset-0 -z-10" aria-hidden="true">
+  {/* Fondo decorativo: el bloque entero es `aria-hidden`, así que la foto va
+      con `alt` vacío a propósito. Lo que cuenta el héroe lo dice el titular. */}
+  <div class="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true" data-parallax>
     <Foto
-      nombre={foto.nombre}
+      nombre={foto}
       alt=""
       priority
       sizes="100vw"
-      class={`absolute inset-0 h-full w-full ${movil} ${ancho}`}
+      class="absolute inset-0 h-full w-full"
+      objectPosition={posicionFoto}
     />
-    {/* Degradados: legibilidad del texto sin tocar la foto. En pantalla ancha
-        el oscurecido va de izquierda a derecha; en móvil, de abajo arriba. */}
-    <div class="absolute inset-0 bg-gradient-to-t from-bg from-30% via-bg/88 via-62% to-bg/25 lg:hidden"></div>
-    <div class="absolute inset-0 hidden bg-gradient-to-r from-bg from-12% via-bg/80 via-52% to-bg/10 lg:block"></div>
-    <div class="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-bg/85 to-transparent"></div>
-    <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg to-transparent"></div>
+    {/* Velos: legibilidad del texto sin tocar la foto. En pantalla ancha el
+        oscurecido va de izquierda a derecha; en móvil, de abajo arriba. */}
+    <div class="absolute inset-0 bg-gradient-to-t from-bg from-28% via-bg/90 via-64% to-bg/30 lg:hidden"></div>
+    <div class="absolute inset-0 hidden bg-gradient-to-r from-bg from-14% via-bg/85 via-56% to-bg/15 lg:block"></div>
+    <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-bg/90 to-transparent"></div>
+    <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-bg to-transparent"></div>
   </div>
 
-  <div class="container-brand relative">
-    <p class="text-eyebrow flex items-center gap-2.5 text-brand-orange">
-      <span class="h-px w-6 bg-brand-orange" aria-hidden="true"></span>
+  {altFoto ? <span class="sr-only">{altFoto}</span> : null}
+
+  <div class="container-brand contenido-entra">
+    <p class="text-eyebrow flex items-center gap-3 text-brand-orange">
+      <span class="regla-acento w-8" aria-hidden="true"></span>
       {eyebrow}
     </p>
 
-    <h1 class="mt-6 max-w-3xl text-6xl">{titulo}</h1>
+    <h1
+      class:list={[
+        "mt-6 max-w-4xl",
+        portada ? "text-6xl" : "text-5xl",
+      ]}
+    >
+      {titulo}
+      {destacado ? <><br /><span class="text-brand-orange">{destacado}</span></> : null}
+    </h1>
 
-    <p class="mt-6 max-w-xl text-lg text-fg-muted">{descripcion}</p>
+    <p class="mt-6 max-w-2xl text-xl text-fg-muted">{entradilla}</p>
 
-    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-      <EnlaceBoton href="/contacto" tamano="lg">
-        Solicitar presupuesto
+    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <EnlaceBoton href="/contacto" tamano="lg" data-evento="presupuesto_cta" data-evento-origen="hero">
+        Pedir presupuesto
         <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </EnlaceBoton>
-      <EnlaceBoton href={hrefWhatsApp(mensajeWhatsApp)} variante="secundario" tamano="lg">
+      <EnlaceBoton href={hrefTelefono()} variante="secundario" tamano="lg">
+        <Phone className="h-4 w-4" aria-hidden="true" />
+        {site.nap.telefono}
+      </EnlaceBoton>
+      <EnlaceBoton href={hrefWhatsApp(mensajeWhatsApp)} variante="fantasma" tamano="lg">
         <MessageCircle className="h-4 w-4" aria-hidden="true" />
         WhatsApp
       </EnlaceBoton>
     </div>
 
-    {
-      conBarraConfianza ? (
-        <ul class="hairline-t mt-12 flex flex-wrap items-center gap-x-6 gap-y-2.5 pt-6">
-          {barraConfianza.map((item) => (
-            <li class="text-eyebrow flex items-center gap-2 text-fg-dim">
-              <span class="h-1 w-1 rounded-full bg-n-500" aria-hidden="true" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      ) : null
-    }
+    <ul class="hairline-t mt-10 flex flex-wrap gap-x-8 gap-y-3 pt-6">
+      {
+        pruebas.map((prueba) => (
+          <li class="text-eyebrow flex items-center gap-2.5 text-fg-muted">
+            <prueba.icono className="h-4 w-4 shrink-0 text-brand-orange" aria-hidden="true" />
+            {prueba.texto}
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
+
+<script>
+  /* Parallax del héroe.
+     La foto sube a un tercio de la velocidad del scroll. Es un detalle
+     pequeño y por eso se hace barato: una variable CSS actualizada en
+     `requestAnimationFrame`, y solo mientras el héroe está en pantalla.
+     Con movimiento reducido no se activa, y en móvil tampoco: ahí el coste
+     de repintar no compensa. */
+  const capa = document.querySelector<HTMLElement>("[data-parallax]");
+  const permitido =
+    capa &&
+    window.matchMedia("(min-width: 64rem)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (permitido) {
+    const foto = capa.querySelector<HTMLElement>("picture, img");
+    if (foto) {
+      foto.style.willChange = "transform";
+      let pendiente = false;
+
+      const mover = () => {
+        pendiente = false;
+        const alto = capa.offsetHeight;
+        const y = window.scrollY;
+        if (y > alto) return;
+        foto.style.transform = `translate3d(0, ${(y * 0.3).toFixed(1)}px, 0) scale(1.12)`;
+      };
+
+      const alScroll = () => {
+        if (pendiente) return;
+        pendiente = true;
+        requestAnimationFrame(mover);
+      };
+
+      mover();
+      window.addEventListener("scroll", alScroll, { passive: true });
+    }
+  }
+</script>
