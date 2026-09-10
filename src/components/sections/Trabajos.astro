@@ -1,5 +1,5 @@
 ---
-import { Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/ui/Reveal.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
@@ -8,9 +8,14 @@ import Foto from "@/components/ui/Foto.astro";
 import { tiposFinca, trabajos } from "@/content/trabajos";
 import { servicios } from "@/content/servicios";
 import { fotos } from "@/content/fotos";
+import { secciones } from "@/content/secciones";
 
-type Props = { numero?: string };
-const { numero = "03" } = Astro.props;
+type Props = {
+  numero?: string;
+  /** En `/proyectos` el H1 de la página ya hace de encabezado. */
+  conEncabezado?: boolean;
+};
+const { numero = "03", conEncabezado = true } = Astro.props;
 
 /*
  * Galería filtrable.
@@ -37,16 +42,24 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
   trabajos.length > 0 ? (
     <section id="trabajos" class="py-section" aria-labelledby="titulo-trabajos">
       <div class="container-brand">
-        <SectionHeading
-          numero={numero}
-          eyebrow="Trabajos"
-          tituloId="titulo-trabajos"
-          titulo="Lo que se ve cuando el trabajo está bien hecho"
-          descripcion="Cada tipo de intervención con lo que realmente incluye. Filtra por oficio o por tipo de finca, y toca una imagen para verla completa."
-        />
+        {
+          conEncabezado ? (
+            <SectionHeading
+              numero={numero}
+              eyebrow={secciones.trabajos.eyebrow}
+              tituloId="titulo-trabajos"
+              titulo={secciones.trabajos.titulo}
+              descripcion={secciones.trabajos.descripcion}
+            />
+          ) : (
+            <h2 id="titulo-trabajos" class="sr-only">
+              Galería de trabajos
+            </h2>
+          )
+        }
 
         <Reveal>
-          <div class="mt-10 flex flex-col gap-4" data-filtros>
+          <div class:list={["flex flex-col gap-4", conEncabezado && "mt-10"]} data-filtros>
             <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrar por oficio">
               <span class="text-eyebrow mr-1 text-fg-dim">Oficio</span>
               <button type="button" class="chip-filtro" data-eje="oficio" data-valor="" aria-pressed="true">
@@ -90,12 +103,16 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
               data-oficio={trabajo.servicio}
               data-tipo={trabajo.tipo}
             >
+              {/* Sin `aria-label`: el nombre accesible sale del propio
+                  contenido, con un prefijo solo para lectores. Con etiqueta
+                  el nombre era «Ampliar: <título>» y no contenía el pie
+                  visible, que es justo lo que el criterio 2.5.3 pide. */}
               <button
                 type="button"
                 class="tarjeta group flex w-full flex-col overflow-hidden p-0 text-left"
                 data-visor-abrir={i}
-                aria-label={`Ampliar: ${trabajo.titulo}`}
               >
+                <span class="sr-only">Ampliar imagen:</span>
                 <span class="relative block shrink-0">
                   <Foto
                     nombre={trabajo.foto}
@@ -147,10 +164,17 @@ const tipos = tiposFinca.filter((t) => trabajos.some((x) => x.tipo === t.id));
           </figure>
 
           <div class="container-brand flex shrink-0 items-center justify-center gap-3 pb-8">
+            {/* Iconos y no «‹»/«›»: con texto visible, el nombre accesible
+                tiene que contener ese texto, y «‹» dentro de «Imagen
+                anterior» no encaja. Con un icono no hay texto que casar. */}
             <button type="button" data-visor-anterior aria-label="Imagen anterior"
-              class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg">‹</button>
+              class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg">
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
             <button type="button" data-visor-siguiente aria-label="Imagen siguiente"
-              class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg">›</button>
+              class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg">
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </dialog>

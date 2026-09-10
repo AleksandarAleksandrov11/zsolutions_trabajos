@@ -5,6 +5,7 @@ import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import { zonas, zonasPorComarca } from "@/content/zonas";
+import { secciones } from "@/content/secciones";
 
 type Props = { numero?: string; conEnlace?: boolean };
 const { numero = "06", conEnlace = false } = Astro.props;
@@ -19,9 +20,9 @@ const porComarca = zonasPorComarca();
   <div class="container-brand">
     <SectionHeading
       numero={numero}
-      eyebrow="Dónde trabajo"
+      eyebrow={secciones.zonas.eyebrow}
       tituloId="titulo-zonas"
-      titulo="Barcelona, área metropolitana y Cataluña"
+      titulo={secciones.zonas.titulo}
       descripcion={`${zonas.length} municipios con salida habitual. Si el tuyo no está, pregúntame igualmente: lo que no hago es cobrarte un desplazamiento que no te aporta nada.`}
     />
 

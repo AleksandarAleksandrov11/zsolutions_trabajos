@@ -3,6 +3,7 @@ import SectionHeading from "@/components/ui/SectionHeading.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import { trayectoria } from "@/content/trayectoria";
+import { secciones } from "@/content/secciones";
 
 type Props = { numero?: string };
 const { numero = "02" } = Astro.props;
@@ -18,9 +19,9 @@ const { numero = "02" } = Astro.props;
   <div class="container-brand">
     <SectionHeading
       numero={numero}
-      eyebrow="Trayectoria"
+      eyebrow={secciones.trayectoria.eyebrow}
       tituloId="titulo-trayectoria"
-      titulo="De peón de obra a instalador certificado"
+      titulo={secciones.trayectoria.titulo}
     />
 
     <div class="relative mt-12 pl-6 sm:pl-8" data-trayectoria>

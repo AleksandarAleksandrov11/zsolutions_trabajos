@@ -4,6 +4,7 @@ import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/ui/Reveal.astro";
 import { lugares, sintomas } from "@/content/diagnostico";
 import { servicios } from "@/content/servicios";
+import { secciones } from "@/content/secciones";
 
 type Props = { numero?: string };
 const { numero = "01" } = Astro.props;
@@ -28,10 +29,10 @@ const porSlug = new Map(servicios.map((s) => [s.slug, s]));
   <div class="container-brand">
     <SectionHeading
       numero={numero}
-      eyebrow="Qué necesitas"
+      eyebrow={secciones.selector.eyebrow}
       tituloId="titulo-selector"
-      titulo="Cuéntame qué te pasa y te digo de qué es"
-      descripcion="Dos preguntas y sabes a qué oficio corresponde, qué incluye y cuánto se tarda. Sin tener que adivinar el nombre técnico."
+      titulo={secciones.selector.titulo}
+      descripcion={secciones.selector.descripcion}
     />
 
     <Reveal class="mt-12">

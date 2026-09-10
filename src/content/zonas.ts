@@ -260,12 +260,26 @@ export const siluetaCataluna = {
  * `publicada: false` significa que la agrupación existe como concepto pero
  * todavía no tiene página: sus municipios enlazan al listado de `/zonas`.
  */
+export type CasoZona = { titulo: string; detalle: string };
+export type PreguntaZona = { p: string; r: string };
+
 export type Agrupacion = {
   slug: string;
   nombre: string;
-  /** Titular y descripción de la página, cuando la haya. */
+  /** Titular de la página. */
   titulo: string;
+  /** `<title>` y `<meta description>`, que no son el titular. */
+  metaTitulo: string;
+  metaDescripcion: string;
   entradilla: string;
+  /** Cuerpo editorial: por qué el trabajo es distinto aquí. */
+  cuerpo: string[];
+  /** Casos típicos de la zona, no de la empresa. */
+  casos: CasoZona[];
+  /** Preguntas propias de la zona. Alimentan el `FAQPage` de la página. */
+  faq: PreguntaZona[];
+  /** Solo Barcelona ciudad: los diez distritos. */
+  distritos?: string[];
   /** Municipios que la componen, por `slug` de zona. */
   municipios: string[];
   publicada: boolean;
@@ -276,26 +290,101 @@ export const agrupaciones: Agrupacion[] = [
     slug: "barcelona-ciudad",
     nombre: "Barcelona ciudad",
     titulo: "Electricista y lampista en Barcelona ciudad",
+    metaTitulo: "Electricista y lampista en Barcelona | ZSolutions",
+    metaDescripcion:
+      "Instalaciones de electricidad, fontanería y clima en los diez distritos de Barcelona. Finca antigua, bloque de los sesenta y obra nueva, cada una con su criterio.",
     entradilla:
       "Los diez distritos, con el criterio que exige cada tipo de finca: del Eixample con patio de luces al bloque de los sesenta de Nou Barris.",
+    cuerpo: [
+      "Barcelona no es una ciudad, son varias superpuestas. En el mismo kilómetro cuadrado conviven fincas de finales del XIX con la instalación pasada por encima de la moldura, bloques de los sesenta con montantes que nadie ha tocado desde que se construyeron, y obra nueva donde el problema no es la instalación sino el acceso para mantenerla.",
+      "Eso cambia el trabajo más de lo que parece. En finca antigua del Eixample o de Ciutat Vella, lo que condiciona todo es por dónde pasan las cosas: patios de luces estrechos, huecos de escalera protegidos y comunidades donde cualquier obra vista necesita permiso. En el bloque de los sesenta y setenta de Nou Barris, Sant Andreu o Horta, el condicionante es otro: instalaciones de origen dimensionadas para una casa con nevera y poco más, que hoy tienen que sostener inducción, aire y coche eléctrico.",
+      "Trabajar en Barcelona ciudad también significa contar con la calle. Ocupar acera o calzada requiere licencia y tiempo, así que en fachada y cubierta casi siempre sale mejor el acceso por cuerda: sin andamio, sin permiso de ocupación y sin cortar el paso a nadie.",
+      "El resultado práctico: el presupuesto empieza por la visita, no por el catálogo. Lo que sirve en un piso de Gràcia no sirve en uno de la Barceloneta, y decirlo antes evita la mitad de los sustos.",
+    ],
+    casos: [
+      { titulo: "Ampliación de potencia en finca antigua", detalle: "Estudio de la carga real, adecuación del montante y boletín para que la distribuidora acepte el cambio. En finca antigua lo caro no es el cuadro: es el recorrido." },
+      { titulo: "Separación de circuitos en bloque de los sesenta", detalle: "Cocina, baño, alumbrado y tomas por separado, con diferencial superinmunizado para que un electrodoméstico no deje la casa entera a oscuras." },
+      { titulo: "Aire acondicionado con patio de luces estrecho", detalle: "Ubicación de la unidad exterior donde no moleste al vecino ni incumpla la normativa de la comunidad, y reparto por conductos cuando el split por estancia no cabe." },
+      { titulo: "Fachada y patio sin andamio", detalle: "Acceso por cuerda para revisar bajantes, pasos de instalación y remates, sin ocupar la vía pública ni pedir licencia de andamio." },
+    ],
+    faq: [
+      { p: "¿Trabajas en todos los distritos de Barcelona?", r: "Sí, en los diez. En Ciutat Vella y Gràcia hay más restricción de acceso y aparcamiento, así que suelo cerrar la visita a primera hora." },
+      { p: "Mi finca es de 1920 y no hay planos. ¿Es un problema?", r: "Es lo normal y no lo es. Se levanta el estado real en la visita y lo que salga se entrega dibujado, que es más de lo que había antes." },
+      { p: "¿Puedes trabajar con la comunidad y no solo con mi piso?", r: "Sí. El presupuesto de comunidad va desglosado por partidas para que se pueda llevar a junta sin tener que traducirlo." },
+      { p: "¿Hace falta andamio para tocar la fachada?", r: "Casi nunca. Con acceso por cuerda se resuelve la mayoría de intervenciones sin ocupar la calle, que en Barcelona es lo que más retrasa una obra." },
+    ],
+    distritos: [
+      "Ciutat Vella",
+      "L'Eixample",
+      "Sants-Montjuïc",
+      "Les Corts",
+      "Sarrià-Sant Gervasi",
+      "Gràcia",
+      "Horta-Guinardó",
+      "Nou Barris",
+      "Sant Andreu",
+      "Sant Martí",
+    ],
     municipios: ["barcelona"],
-    publicada: false,
+    publicada: true,
   },
   {
     slug: "barcelones-nord",
     nombre: "Barcelonès Nord",
     titulo: "Instalaciones en el Barcelonès Nord",
+    metaTitulo: "Electricista en Badalona, Santa Coloma i Sant Adrià | ZSolutions",
+    metaDescripcion:
+      "Electricidad, fontanería y clima en Badalona, Santa Coloma de Gramenet y Sant Adrià de Besòs. Bloque denso, instalación de origen y servicios generales de comunidad.",
     entradilla:
       "Badalona, Santa Coloma i Sant Adrià: bloque denso, mucha instalación de origen y comunidades con servicios generales que hay que poner al día.",
+    cuerpo: [
+      "El Barcelonès Nord creció deprisa entre los cincuenta y los setenta, y eso se nota al abrir cualquier cuadro. Mucho bloque de cuatro y cinco alturas sin ascensor, montantes comunes que nunca se han renovado y derivaciones individuales dimensionadas para un consumo que hoy no existe.",
+      "La consecuencia más habitual no es una avería espectacular, es una acumulación: el diferencial que salta cuando coinciden la lavadora y el horno, la toma de tierra que no llega a todas las estancias, el cuadro donde se han ido añadiendo automáticos sin tocar el reparto de circuitos. Se resuelve por partes y en orden, no cambiándolo todo de golpe.",
+      "En Santa Coloma y en la parte alta de Badalona hay además mucha pendiente y mucha finca en ladera, con presión de agua justa en los últimos pisos y grupos de presión que llevan años funcionando sin revisión. Y en Sant Adrià, el frente marítimo añade lo suyo: salitre en todo lo que esté a la intemperie.",
+      "Es zona de comunidades pequeñas, con presupuesto contado y sin administrador en muchos casos. Por eso aquí el presupuesto desglosado y las fases importan más que en ningún otro sitio: permite empezar por lo que corre prisa y dejar el resto para el ejercicio siguiente.",
+    ],
+    casos: [
+      { titulo: "Renovación del cuadro sin rehacer la casa", detalle: "Separación real de circuitos y protección diferencial aprovechando el recorrido existente donde aguanta, y sustituyendo solo los tramos que no." },
+      { titulo: "Presión de agua en los pisos altos", detalle: "Revisión del grupo de presión, del montante y de las llaves de corte antes de proponer nada: muchas veces el problema está en un tramo, no en el grupo." },
+      { titulo: "Servicios generales de comunidad", detalle: "Alumbrado de escalera, portero, bomba y cuadro de servicios comunes, con las lecturas anotadas para poder comparar en la siguiente visita." },
+      { titulo: "Instalación expuesta al salitre", detalle: "Material y protecciones adecuadas para primera línea, y revisión de lo que ya está montado antes de que se convierta en una avería." },
+    ],
+    faq: [
+      { p: "¿Trabajas con comunidades sin administrador?", r: "Sí, es lo más habitual aquí. El presupuesto va desglosado por partidas para que se pueda leer en junta sin tener que traducirlo." },
+      { p: "El edificio no tiene ascensor. ¿Cambia el precio?", r: "No en la mano de obra. Puede cambiar en material voluminoso, y si es así lo digo en el presupuesto, no después." },
+      { p: "¿Se puede hacer por fases?", r: "Sí, y en instalaciones antiguas suele ser lo sensato. Se empieza por lo que es seguridad y se deja para más adelante lo que es comodidad." },
+      { p: "¿Cuánto tardas en venir desde Barcelona?", r: "Es zona limítrofe, así que suele ser el mismo día o el siguiente." },
+    ],
     municipios: ["badalona", "santa-coloma-de-gramenet", "sant-adria-de-besos"],
-    publicada: false,
+    publicada: true,
   },
   {
     slug: "baix-llobregat",
     nombre: "Baix Llobregat",
     titulo: "Electricista y lampista en el Baix Llobregat",
+    metaTitulo: "Electricista y fontanero en el Baix Llobregat | ZSolutions",
+    metaDescripcion:
+      "Instalaciones en L'Hospitalet, Cornellà, Sant Boi, Esplugues, El Prat y Castelldefels. Vivienda de superficie, polígono y litoral, cada uno con su tipo de instalación.",
     entradilla:
       "De L'Hospitalet a Castelldefels: vivienda de superficie, polígono y litoral, cada uno con su tipo de instalación.",
+    cuerpo: [
+      "El Baix Llobregat es la comarca donde más cambia el trabajo según el municipio. L'Hospitalet es la ciudad más densa de Europa y funciona como Barcelona: bloque apretado, patios estrechos y comunidades numerosas. Cornellà, Sant Boi y Esplugues mezclan ese bloque con vivienda de superficie de los ochenta y noventa, donde la instalación es más reciente pero se ha quedado corta de potencia.",
+      "El Prat y Castelldefels son otra cosa. Mucha casa unifamiliar, mucha parcela y mucha instalación que empieza en un cuadro general y se reparte por exterior. Ahí lo determinante es el recorrido y la protección de lo que va a la intemperie, no el cuadro en sí.",
+      "Es también la comarca con más polígono y más nave por metro cuadrado del área. Una nave no es una casa grande: cambian las secciones, cambia la protección y cambia la manera de planificar, porque la actividad no se puede parar tres días.",
+      "Y en el litoral, de El Prat a Castelldefels, vuelve el salitre y vuelve la humedad. Material de intemperie de verdad, no el que aguanta un invierno.",
+    ],
+    casos: [
+      { titulo: "Ampliación de potencia en vivienda de superficie", detalle: "Cálculo de la carga real de la casa con inducción, aire y cargador, y adecuación de la línea antes de pedir el cambio a la distribuidora." },
+      { titulo: "Instalación exterior en parcela", detalle: "Reparto desde el cuadro general con canalización y protecciones aptas para intemperie: riego, iluminación, piscina y caseta." },
+      { titulo: "Cuadro y protecciones en nave", detalle: "Secciones y protecciones dimensionadas para la maquinaria real, con la obra planificada por fases para no parar la actividad." },
+      { titulo: "Aerotermia en unifamiliar", detalle: "Cálculo de demanda y revisión de los emisores existentes antes de proponer la máquina. Si los radiadores no acompañan, se dice." },
+    ],
+    faq: [
+      { p: "¿Trabajas en polígono y nave, no solo en vivienda?", r: "Sí. Es una parte importante del trabajo en esta comarca, y se planifica para no parar la actividad más de lo imprescindible." },
+      { p: "Tengo casa con parcela. ¿Llevas la instalación de exterior?", r: "Sí: riego, iluminación, piscina y caseta, con canalización y protecciones aptas para intemperie de verdad." },
+      { p: "¿Merece la pena la aerotermia en una casa de los noventa?", r: "Depende de los emisores. Se calcula antes: si los radiadores actuales no acompañan, lo digo y planteamos el cambio por fases o no lo hacemos." },
+      { p: "¿Hasta dónde llegas por la costa?", r: "Hasta Castelldefels con normalidad, y más allá según el trabajo. Si no me corresponde, también te lo digo." },
+    ],
     municipios: [
       "hospitalet-de-llobregat",
       "cornella-de-llobregat",
@@ -304,21 +393,42 @@ export const agrupaciones: Agrupacion[] = [
       "el-prat-de-llobregat",
       "castelldefels",
     ],
-    publicada: false,
+    publicada: true,
   },
   {
     slug: "valles-occidental",
     nombre: "Vallès Occidental",
     titulo: "Instalaciones en el Vallès Occidental",
+    metaTitulo: "Electricista y lampista en el Vallès Occidental | ZSolutions",
+    metaDescripcion:
+      "Instalaciones en Sant Cugat, Cerdanyola, Sabadell y Terrassa. Casa unifamiliar, casco antiguo y nave industrial en la misma comarca.",
     entradilla:
       "Sant Cugat, Cerdanyola, Sabadell i Terrassa: casa unifamiliar, nave industrial y casco antiguo en la misma comarca.",
+    cuerpo: [
+      "El Vallès Occidental junta tres mundos que rara vez coinciden tan cerca. Sant Cugat y Cerdanyola son sobre todo unifamiliar y vivienda de superficie reciente, con instalaciones correctas de origen pero pensadas para un consumo de hace veinte años. Sabadell y Terrassa tienen casco antiguo denso, ensanche industrial y mucha nave reconvertida.",
+      "En la casa unifamiliar el trabajo suele ir de ampliar: potencia para el coche eléctrico, aire donde solo había radiadores, aerotermia donde había gas. Lo que decide si sale bien es el cálculo previo, no la máquina; con los emisores equivocados, la mejor bomba de calor funciona mal y la factura no baja.",
+      "En el casco antiguo de Sabadell y Terrassa el trabajo se parece más al de Barcelona: finca con recorridos difíciles, comunidades y actuaciones por fases. Y en la nave reconvertida hay un tercer escenario, el más delicado: instalaciones industriales adaptadas a uso terciario o residencial, donde lo que había no siempre sirve para lo que hay ahora.",
+      "Es la comarca donde más se agradece que quien presupuesta sea quien sube. La distancia entre lo que se ve en una foto y lo que hay detrás de un falso techo es demasiado grande para presupuestar por teléfono.",
+    ],
+    casos: [
+      { titulo: "Punto de recarga para coche eléctrico", detalle: "Estudio de la carga real, línea protegida hasta la plaza y gestión del cambio de potencia si hace falta. En comunidad, con la documentación para junta." },
+      { titulo: "Aerotermia sustituyendo caldera de gas", detalle: "Cálculo de demanda, revisión de los emisores y planteamiento por fases si los radiadores actuales no acompañan." },
+      { titulo: "Nave reconvertida a otro uso", detalle: "Revisión de lo que hay, adecuación de secciones y protecciones al uso nuevo, y documentación de lo ejecutado." },
+      { titulo: "Actuación por fases en casco antiguo", detalle: "Recorridos difíciles y comunidad de por medio: se planifica por tramos para dejar el menor tiempo posible sin servicio." },
+    ],
+    faq: [
+      { p: "¿Instalas puntos de recarga en comunidad?", r: "Sí, con la documentación preparada para junta y la línea protegida hasta la plaza." },
+      { p: "Quiero quitar el gas. ¿Es siempre buena idea?", r: "No siempre, y por eso se calcula antes. Si los emisores no acompañan, la factura no baja lo que esperas. Te lo digo antes de vender nada." },
+      { p: "Tengo una nave que quiero cambiar de uso. ¿Lo llevas?", r: "Sí. Lo primero es ver qué hay y qué sirve para el uso nuevo, que casi nunca es todo." },
+      { p: "¿Vienes a Terrassa y Sabadell con la misma agilidad?", r: "Sí. Es zona habitual de trabajo, así que la visita suele cerrarse en el mismo plazo que en Barcelona." },
+    ],
     municipios: [
       "sant-cugat-del-valles",
       "cerdanyola-del-valles",
       "sabadell",
       "terrassa",
     ],
-    publicada: false,
+    publicada: true,
   },
 ];
 

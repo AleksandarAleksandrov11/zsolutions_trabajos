@@ -22,10 +22,29 @@ const robots = meta.indexable
   ? "index, follow, max-image-preview:large"
   : "noindex, follow";
 
-/* Los scripts de analítica los sirve la propia plataforma bajo `/_vercel/`.
-   Fuera de Vercel esas rutas no existen, así que solo se emiten cuando el
-   build se ejecuta allí: en local no hay peticiones fallidas ni ruido en la
-   consola. */
+/*
+ * Analítica.
+ *
+ * Los scripts los sirve la propia plataforma bajo `/_vercel/`. Fuera de
+ * Vercel esas rutas no existen, así que solo se emiten cuando el build se
+ * ejecuta allí: en local no hay peticiones fallidas ni ruido en la consola.
+ *
+ * DECISIÓN, y es deliberada: se cargan ANTES del aviso de cookies, no
+ * detrás. El artículo 22.2 de la LSSI y la guía de cookies de la AEPD exigen
+ * consentimiento para almacenar información en el equipo del usuario o
+ * acceder a ella. Vercel Web Analytics y Speed Insights no lo hacen: no
+ * escriben cookies, no generan identificadores persistentes y no siguen a
+ * nadie entre sitios ni entre sesiones. Queda fuera de lo que ese artículo
+ * somete a consentimiento.
+ *
+ * Lo que sí hace falta, y está hecho, es declararlo: la política de cookies
+ * lo explica en su apartado 3 y el aviso lo menciona en la primera línea.
+ *
+ * Si en algún momento se añade una herramienta que sí instale cookies
+ * (Google Analytics, píxel de Meta), el sistema de consentimiento ya tiene
+ * la categoría preparada y no debe cargarse ni un script hasta que se
+ * autorice. Eso NO es lo que pasa aquí.
+ */
 const enVercel = Boolean(process.env.VERCEL);
 ---
 
@@ -81,7 +100,14 @@ const enVercel = Boolean(process.env.VERCEL);
 
     {/* TODO (Alex): pegar aquí la etiqueta de verificación de Search Console. */}
 
-    <JsonLd datos={[schemaNegocioLocal(), schemaPersona(), schemaWebSite()]} />
+    {/* El grafo de negocio local solo tiene sentido en páginas indexables: en
+        la 404 y en cualquier otra marcada `noindex` es peso muerto que además
+        confunde a quien lee el marcado. */}
+    {
+      meta.indexable ? (
+        <JsonLd datos={[schemaNegocioLocal(), schemaPersona(), schemaWebSite()]} />
+      ) : null
+    }
     {schema ? <JsonLd datos={schema} /> : null}
   </head>
 

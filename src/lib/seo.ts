@@ -98,12 +98,15 @@ export const ES_INDEXABLE = (() => {
 /**
  * Miniatura para redes sociales.
  *
- * Es una imagen estática de marca, no generada al vuelo: una imagen compuesta
- * en tiempo de petición obligaría a desplegar una función de servidor, y todo
+ * Hay una por página, compuesta en la compilación con `pnpm og` y subida al
+ * repositorio. No se genera al vuelo a propósito: una imagen compuesta en
+ * tiempo de petición obligaría a desplegar una función de servidor, y todo
  * este sitio se sirve como ficheros estáticos.
+ *
+ * Si a una página no se le pasa la suya, cae en la de marca.
  */
-export function urlOg(): string {
-  return `${BASE_URL}/og.png`;
+export function urlOg(ruta = "/og.png"): string {
+  return `${BASE_URL}${ruta}`;
 }
 
 export type Metadatos = {
@@ -126,6 +129,8 @@ type Args = {
   path: string;
   /** Excluir de los índices (páginas técnicas). */
   noIndex?: boolean;
+  /** Miniatura propia, empezando por "/". Sin ella se usa la de marca. */
+  og?: string;
 };
 
 export function crearMetadata({
@@ -133,12 +138,13 @@ export function crearMetadata({
   description,
   path,
   noIndex = false,
+  og,
 }: Args): Metadatos {
   return {
     title,
     description,
     canonical: `${BASE_URL}${path === "/" ? "" : path}`,
-    imagen: urlOg(),
+    imagen: urlOg(og),
     indexable: ES_INDEXABLE && !noIndex,
     locale: site.locale,
     siteName: site.nombre,

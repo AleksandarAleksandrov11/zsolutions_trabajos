@@ -2,7 +2,6 @@
 import Base from "@/layouts/Base.astro";
 import Hero from "@/components/sections/Hero.astro";
 import SelectorServicio from "@/components/sections/SelectorServicio.astro";
-import ServicesGrid from "@/components/sections/ServicesGrid.astro";
 import Metodo from "@/components/sections/Metodo.astro";
 import Trabajos from "@/components/sections/Trabajos.astro";
 import SobreAlex from "@/components/sections/SobreAlex.astro";
@@ -41,16 +40,15 @@ const meta = crearMetadata({
   />
 
   <SelectorServicio numero="01" />
-  <ServicesGrid numero="02" />
   <BandaContacto claim="¿Ya sabes lo que necesitas? Cuéntamelo en un minuto por teléfono o WhatsApp." />
-  <Metodo numero="03" />
-  <Trabajos numero="04" />
-  <Comparador comparativa={comparativaPortada} numero="05" />
+  <Metodo numero="02" />
+  <Trabajos numero="03" />
+  <Comparador comparativa={comparativaPortada} numero="04" />
   <BandaContacto />
-  <SobreAlex numero="06" />
-  <Testimonios numero="07" />
+  <SobreAlex numero="05" />
+  <Testimonios numero="06" />
   <BandaContacto claim="¿Tu zona no está en la lista? Pregúntame igualmente: casi siempre llego." />
-  <Zonas numero="08" conEnlace />
-  <FAQ preguntas={faqHome} numero="09" />
+  <Zonas numero="07" conEnlace />
+  <FAQ preguntas={faqHome} numero="08" />
   <CTASection />
 </Base>

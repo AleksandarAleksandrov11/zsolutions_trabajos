@@ -10,7 +10,7 @@ Barcelona, el área metropolitana y Cataluña.
 **Stack:** Astro 7 en estático · TypeScript estricto · Tailwind CSS v4 · React 19
 solo en el formulario · Zod · Resend · Vercel.
 
-La web entera se compila a HTML: 15 páginas que Vercel sirve desde la CDN sin
+La web entera se compila a HTML: 20 páginas que Vercel sirve desde la CDN sin
 ejecutar nada. La única parte dinámica es el envío del formulario, que vive en
 `api/presupuesto.ts` como función independiente, fuera del build del framework.
 
@@ -107,7 +107,7 @@ en un componente.** Todo vive en `src/content/`, en archivos TypeScript tipados.
 |---|---|
 | `site.ts` | Nombre, NAP, teléfono, WhatsApp, email, redes, navegación |
 | `servicios.ts` | Los 6 servicios completos: textos, FAQ, proceso, palabras clave |
-| `zonas.ts` | Las 21 zonas, con su comarca y su punto en el mapa |
+| `zonas.ts` | Los 21 municipios con su comarca y su punto en el mapa, y las agrupaciones con página propia |
 | `trabajos.ts` | Galería de tipos de intervención |
 | `testimonios.ts` | Opiniones de clientes (**hay que sustituirlas**, ver §5) |
 | `certificaciones.ts` | Las 19 acreditaciones agrupadas |
@@ -185,17 +185,28 @@ scripts/           generación de imágenes, iconos y miniatura, y auditorías
 
 | Ruta | Qué es |
 |---|---|
-| `/` | Portada: servicios, método, trabajos, Alex, testimonios, zonas y FAQ |
+| `/` | Portada: selector de servicio, método, trabajos, comparador, Alex, testimonios, zonas y FAQ |
 | `/servicios` | Índice de los seis servicios |
 | `/servicios/<slug>` | Seis páginas, una por oficio. Es el núcleo del SEO |
-| `/zonas` | Mapa real de Cataluña y las 21 zonas por comarca |
-| `/sobre-alex` | Trayectoria y acreditaciones completas |
+| `/proyectos` | Galería filtrable por oficio y por tipo de finca |
+| `/zonas` | Mapa navegable de Cataluña y los 21 municipios por comarca |
+| `/zonas/<agrupación>` | Cuatro páginas por comarca o conurbación, con contenido propio |
+| `/sobre-alex` | Trayectoria, cifras y acreditaciones completas |
 | `/contacto` | Formulario de presupuesto |
 | Tres páginas legales y el 404 | |
 
-No hay página por municipio ni página de formación: se quitaron a propósito
-para que la navegación no compita consigo misma. Las direcciones antiguas
-siguen funcionando con un 301 (ver §3).
+**No hay página por municipio.** Veintiuna páginas competirían entre ellas por
+las mismas búsquedas y ninguna tendría nada propio que contar. Se agrupa por
+comarca o conurbación, que es como se busca de verdad, y solo se publica la
+agrupación que tenga contenido diferenciado escrito: hoy Barcelona ciudad,
+Barcelonès Nord, Baix Llobregat y Vallès Occidental. Las demás llevan
+`publicada: false` en `src/content/zonas.ts` y sus municipios apuntan al
+listado. Cada dirección antigua de municipio redirige con un 301 a su
+agrupación, o al listado si todavía no tiene página (ver §3).
+
+**No hay página de formación.** Va dirigida a instaladores y esta web va
+dirigida a clientes con una avería: son dos intenciones de búsqueda distintas
+y mezclarlas diluye las dos. `/formacion` redirige a `/sobre-alex`.
 
 ### Qué se ejecuta en el navegador
 
@@ -303,7 +314,7 @@ salen del mismo isotipo con `pnpm iconos`.
   logotipo oficial y de la foto de portada.
 - JSON-LD: `LocalBusiness` (`Electrician` + `HVACBusiness` + `Plumber`),
   `Person`, `WebSite`, `Service`, `FAQPage` y `BreadcrumbList`.
-- `sitemap.xml` y `robots.txt` generados en la compilación con las 14 rutas
+- `sitemap.xml` y `robots.txt` generados en la compilación con las 19 rutas
   indexables.
 - URLs limpias en español, sin barra final, breadcrumbs visibles y enlazado
   interno denso.
@@ -456,7 +467,7 @@ lleva una cabecera que lo advierte.
 
 ### Qué sube exactamente a Vercel
 
-- **`dist/`**, con 15 páginas HTML, el CSS, las fuentes, el logotipo, las
+- **`dist/`**, con 20 páginas HTML, el CSS, las fuentes, el logotipo, las
   imágenes y unos pocos kilobytes de JavaScript. Se sirve desde la CDN.
 - **`api/presupuesto.ts`**, la única función. Vercel la detecta por estar en el
   directorio `api/` de la raíz, no a través del framework.

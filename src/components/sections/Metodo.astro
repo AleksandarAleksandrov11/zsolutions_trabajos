@@ -2,6 +2,7 @@
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
+import { secciones } from "@/content/secciones";
 
 /* `tema` decide el fondo del bloque. En la portada va en azul, que es donde el
    corporativo funciona como superficie. En `/servicios` cae justo encima del
@@ -39,9 +40,9 @@ const argumentos = [
     <div class="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-20">
       <SectionHeading
         numero={numero}
-        eyebrow="Cómo trabajo"
+        eyebrow={secciones.metodo.eyebrow}
         tituloId="titulo-metodo"
-        titulo="La diferencia no está en el precio, está en quién sube"
+        titulo={secciones.metodo.titulo}
         class="lg:sticky lg:top-28 lg:self-start"
       />
 

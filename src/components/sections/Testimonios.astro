@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Pause, Play, Quote } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/ui/Reveal.astro";
 import { testimonios } from "@/content/testimonios";
+import { secciones } from "@/content/secciones";
 
 type Props = { numero?: string };
 const { numero = "05" } = Astro.props;
@@ -37,9 +38,9 @@ const inicial = (autor: string) => autor.trim().charAt(0).toUpperCase();
         <div class="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
             numero={numero}
-            eyebrow="Clientes"
+            eyebrow={secciones.testimonios.eyebrow}
             tituloId="titulo-testimonios"
-            titulo="Lo que dicen quienes ya han trabajado conmigo"
+            titulo={secciones.testimonios.titulo}
             class="max-w-xl"
           />
 

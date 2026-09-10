@@ -42,6 +42,7 @@ const meta = crearMetadata({
   title: servicio.titleSeo,
   description: servicio.descriptionSeo,
   path: `/servicios/${servicio.slug}`,
+  og: `/og/servicios-${servicio.slug}.png`,
 });
 
 const acreditaciones = getCertificaciones(servicio.certificaciones);
@@ -154,6 +155,21 @@ const comparativa = comparativaDe(servicio.slug);
 
   {/* Para quién */}
   {comparativa ? <Comparador comparativa={comparativa} eyebrow="Antes y después" /> : null}
+
+  {/* Enlace cruzado con la galería: es donde se ve el resultado del oficio. */}
+  <section class="pb-section" aria-label="Trabajos del servicio">
+    <div class="container-brand">
+      <a href="/proyectos" class="tarjeta flex flex-wrap items-center justify-between gap-4 p-6">
+        <span>
+          <span class="block text-lg font-bold">Ver trabajos de este tipo</span>
+          <span class="mt-1.5 block text-sm text-fg-muted">
+            La galería completa, filtrable por oficio y por tipo de finca.
+          </span>
+        </span>
+        <ArrowUpRight className="h-5 w-5 shrink-0 text-fg-dim" aria-hidden="true" />
+      </a>
+    </div>
+  </section>
 
   <BandaContacto />
 

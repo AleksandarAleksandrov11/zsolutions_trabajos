@@ -6,6 +6,7 @@ import {
   certificacionesPorGrupo,
   gruposCertificacion,
 } from "@/content/certificaciones";
+import { secciones } from "@/content/secciones";
 
 type Props = {
   numero?: string;
@@ -18,8 +19,8 @@ type Props = {
 const {
   numero = "06",
   detallado = false,
-  titulo = "Certificaciones y habilitaciones",
-  descripcion = "Las habilitaciones oficiales no son un adorno del presupuesto: son lo que permite ejecutar, firmar y legalizar una instalación.",
+  titulo = secciones.acreditaciones.titulo,
+  descripcion = secciones.acreditaciones.descripcion,
 } = Astro.props;
 ---
 
@@ -27,7 +28,7 @@ const {
   <div class="container-brand">
     <SectionHeading
       numero={numero}
-      eyebrow="Acreditaciones"
+      eyebrow={secciones.acreditaciones.eyebrow}
       tituloId="titulo-certificaciones"
       titulo={titulo}
       descripcion={descripcion}

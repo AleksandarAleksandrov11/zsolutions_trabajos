@@ -64,6 +64,10 @@ const ancho = encuadres[(foto.posicion ?? "50% 30%") as Encuadre].ancho;
       : "pt-32 pb-14 sm:pt-40 sm:pb-20",
   ]}
 >
+  {/* Fondo decorativo. El bloque entero es `aria-hidden`, así que la foto va
+      con `alt` vacío a propósito: lo que cuenta el héroe lo dice el titular,
+      y anunciar la imagen antes que él solo añadiría ruido. La descripción de
+      esta misma foto sí se usa donde es contenido, en `/sobre-alex`. */}
   <div class="absolute inset-0 -z-10" aria-hidden="true">
     <Foto
       nombre={foto.nombre}

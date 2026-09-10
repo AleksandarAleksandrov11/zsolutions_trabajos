@@ -8,6 +8,7 @@ import Foto from "@/components/ui/Foto.astro";
 import { bioAlex } from "@/content/trayectoria";
 import { site } from "@/content/site";
 import { cifrasPortada } from "@/content/cifras";
+import { secciones } from "@/content/secciones";
 
 type Props = { numero?: string };
 const { numero = "04" } = Astro.props;
@@ -30,7 +31,7 @@ const { numero = "04" } = Astro.props;
       <div>
         <SectionHeading
           numero={numero}
-          eyebrow="Quién está detrás"
+          eyebrow={secciones.alex.eyebrow}
           tituloId="titulo-alex"
           titulo={site.fundador}
         />
