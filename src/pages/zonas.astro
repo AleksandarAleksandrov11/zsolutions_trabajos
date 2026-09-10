@@ -9,7 +9,14 @@ import MapaZonas from "@/components/sections/MapaZonas.astro";
 import CTASection from "@/components/sections/CTASection.astro";
 import { schemaMigas } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
-import { agrupaciones, agrupacionDe, hrefZona, zonas, zonasPorComarca } from "@/content/zonas";
+import {
+  agrupaciones,
+  agrupacionDe,
+  comarcaSlug,
+  hrefZona,
+  zonas,
+  zonasPorComarca,
+} from "@/content/zonas";
 import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import { hrefWhatsApp, mensajeWhatsApp, site } from "@/content/site";
 import { fondoCss } from "@/lib/fondos";
@@ -74,7 +81,10 @@ const meta = crearMetadata({
           {
             porComarca.map((grupo) => (
               <RevealItem>
-                <h2 class="text-eyebrow hairline-b mb-4 flex items-baseline justify-between gap-4 pb-2 text-fg-dim">
+                <h2
+                  id={`comarca-${comarcaSlug(grupo.comarca)}`}
+                  class="text-eyebrow hairline-b mb-4 flex scroll-mt-28 items-baseline justify-between gap-4 pb-2 text-fg-dim"
+                >
                   {grupo.comarca}
                   <span class="font-display text-brand-orange">
                     {String(grupo.zonas.length).padStart(2, "0")}

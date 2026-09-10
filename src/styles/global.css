@@ -842,6 +842,49 @@
     display: none;
   }
 
+  /* Silueta completa de Cataluña, de fondo del mapa de zonas: da contexto al
+     hueco entre una comarca de trabajo y otra (Girona queda lejos de verdad)
+     sin robarles protagonismo a los contornos de color. */
+  .mapa-fondo {
+    fill: color-mix(in srgb, var(--color-n-0) 6%, transparent);
+    stroke: color-mix(in srgb, var(--color-n-0) 16%, transparent);
+    stroke-width: 1;
+  }
+
+  /* Contorno de cada comarca de trabajo: un enlace de verdad, no solo el
+     punto del municipio. Al pasar por encima o enfocarlo pasa a naranja,
+     el mismo lenguaje que ya usa el punto señalado. */
+  .comarca-zona {
+    cursor: pointer;
+  }
+
+  .comarca-zona-forma {
+    fill: color-mix(in srgb, var(--color-brand-blue) 22%, transparent);
+    stroke: var(--color-brand-blue);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    transition:
+      fill 0.2s var(--ease-brand),
+      stroke 0.2s var(--ease-brand);
+  }
+
+  @media (hover: hover) {
+    .comarca-zona:hover .comarca-zona-forma {
+      fill: color-mix(in srgb, var(--color-brand-orange) 30%, transparent);
+      stroke: var(--color-brand-orange);
+    }
+  }
+
+  .comarca-zona:focus-visible {
+    outline: none;
+  }
+
+  .comarca-zona:focus-visible .comarca-zona-forma {
+    fill: color-mix(in srgb, var(--color-brand-orange) 30%, transparent);
+    stroke: var(--color-brand-orange);
+    stroke-width: 2;
+  }
+
   /* Mapa de zonas navegable. El punto crece y se pone naranja al señalarlo,
      y su etiqueta pasa a blanco. `paint-order` evita que el trazo se coma el
      relleno cuando el punto es de 2 px. */
