@@ -81,7 +81,7 @@ const activo = (href: string) => {
       {/* El envoltorio controla la visibilidad: `hidden` sobre el propio botón
           no gana a su `inline-flex` de base. */}
       <span class="hidden sm:block">
-        <EnlaceBoton href="/contacto">Presupuesto</EnlaceBoton>
+        <EnlaceBoton href="/contacto" data-evento="presupuesto_cta">Presupuesto</EnlaceBoton>
       </span>
 
       <button
@@ -134,14 +134,14 @@ const activo = (href: string) => {
         ))
       }
       <li class="hairline-b">
-        <a href="/contacto" class="flex items-center py-5 font-display text-3xl">
+        <a href="/contacto" data-evento="presupuesto_cta" class="flex items-center py-5 font-display text-3xl">
           Contacto
         </a>
       </li>
     </ul>
 
     <div class="mt-8 flex flex-col gap-3">
-      <EnlaceBoton href="/contacto" tamano="lg" class="w-full">
+      <EnlaceBoton href="/contacto" data-evento="presupuesto_cta" tamano="lg" class="w-full">
         Solicitar presupuesto
       </EnlaceBoton>
       <EnlaceBoton

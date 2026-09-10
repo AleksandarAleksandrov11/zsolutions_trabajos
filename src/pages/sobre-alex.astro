@@ -12,6 +12,7 @@ import { schemaMigas, schemaPersona } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { bioAlex } from "@/content/trayectoria";
 import { barraConfianza, site } from "@/content/site";
+import BandaContacto from "@/components/sections/BandaContacto.astro";
 
 const migas = [{ label: "Sobre Alex", href: "/sobre-alex" }];
 
@@ -139,7 +140,11 @@ const meta = crearMetadata({
     </div>
   </section>
 
+  <BandaContacto />
+
   <Timeline numero="02" />
+
+  <BandaContacto claim="Si prefieres hablarlo antes de rellenar nada, llámame o escríbeme." />
 
   <Certifications
     numero="03"

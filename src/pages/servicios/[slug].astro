@@ -17,6 +17,7 @@ import { crearMetadata } from "@/lib/seo";
 import { servicios, type Servicio } from "@/content/servicios";
 import { getCertificaciones } from "@/content/certificaciones";
 import { hrefWhatsApp, site } from "@/content/site";
+import BandaContacto from "@/components/sections/BandaContacto.astro";
 
 /* Conjunto cerrado de slugs: se generan todas sus páginas en la compilación y
    cualquier otra dirección da 404. */
@@ -148,6 +149,8 @@ const enMinusculas = servicio.nombre.toLowerCase();
   </section>
 
   {/* Para quién */}
+  <BandaContacto />
+
   <section class="py-section" aria-labelledby="titulo-paraquien">
     <div class="container-brand">
       <SectionHeading
@@ -177,6 +180,8 @@ const enMinusculas = servicio.nombre.toLowerCase();
   <ProcesoSteps pasos={servicio.proceso} numero="03" />
 
   {/* Acreditaciones aplicables */}
+  <BandaContacto claim="¿Dudas de si tu caso entra aquí? Cuéntamelo y te digo en el día si es trabajo mío." />
+
   <section class="seccion-alterna py-section" aria-labelledby="titulo-acreditaciones">
     <div class="container-brand">
       <SectionHeading

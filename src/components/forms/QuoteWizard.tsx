@@ -50,6 +50,7 @@ import {
   type Urgencia,
 } from "@/lib/validation";
 import { site } from "@/content/site";
+import { evento as registrarEvento } from "@/lib/analitica";
 
 const CLAVE_SESION = "zs_presupuesto";
 
@@ -180,8 +181,16 @@ export function QuoteWizard() {
     }
   }, [estado, datos.servicio]);
 
+  /* El primer campo que se toca es lo que marca que el formulario ha empezado
+     de verdad, y no solo que alguien llegó a la página. */
+  const empezado = useRef(false);
+
   const actualizar = useCallback(
     <C extends keyof Formulario>(campo: C, valor: Formulario[C]) => {
+      if (!empezado.current) {
+        empezado.current = true;
+        registrarEvento("presupuesto_inicio");
+      }
       setDatos((prev) => ({ ...prev, [campo]: valor }));
       setErrores((prev) => {
         if (!prev[campo]) return prev;
@@ -210,7 +219,9 @@ export function QuoteWizard() {
     setTocado(true);
     if (!validarPaso(paso)) return;
     setTocado(false);
-    setPaso((p) => Math.min(p + 1, TITULOS.length - 1));
+    const siguiente = Math.min(paso + 1, TITULOS.length - 1);
+    registrarEvento("presupuesto_paso", { paso: siguiente + 1, de: TITULOS.length });
+    setPaso(siguiente);
   }, [paso, validarPaso]);
 
   const retroceder = useCallback(() => {
@@ -253,6 +264,9 @@ export function QuoteWizard() {
         });
 
         const cuerpo = (await respuesta.json()) as EstadoPresupuesto;
+        if (cuerpo.estado === "ok") {
+          registrarEvento("presupuesto_enviado", { servicio: datos.servicio || "sin indicar" });
+        }
         setEstado(cuerpo);
         if (cuerpo.estado === "error" && cuerpo.errores) setErrores(cuerpo.errores);
       } catch {

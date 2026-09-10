@@ -150,6 +150,13 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Hueco para la barra de contacto fija, que si no tapa el final del pie. */
+  @media (width < 64rem) {
+    body {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
+  }
+
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 400;
@@ -323,6 +330,7 @@
   /* Filete de acento junto a la numeración de sección. */
   .regla-acento {
     display: inline-block;
+    height: 1px;
     background-color: var(--color-brand-orange);
   }
 
@@ -424,6 +432,24 @@
   visibility: visible;
   opacity: 1;
   transition: opacity 0.3s var(--ease-brand), visibility 0s;
+}
+
+/* Barra de contacto y botón flotante: entran desde abajo tras el primer
+   scroll. `visibility` evita que sigan siendo enfocables mientras están
+   ocultos, que es lo que pasaba antes con la opacidad sola. */
+.barra-contacto {
+  transition:
+    opacity 0.3s var(--ease-brand),
+    transform 0.3s var(--ease-brand),
+    visibility 0s linear 0s;
+}
+
+.barra-contacto[data-oculta] {
+  opacity: 0;
+  transform: translateY(0.75rem);
+  visibility: hidden;
+  pointer-events: none;
+  transition-delay: 0s, 0s, 0.3s;
 }
 
 .banner-cookies {

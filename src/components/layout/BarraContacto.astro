@@ -1,0 +1,97 @@
+---
+import { ArrowRight, MessageCircle, Phone } from "lucide-react";
+import { hrefTelefono, hrefWhatsApp, mensajeWhatsApp } from "@/content/site";
+
+/**
+ * Punto de contacto permanente.
+ *
+ * En móvil es una barra inferior fija con las tres acciones que de verdad
+ * usa alguien con una avería: llamar, escribir por WhatsApp o pedir
+ * presupuesto. Antes solo había un botón flotante de WhatsApp, y en la
+ * portada se llegaban a recorrer diez pantallas seguidas sin ningún punto de
+ * contacto a la vista.
+ *
+ * En escritorio hay sitio de sobra en la cabecera, así que ahí se queda el
+ * botón flotante de siempre y la barra no aparece.
+ *
+ * Las dos versiones entran tras el primer scroll para no tapar el hero.
+ */
+---
+
+<div
+  id="barra-contacto"
+  class="barra-contacto fixed inset-x-0 bottom-0 z-80 lg:hidden"
+  data-oculta
+>
+  <div class="hairline-t bg-bg/95 backdrop-blur">
+    <nav
+      class="grid grid-cols-3 gap-1 px-2 pt-2"
+      style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom))"
+      aria-label="Contacto rápido"
+    >
+      <a
+        href={hrefTelefono()}
+        data-evento="llamada"
+        data-evento-origen="barra-movil"
+        class="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-2xs font-bold tracking-[0.1em] text-fg-muted uppercase"
+      >
+        <Phone className="h-5 w-5" aria-hidden="true" />
+        Llamar
+      </a>
+
+      <a
+        href={hrefWhatsApp(mensajeWhatsApp)}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-evento="whatsapp"
+        data-evento-origen="barra-movil"
+        class="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-2xs font-bold tracking-[0.1em] text-fg-muted uppercase"
+      >
+        <MessageCircle className="h-5 w-5" aria-hidden="true" />
+        WhatsApp
+      </a>
+
+      <a
+        href="/contacto"
+        data-evento="presupuesto_cta"
+        data-evento-origen="barra-movil"
+        class="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-brand-blue text-2xs font-bold tracking-[0.1em] text-n-0 uppercase"
+      >
+        <ArrowRight className="h-5 w-5" aria-hidden="true" />
+        Presupuesto
+      </a>
+    </nav>
+  </div>
+</div>
+
+<a
+  id="whatsapp-flotante"
+  href={hrefWhatsApp(mensajeWhatsApp)}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Escribir por WhatsApp"
+  data-evento="whatsapp"
+  data-evento-origen="flotante"
+  class="barra-contacto pointer-events-none fixed right-6 bottom-6 z-80 hidden h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-n-0 shadow-lg shadow-black/40 transition-colors hover:bg-brand-blue-hover lg:inline-flex"
+  data-oculta
+>
+  <MessageCircle className="h-6 w-6" aria-hidden="true" />
+</a>
+
+<script>
+  /* Las dos piezas comparten disparador: aparecen en cuanto el hero deja de
+     estar en pantalla, y se apartan cuando el aviso de cookies está abierto
+     para no solaparse con él. */
+  const piezas = document.querySelectorAll<HTMLElement>(".barra-contacto");
+  if (piezas.length > 0) {
+    let visible: boolean | null = null;
+    const alScroll = () => {
+      const ahora = window.scrollY > 400;
+      if (ahora === visible) return;
+      visible = ahora;
+      piezas.forEach((p) => p.toggleAttribute("data-oculta", !ahora));
+    };
+    alScroll();
+    window.addEventListener("scroll", alScroll, { passive: true });
+  }
+</script>

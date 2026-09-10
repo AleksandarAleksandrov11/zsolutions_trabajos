@@ -9,6 +9,7 @@ import Testimonios from "@/components/sections/Testimonios.astro";
 import Zonas from "@/components/sections/Zonas.astro";
 import FAQ from "@/components/sections/FAQ.astro";
 import CTASection from "@/components/sections/CTASection.astro";
+import BandaContacto from "@/components/sections/BandaContacto.astro";
 import { schemaFaq } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { faqHome } from "@/content/faq";
@@ -37,10 +38,13 @@ const meta = crearMetadata({
   />
 
   <ServicesGrid numero="01" />
+  <BandaContacto claim="¿Ya sabes lo que necesitas? Cuéntamelo en un minuto por teléfono o WhatsApp." />
   <Metodo numero="02" />
   <Trabajos numero="03" />
+  <BandaContacto />
   <SobreAlex numero="04" />
   <Testimonios numero="05" />
+  <BandaContacto claim="¿Tu zona no está en la lista? Pregúntame igualmente: casi siempre llego." />
   <Zonas numero="06" conEnlace />
   <FAQ preguntas={faqHome} numero="07" />
   <CTASection />
