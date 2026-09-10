@@ -701,13 +701,16 @@
      ancho fijo en vez de `%`, porque aquí el contenido no es un texto corto
      sino una tarjeta completa con cita y pie. */
   .cinta-testimonios {
+    display: flex;
     overflow: hidden;
     mask-image: linear-gradient(to right, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
   }
 
   .cinta-testimonios-pista {
     display: flex;
+    flex: none;
     gap: 1.25rem;
+    min-width: 100%;
     padding-inline: var(--spacing-gutter);
     animation: cinta-desplaza var(--cinta-duracion, 55s) linear infinite;
   }
@@ -837,6 +840,49 @@
 
   .galeria-item[data-filtrado] {
     display: none;
+  }
+
+  /* Silueta completa de Cataluña, de fondo del mapa de zonas: da contexto al
+     hueco entre una comarca de trabajo y otra (Girona queda lejos de verdad)
+     sin robarles protagonismo a los contornos de color. */
+  .mapa-fondo {
+    fill: color-mix(in srgb, var(--color-n-0) 6%, transparent);
+    stroke: color-mix(in srgb, var(--color-n-0) 16%, transparent);
+    stroke-width: 1;
+  }
+
+  /* Contorno de cada comarca de trabajo: un enlace de verdad, no solo el
+     punto del municipio. Al pasar por encima o enfocarlo pasa a naranja,
+     el mismo lenguaje que ya usa el punto señalado. */
+  .comarca-zona {
+    cursor: pointer;
+  }
+
+  .comarca-zona-forma {
+    fill: color-mix(in srgb, var(--color-brand-blue) 22%, transparent);
+    stroke: var(--color-brand-blue);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    transition:
+      fill 0.2s var(--ease-brand),
+      stroke 0.2s var(--ease-brand);
+  }
+
+  @media (hover: hover) {
+    .comarca-zona:hover .comarca-zona-forma {
+      fill: color-mix(in srgb, var(--color-brand-orange) 30%, transparent);
+      stroke: var(--color-brand-orange);
+    }
+  }
+
+  .comarca-zona:focus-visible {
+    outline: none;
+  }
+
+  .comarca-zona:focus-visible .comarca-zona-forma {
+    fill: color-mix(in srgb, var(--color-brand-orange) 30%, transparent);
+    stroke: var(--color-brand-orange);
+    stroke-width: 2;
   }
 
   /* Mapa de zonas navegable. El punto crece y se pone naranja al señalarlo,
@@ -1115,6 +1161,12 @@
    ver movimiento, no llega a aparecer.
    ============================================================ */
 
+/* Solo la primera vez: el script de guardia de `Cortina.astro` marca
+   `<html>` antes del primer pintado si ya se vio en una visita anterior. */
+.sin-cortina .cortina {
+  display: none;
+}
+
 .cortina {
   position: fixed;
   inset: 0;
@@ -1122,27 +1174,32 @@
   display: grid;
   place-items: center;
   background-color: var(--color-n-950);
-  animation: cortina-sale 0.5s var(--ease-brand) 0.75s both;
+  animation: cortina-sale 0.4s var(--ease-brand) 1.05s both;
 }
 
 .cortina-marca {
-  width: min(15rem, 46vw);
-  animation: cortina-marca-entra 0.65s var(--ease-brand) both;
+  width: min(19rem, 58vw);
+  animation: cortina-marca-entra 0.45s var(--ease-brand) both;
 }
 
-/* El rayo de la Z se dibuja solo, y después se rellena. */
-.cortina-rayo {
-  stroke-dasharray: 96;
-  stroke-dashoffset: 96;
+/* La Z del isotipo se traza con el trazo y después se rellena. 1021 es la
+   longitud real del contorno (los cuatro subtrazos que la forman), medida
+   sobre el propio `d` del logo: con un valor inventado el trazo no llega a
+   completarse a tiempo o se queda esperando de más. */
+.cortina-z {
+  stroke-dasharray: 1021;
+  stroke-dashoffset: 1021;
   animation:
-    cortina-traza 0.7s var(--ease-brand) 0.15s forwards,
-    cortina-rellena 0.35s var(--ease-brand) 0.7s forwards;
+    cortina-traza 0.55s var(--ease-brand) 0.1s forwards,
+    cortina-rellena 0.25s var(--ease-brand) 0.55s forwards;
 }
 
-.cortina-linea {
-  transform-origin: center;
-  scale: 0 1;
-  animation: cortina-linea 0.5s var(--ease-brand) 0.55s forwards;
+/* El resto del logotipo (el rayo interior y «OLUTIONS») entra justo cuando
+   la Z termina de rellenarse. */
+.cortina-resto {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: cortina-resto-entra 0.35s var(--ease-brand) 0.6s forwards;
 }
 
 @keyframes cortina-marca-entra {
@@ -1158,8 +1215,8 @@
   to { fill-opacity: 1; }
 }
 
-@keyframes cortina-linea {
-  to { scale: 1 1; }
+@keyframes cortina-resto-entra {
+  to { opacity: 1; transform: none; }
 }
 
 @keyframes cortina-sale {

@@ -1,5 +1,5 @@
 ---
-import { hrefZona, siluetaCataluna, zonas } from "@/content/zonas";
+import { comarcasMapa, hrefZona, mapaBase, zonas } from "@/content/zonas";
 
 type Props = { class?: string };
 const { class: clase } = Astro.props;
@@ -7,22 +7,25 @@ const { class: clase } = Astro.props;
 /**
  * Mapa de zonas de actuación, navegable.
  *
- * El contorno es la frontera real de Cataluña (OpenStreetMap, simplificada y
- * proyectada), y cada punto está en la latitud y la longitud reales de su
- * municipio. No es un esquema: si se añade una zona nueva a `zonas.ts` con sus
- * coordenadas, aparece en su sitio.
+ * Tres capas, todas sobre la misma proyección real (latitud y longitud de
+ * cada municipio y cada comarca, no un esquema dibujado a mano):
  *
- * Cada municipio es un enlace de verdad, no un `onclick`: funciona con ratón,
- * con dedo, con teclado y con el botón central del ratón. Encima del punto
- * visible, que mide entre 2 y 5 px, hay un círculo transparente de 22 px para
- * que se pueda tocar con el dedo sin apuntar.
+ * 1. La silueta completa de Cataluña, muy tenue, de fondo: da contexto a lo
+ *    que queda entre una comarca de trabajo y otra sin robarles protagonismo.
+ * 2. El contorno de cada comarca donde se trabaja (OpenStreetMap,
+ *    simplificado), clicable: lleva al grupo de esa comarca en `/zonas`.
+ * 3. El punto de cada municipio, clicable, que lleva a su zona.
+ *
+ * Encima de cada punto visible, que mide entre 2 y 5 px, hay un círculo
+ * transparente de 22 px para que se pueda tocar con el dedo sin apuntar.
  *
  * La lista de al lado sigue siendo el camino principal para un lector de
  * pantalla; el mapa se anuncia como lo que es y sus enlaces llevan el nombre
- * completo del municipio.
+ * completo de la comarca o el municipio.
  */
-const { ancho, alto, camino } = siluetaCataluna;
+const { ancho, alto, contorno } = mapaBase;
 const conEtiqueta = zonas.filter((z) => z.etiqueta);
+const barcelona = zonas.find((z) => z.slug === "barcelona")!;
 ---
 
 <div class={clase}>
@@ -34,22 +37,27 @@ const conEtiqueta = zonas.filter((z) => z.etiqueta);
   >
     <title id="mapa-zonas-titulo">Mapa de zonas de actuación</title>
     <desc id="mapa-zonas-desc">
-      Contorno de Cataluña con los {zonas.length} municipios en los que trabaja ZSolutions.
-      Cada punto es un enlace a su zona.
+      Comarcas de trabajo en Cataluña con los {zonas.length} municipios en los que trabaja ZSolutions.
+      Cada comarca y cada municipio son un enlace.
     </desc>
 
-    <path
-      d={camino}
-      fill="rgba(47,74,160,.28)"
-      stroke="#3D5FC4"
-      stroke-width="1.2"
-      stroke-linejoin="round"></path>
+    {/* Silueta completa de Cataluña, de fondo. */}
+    <path d={contorno} class="mapa-fondo" aria-hidden="true"></path>
+
+    {/* Comarcas de trabajo: cada contorno es un enlace al grupo de /zonas. */}
+    {
+      comarcasMapa.map((c) => (
+        <a href={`/zonas#comarca-${c.slug}`} class="comarca-zona" aria-label={`${c.nombre}, ver municipios`}>
+          <path d={c.camino} class="comarca-zona-forma" />
+        </a>
+      ))
+    }
 
     {/* Radio de trabajo habitual alrededor de Barcelona */}
     <circle
-      cx="272.8"
-      cy="268.1"
-      r="42"
+      cx={barcelona.mapa.x}
+      cy={barcelona.mapa.y}
+      r="50"
       fill="none"
       stroke="rgba(61,95,196,.4)"
       stroke-width="1"
