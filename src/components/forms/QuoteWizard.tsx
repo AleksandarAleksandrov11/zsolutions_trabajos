@@ -139,12 +139,26 @@ export function QuoteWizard() {
 
   /* --- Persistencia en sessionStorage: no se pierde nada al recargar --- */
   useEffect(() => {
+    let recuperado: Partial<Formulario> = {};
     try {
       const guardado = sessionStorage.getItem(CLAVE_SESION);
-      if (guardado) setDatos({ ...INICIAL, ...JSON.parse(guardado) });
+      if (guardado) recuperado = JSON.parse(guardado) as Partial<Formulario>;
     } catch {
       /* Modo privado o almacenamiento bloqueado: se sigue sin persistencia. */
     }
+
+    /* `?servicio=` lo pone el selector de servicio y los enlaces de cada
+       página de servicio: quien llega ya ha dicho qué necesita, y volver a
+       preguntárselo en el primer paso es hacerle repetir. Manda sobre lo
+       guardado, porque es lo último que ha elegido. */
+    const pedido = new URLSearchParams(window.location.search).get("servicio");
+    const valido = pedido && (opcionesServicio as readonly string[]).includes(pedido);
+
+    setDatos({
+      ...INICIAL,
+      ...recuperado,
+      ...(valido ? { servicio: pedido as Servicio } : {}),
+    });
   }, []);
 
   useEffect(() => {

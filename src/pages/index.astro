@@ -1,6 +1,7 @@
 ---
 import Base from "@/layouts/Base.astro";
 import Hero from "@/components/sections/Hero.astro";
+import SelectorServicio from "@/components/sections/SelectorServicio.astro";
 import ServicesGrid from "@/components/sections/ServicesGrid.astro";
 import Metodo from "@/components/sections/Metodo.astro";
 import Trabajos from "@/components/sections/Trabajos.astro";
@@ -10,9 +11,11 @@ import Zonas from "@/components/sections/Zonas.astro";
 import FAQ from "@/components/sections/FAQ.astro";
 import CTASection from "@/components/sections/CTASection.astro";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
+import Comparador from "@/components/sections/Comparador.astro";
 import { schemaFaq } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { faqHome } from "@/content/faq";
+import { comparativaPortada } from "@/content/comparativas";
 
 const meta = crearMetadata({
   title: "Electricista y lampista en Barcelona | ZSolutions",
@@ -37,15 +40,17 @@ const meta = crearMetadata({
     }}
   />
 
-  <ServicesGrid numero="01" />
+  <SelectorServicio numero="01" />
+  <ServicesGrid numero="02" />
   <BandaContacto claim="¿Ya sabes lo que necesitas? Cuéntamelo en un minuto por teléfono o WhatsApp." />
-  <Metodo numero="02" />
-  <Trabajos numero="03" />
+  <Metodo numero="03" />
+  <Trabajos numero="04" />
+  <Comparador comparativa={comparativaPortada} numero="05" />
   <BandaContacto />
-  <SobreAlex numero="04" />
-  <Testimonios numero="05" />
+  <SobreAlex numero="06" />
+  <Testimonios numero="07" />
   <BandaContacto claim="¿Tu zona no está en la lista? Pregúntame igualmente: casi siempre llego." />
-  <Zonas numero="06" conEnlace />
-  <FAQ preguntas={faqHome} numero="07" />
+  <Zonas numero="08" conEnlace />
+  <FAQ preguntas={faqHome} numero="09" />
   <CTASection />
 </Base>

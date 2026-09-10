@@ -417,7 +417,9 @@ lleva una cabecera que lo advierte.
 - [ ] Sustituir las cifras provisionales de los contadores por las reales
 - [ ] Sustituir las fotos de banco por reportaje propio, o verificar la licencia
       comercial de cada una antes de publicar
-- [ ] Sustituir los pares antes/después por obra real
+- [ ] Sustituir los pares antes/después por obra real: misma obra, mismo
+      encuadre. El cuadro eléctrico de «después» es británico y se le ven las
+      etiquetas en inglés; es el primero que conviene cambiar
 - [ ] Confirmar el horario de atención y actualizarlo en `src/content/site.ts`,
       de donde lo toma el `LocalBusiness` que alimenta la ficha de Google
 - [ ] Confirmar teléfono, WhatsApp y correo de producción

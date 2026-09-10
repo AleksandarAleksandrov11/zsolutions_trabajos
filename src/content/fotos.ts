@@ -109,6 +109,69 @@ export const fotos = {
       ],
     },
   },
+  "antes-cuadro-electrico": {
+    src: "/images/antes-cuadro-electrico.jpg",
+    ancho: 1600,
+    alto: 1200,
+    blur:
+      "data:image/webp;base64,UklGRjYAAABXRUJQVlA4ICoAAADQAQCdASoQAAwABABoJZwAAuP9FE2+AAD4LeeH+qBF9ywZseE0LzWAAAA=",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/antes-cuadro-electrico-420.avif" },
+        { ancho: 720, src: "/images/antes-cuadro-electrico-720.avif" },
+        { ancho: 1080, src: "/images/antes-cuadro-electrico-1080.avif" },
+        { ancho: 1600, src: "/images/antes-cuadro-electrico-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/antes-cuadro-electrico-420.webp" },
+        { ancho: 720, src: "/images/antes-cuadro-electrico-720.webp" },
+        { ancho: 1080, src: "/images/antes-cuadro-electrico-1080.webp" },
+        { ancho: 1600, src: "/images/antes-cuadro-electrico-1600.webp" },
+      ],
+    },
+  },
+  "antes-tuberia": {
+    src: "/images/antes-tuberia.jpg",
+    ancho: 1600,
+    alto: 1200,
+    blur:
+      "data:image/webp;base64,UklGRkIAAABXRUJQVlA4IDYAAAAwAgCdASoQAAwABABoJZgCdH8ADqJgnwMQIADgK3fE6ng+DX1HK3PkA5dCgONaOHGHW5cgAAA=",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/antes-tuberia-420.avif" },
+        { ancho: 720, src: "/images/antes-tuberia-720.avif" },
+        { ancho: 1080, src: "/images/antes-tuberia-1080.avif" },
+        { ancho: 1600, src: "/images/antes-tuberia-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/antes-tuberia-420.webp" },
+        { ancho: 720, src: "/images/antes-tuberia-720.webp" },
+        { ancho: 1080, src: "/images/antes-tuberia-1080.webp" },
+        { ancho: 1600, src: "/images/antes-tuberia-1600.webp" },
+      ],
+    },
+  },
+  "despues-cuadro-electrico": {
+    src: "/images/despues-cuadro-electrico.jpg",
+    ancho: 1600,
+    alto: 1200,
+    blur:
+      "data:image/webp;base64,UklGRjQAAABXRUJQVlA4ICgAAADwAQCdASoQAAwABABoJZwAApQUaq5lFGAAzZJ5zQ5pMduveE3uZAAA",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/despues-cuadro-electrico-420.avif" },
+        { ancho: 720, src: "/images/despues-cuadro-electrico-720.avif" },
+        { ancho: 1080, src: "/images/despues-cuadro-electrico-1080.avif" },
+        { ancho: 1600, src: "/images/despues-cuadro-electrico-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/despues-cuadro-electrico-420.webp" },
+        { ancho: 720, src: "/images/despues-cuadro-electrico-720.webp" },
+        { ancho: 1080, src: "/images/despues-cuadro-electrico-1080.webp" },
+        { ancho: 1600, src: "/images/despues-cuadro-electrico-1600.webp" },
+      ],
+    },
+  },
   "obra-aerotermia": {
     src: "/images/obra-aerotermia.jpg",
     ancho: 1600,

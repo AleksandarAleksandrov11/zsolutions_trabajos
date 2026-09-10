@@ -40,6 +40,19 @@ export const CONTENIDO_PROVISIONAL: ContenidoProvisional[] = [
       "Reportaje propio, o verificación de la licencia comercial de cada imagen.",
   },
   {
+    archivo: "src/content/cifras.ts",
+    que: "Las instalaciones y los clientes son cifras inventadas, aunque verosímiles.",
+    sustituir: "Las cifras reales. Están marcadas con `provisional: true` en el archivo.",
+  },
+  {
+    archivo: "src/content/comparativas.ts",
+    que:
+      "Los pares antes/después son fotos de banco de dos obras distintas, no de la misma. " +
+      "Además el cuadro eléctrico de «después» es británico y tiene las etiquetas en inglés.",
+    sustituir:
+      "Un par real: la misma obra, el mismo encuadre, antes y después. Es lo que hace creíble un comparador.",
+  },
+  {
     archivo: "src/content/site.ts",
     que: "El horario de atención es una suposición que nunca se confirmó.",
     sustituir:

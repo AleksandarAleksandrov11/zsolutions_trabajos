@@ -18,6 +18,8 @@ import { servicios, type Servicio } from "@/content/servicios";
 import { getCertificaciones } from "@/content/certificaciones";
 import { hrefWhatsApp, site } from "@/content/site";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
+import Comparador from "@/components/sections/Comparador.astro";
+import { comparativaDe } from "@/content/comparativas";
 
 /* Conjunto cerrado de slugs: se generan todas sus páginas en la compilación y
    cualquier otra dirección da 404. */
@@ -47,6 +49,8 @@ const relacionados = servicio.relacionados
   .map((s) => servicios.find((otro) => otro.slug === s))
   .filter((s): s is Servicio => Boolean(s));
 const enMinusculas = servicio.nombre.toLowerCase();
+
+const comparativa = comparativaDe(servicio.slug);
 ---
 
 <Base
@@ -149,6 +153,8 @@ const enMinusculas = servicio.nombre.toLowerCase();
   </section>
 
   {/* Para quién */}
+  {comparativa ? <Comparador comparativa={comparativa} eyebrow="Antes y después" /> : null}
+
   <BandaContacto />
 
   <section class="py-section" aria-labelledby="titulo-paraquien">
