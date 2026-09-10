@@ -28,11 +28,14 @@ const { lista = cifras, class: clase } = Astro.props;
   {
     lista.map((cifra) => (
       <RevealItem class="tarjeta flex h-full flex-col p-6">
-        <dl>
-          <dd class="font-display text-4xl text-brand-orange">
+        {/* En el DOM va primero el `<dt>`, que es lo que exige una lista de
+            definición; la cifra se pinta encima con `order`. Al revés el
+            marcado es inválido y los lectores de pantalla se pierden. */}
+        <dl class="flex flex-col">
+          <dt class="text-eyebrow order-2 mt-2 text-fg">{cifra.etiqueta}</dt>
+          <dd class="font-display order-1 text-4xl text-brand-orange">
             <AnimatedCounter valor={cifra.valor} sufijo={cifra.sufijo} />
           </dd>
-          <dt class="text-eyebrow mt-2 text-fg">{cifra.etiqueta}</dt>
         </dl>
         <p class="mt-2 text-sm text-fg-dim">{cifra.detalle}</p>
       </RevealItem>

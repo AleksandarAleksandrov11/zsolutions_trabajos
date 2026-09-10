@@ -41,11 +41,11 @@ const { numero = "04" } = Astro.props;
         <dl class="mt-10 grid grid-cols-3 gap-4">
           {
             cifrasPortada.map((c) => (
-              <div class="tarjeta p-5">
-                <dd class="font-display text-3xl text-brand-orange">
+              <div class="tarjeta flex flex-col p-5">
+                <dt class="order-2 mt-1.5 text-xs text-fg-dim">{c.etiqueta}</dt>
+                <dd class="font-display order-1 text-3xl text-brand-orange">
                   <AnimatedCounter valor={c.valor} sufijo={c.sufijo} />
                 </dd>
-                <dt class="mt-1.5 text-xs text-fg-dim">{c.etiqueta}</dt>
               </div>
             ))
           }
