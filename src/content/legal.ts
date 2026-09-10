@@ -1,35 +1,22 @@
 import { site } from "./site";
 
 /* =================================================================
- * DATOS FISCALES — TODO (Alex)
+ * DATOS FISCALES
  *
- * NINGUNO de estos datos se puede inventar: son de obligada publicación
- * por la LSSI-CE y por el RGPD, y un dato incorrecto es peor que un dato
- * ausente. Rellénalos antes de publicar la web.
- *
- * Mientras valgan `null`, las páginas legales muestran un aviso visible
- * de dato pendiente en su lugar.
+ * De obligada publicación por la LSSI-CE y por el RGPD. Se muestran tal
+ * cual en el aviso legal y en la política de privacidad.
  * ================================================================= */
 
-export type DatoLegal = string | null;
-
 export const datosFiscales = {
-  /** TODO: nombre y apellidos o razón social del titular. */
-  titular: null as DatoLegal,
-  /** TODO: NIF / CIF. */
-  nif: null as DatoLegal,
-  /** TODO: domicilio social o profesional completo. */
-  domicilio: null as DatoLegal,
-  /** TODO: email de contacto para asuntos legales y ejercicio de derechos. */
-  email: null as DatoLegal,
-  /** TODO: teléfono de contacto. */
-  telefono: null as DatoLegal,
-  /** TODO: si estás inscrito en un registro mercantil o profesional, indícalo. */
-  registro: null as DatoLegal,
-
-  /* Estos sí son conocidos */
+  titular: site.nap.razonSocial,
+  nif: site.nap.nif,
+  domicilio: `${site.nap.calle}, ${site.nap.codigoPostal} ${site.nap.ciudad}`,
+  /** Buzón de administración: también el de ejercicio de derechos RGPD. */
+  email: site.nap.emailGestion,
+  telefono: site.nap.telefono,
+  registro: "Registro Mercantil de Barcelona",
   actividad:
-    "Instalación, mantenimiento y reparación de instalaciones eléctricas, de fontanería, de climatización y de trabajos verticales, así como formación técnica para profesionales del sector.",
+    "Instalación, mantenimiento y reparación de instalaciones eléctricas, de fontanería, de climatización y de trabajos verticales.",
   nombreComercial: site.nombre,
   /* El dominio no se escribe aquí: la página legal muestra aquel en el que
      la web está realmente publicada, que es lo que exige la LSSI-CE. */
@@ -130,7 +117,7 @@ export type SeccionLegal = {
 };
 
 export const avisoLegal: { actualizado: string; secciones: SeccionLegal[] } = {
-  actualizado: "TODO: fecha de la última revisión",
+  actualizado: "Septiembre de 2026",
   secciones: [
     {
       titulo: "1. Datos identificativos del titular",
@@ -196,7 +183,7 @@ export const avisoLegal: { actualizado: string; secciones: SeccionLegal[] } = {
 };
 
 export const politicaPrivacidad: { actualizado: string; secciones: SeccionLegal[] } = {
-  actualizado: "TODO: fecha de la última revisión",
+  actualizado: "Septiembre de 2026",
   secciones: [
     {
       titulo: "1. Responsable del tratamiento",
@@ -285,7 +272,7 @@ export const politicaPrivacidad: { actualizado: string; secciones: SeccionLegal[
 };
 
 export const politicaCookies: { actualizado: string; secciones: SeccionLegal[] } = {
-  actualizado: "TODO: fecha de la última revisión",
+  actualizado: "Septiembre de 2026",
   secciones: [
     {
       titulo: "1. Qué es una cookie",
@@ -336,6 +323,3 @@ export const politicaCookies: { actualizado: string; secciones: SeccionLegal[] }
     },
   ],
 };
-
-export const avisoRevisionLegal =
-  "Estos textos son una base redactada para este proyecto y deben ser revisados por un asesor antes de la publicación. No constituyen asesoramiento jurídico.";

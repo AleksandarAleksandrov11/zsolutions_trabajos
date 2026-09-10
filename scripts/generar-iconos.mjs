@@ -16,32 +16,43 @@ import { mkdir, writeFile } from "node:fs/promises";
 const AZUL = "#2F4AA0";
 const BLANCO = "#FFFFFF";
 
-/* Z con el rayo calado, en el sistema de coordenadas del logotipo (120 × 96). */
-const Z =
-  "M8 8h72v14L40 70h40v14H8V70l40-48H8V8Zm50 22L42 50h8l-11 15 20-22h-9l8-11Z";
+/* Isotipo oficial, extraído del manual de identidad. Dos trazados: la Z con
+   sus líneas de fuga y el rayo. Coordenadas en un lienzo de 245.76 × 160.25. */
+const ISOTIPO = {
+  ancho: 245.76,
+  alto: 160.25,
+  z: "M199.78 160.25L0 160.25L54.38 91.88L65.57 91.88L18.18 151.51L181.11 151.51L162.87 129.64L77.41 129.57L83.54 120.83L166.97 120.9L199.78 160.25ZM119.66 57.13L107.26 57.15L145.32 9.83L41.17 9.83L58.49 30.61L92.61 30.61L84.67 40.45L53.89 40.45L20.16 0L165.24 0L119.66 57.13ZM222.91 160.25L190.09 120.9L179.13 120.9L186 129.64L204.24 151.51L211.36 160.25L222.91 160.25ZM245.76 160.25L212.94 120.9L201.98 120.9L208.85 129.64L227.09 151.51L234.21 160.25L245.76 160.25Z",
+  rayo: "M66.48 127.97L116.2 66.09L97.16 66.19L92.15 66.19L110.15 23.14L62.09 82.96L81.14 82.86L85.18 82.86L66.48 127.97Z",
+};
 
 /**
- * A tamaños pequeños las dos líneas de fuga se emborronan, así que el icono
- * usa solo la Z. El manual permite el isotipo suelto y a una tinta.
+ * A tamaños pequeños las tres líneas de fuga se emborronan, así que el icono
+ * las conserva pero el conjunto se escala con margen. El manual permite el
+ * isotipo suelto y a una tinta.
  */
-function svgIcono({ fondo, tinta, escala = 4.2, radio = 0 }) {
-  const anchoZ = 72;
-  const altoZ = 76;
-  const tx = (512 - anchoZ * escala) / 2 - 8 * escala;
-  const ty = (512 - altoZ * escala) / 2 - 8 * escala;
+function svgIcono({ fondo, tinta, rayo, margen = 0.14, radio = 0 }) {
+  const lienzo = 512;
+  const util = lienzo * (1 - margen * 2);
+  const escala = Math.min(util / ISOTIPO.ancho, util / ISOTIPO.alto);
+  const tx = (lienzo - ISOTIPO.ancho * escala) / 2;
+  const ty = (lienzo - ISOTIPO.alto * escala) / 2;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  ${fondo ? `<rect width="512" height="512" rx="${radio}" fill="${fondo}"/>` : ""}
-  <g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${escala})">
-    <path fill="${tinta}" fill-rule="evenodd" clip-rule="evenodd" d="${Z}"/>
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${lienzo} ${lienzo}" width="${lienzo}" height="${lienzo}">
+  ${fondo ? `<rect width="${lienzo}" height="${lienzo}" rx="${radio}" fill="${fondo}"/>` : ""}
+  <g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${escala.toFixed(4)})">
+    <path fill="${tinta}" fill-rule="evenodd" d="${ISOTIPO.z}"/>
+    <path fill="${rayo ?? tinta}" fill-rule="evenodd" d="${ISOTIPO.rayo}"/>
   </g>
 </svg>`;
 }
 
-const iconoPrincipal = svgIcono({ fondo: AZUL, tinta: BLANCO, escala: 4.2 });
-/* Maskable: Android recorta hasta un 20 %, así que la Z va más pequeña. */
-const iconoMaskable = svgIcono({ fondo: AZUL, tinta: BLANCO, escala: 3.1 });
-const iconoMonocromo = svgIcono({ fondo: null, tinta: "#000000", escala: 4.2 });
+/* Sobre azul corporativo, todo a blanco: es la variante a una tinta que
+   prescribe el manual cuando el fondo no deja leer la versión a color. */
+const iconoPrincipal = svgIcono({ fondo: AZUL, tinta: BLANCO });
+/* Maskable: Android recorta hasta un 20 %, así que el isotipo va más pequeño. */
+const iconoMaskable = svgIcono({ fondo: AZUL, tinta: BLANCO, margen: 0.26 });
+/* Pestaña anclada de Safari: una sola tinta, sin fondo. */
+const iconoMonocromo = svgIcono({ fondo: null, tinta: "#000000" });
 
 await mkdir("public/icons", { recursive: true });
 

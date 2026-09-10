@@ -34,7 +34,7 @@ const enVercel = Boolean(process.env.VERCEL);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0F0F10" />
+    <meta name="theme-color" content="#0E0F12" />
     <meta name="color-scheme" content="dark" />
 
     <title>{meta.title}</title>
@@ -77,6 +77,7 @@ const enVercel = Boolean(process.env.VERCEL);
       type="font/woff2"
       crossorigin
     />
+    <link rel="preload" href="/logo/zsolutions-horizontal-blanco.svg" as="image" />
 
     {/* TODO (Alex): pegar aquí la etiqueta de verificación de Search Console. */}
 
@@ -84,16 +85,16 @@ const enVercel = Boolean(process.env.VERCEL);
     {schema ? <JsonLd datos={schema} /> : null}
   </head>
 
-  <body class="grano min-h-dvh bg-bg text-fg antialiased">
+  <body class="flex min-h-dvh flex-col bg-bg text-fg antialiased">
     <a
       href="#contenido"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-200 focus:rounded-[2px] focus:bg-brand-blue focus:px-4 focus:py-3 focus:text-sm focus:text-white"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200 focus:rounded-full focus:bg-brand-blue focus:px-5 focus:py-3 focus:text-sm focus:text-white"
     >
       Saltar al contenido principal
     </a>
 
     <Header />
-    <main id="contenido">
+    <main id="contenido" class="flex-1">
       <slot />
     </main>
     <Footer />
@@ -212,31 +213,5 @@ const enVercel = Boolean(process.env.VERCEL);
     );
 
     contadores.forEach((nodo) => observadorContadores.observe(nodo));
-  }
-
-  /* --- Parallax del hero ----------------------------------------------- */
-  const hero = document.querySelector<HTMLElement>("[data-hero]");
-  const fondo = hero?.querySelector<HTMLElement>("[data-hero-fondo]");
-
-  if (hero && fondo && !menosMovimiento) {
-    let pendiente = false;
-
-    const pintar = () => {
-      pendiente = false;
-      const alto = hero.offsetHeight || 1;
-      /* 0 arriba del todo, 1 cuando el hero ya ha salido por arriba. */
-      const avance = Math.min(Math.max(window.scrollY / alto, 0), 1);
-      fondo.style.transform = `translate3d(0, ${avance * 15}%, 0)`;
-    };
-
-    const alScroll = () => {
-      if (pendiente) return;
-      pendiente = true;
-      requestAnimationFrame(pintar);
-    };
-
-    pintar();
-    window.addEventListener("scroll", alScroll, { passive: true });
-    window.addEventListener("resize", alScroll, { passive: true });
   }
 </script>

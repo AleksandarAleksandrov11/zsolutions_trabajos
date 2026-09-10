@@ -1,0 +1,76 @@
+---
+import { siluetaCataluna, zonas } from "@/content/zonas";
+
+type Props = { class?: string };
+const { class: clase } = Astro.props;
+
+/**
+ * Mapa de zonas de actuación.
+ *
+ * El contorno es la frontera real de Cataluña (OpenStreetMap, simplificada y
+ * proyectada), y cada punto está en la latitud y la longitud reales de su
+ * municipio. No es un esquema: si se añade una zona nueva a `zonas.ts` con sus
+ * coordenadas, aparece en su sitio.
+ *
+ * El contenido navegable de verdad es la lista de al lado, que es lo que lee
+ * un lector de pantalla; el mapa se presenta como imagen con su descripción.
+ */
+const { ancho, alto, camino } = siluetaCataluna;
+const conEtiqueta = zonas.filter((z) => z.etiqueta);
+---
+
+<div class={clase}>
+  <svg
+    viewBox={`0 0 ${ancho} ${alto}`}
+    class="w-full"
+    role="img"
+    aria-label={`Mapa de Cataluña con los ${zonas.length} municipios en los que trabaja ZSolutions`}
+  >
+    <path
+      d={camino}
+      fill="rgba(47,74,160,.2)"
+      stroke="rgba(143,164,232,.6)"
+      stroke-width="1.2"
+      stroke-linejoin="round"></path>
+
+    {/* Radio de trabajo habitual alrededor de Barcelona */}
+    <circle
+      cx="272.8"
+      cy="268.1"
+      r="42"
+      fill="none"
+      stroke="rgba(143,164,232,.28)"
+      stroke-width="1"
+      stroke-dasharray="3 5"></circle>
+
+    {
+      zonas.map((z) => {
+        const base = z.slug === "barcelona";
+        return (
+          <circle
+            cx={z.mapa.x}
+            cy={z.mapa.y}
+            r={base ? 4.5 : 2.4}
+            fill={base ? "#FF7A1A" : "#FFFFFF"}
+            opacity={base ? 1 : 0.8}
+          />
+        );
+      })
+    }
+
+    {
+      conEtiqueta.map((z) => (
+        <text
+          x={z.mapa.x + z.etiqueta!.dx}
+          y={z.mapa.y + z.etiqueta!.dy}
+          fill="#C6CAD4"
+          font-size="9.5"
+          text-anchor={z.etiqueta!.anclaje ?? "start"}
+          font-family="Arial, Helvetica, sans-serif"
+        >
+          {z.ciudad}
+        </text>
+      ))
+    }
+  </svg>
+</div>

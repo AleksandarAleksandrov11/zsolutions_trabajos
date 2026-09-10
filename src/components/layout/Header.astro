@@ -1,96 +1,83 @@
 ---
-import { Phone, Mail, Menu, X } from "lucide-react";
+import { Menu, Phone, X } from "lucide-react";
 import BrandLogo from "@/components/ui/BrandLogo.astro";
 import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import {
-  hrefEmail,
   hrefTelefono,
   hrefWhatsApp,
   mensajeWhatsApp,
   navLegal,
   navPrincipal,
   site,
-  telefonoVisible,
 } from "@/content/site";
-import { numeroSeccion } from "@/lib/utils";
 
 /**
  * Cabecera y menú móvil.
  *
- * Todo el marcado sale ya resuelto del build: el enlace activo se calcula
- * aquí, en tiempo de compilación, a partir de la ruta de la página. Lo único
- * que viaja al navegador es el script del final, que compacta la cabecera al
- * hacer scroll y abre y cierra el menú. No hay framework de por medio.
+ * El enlace activo se calcula aquí, en la compilación. Al navegador solo viaja
+ * el script del final: compacta la cabecera al bajar y abre y cierra el menú.
  */
 const ruta = Astro.url.pathname.replace(/\/+$/, "") || "/";
-const telefono = telefonoVisible();
+/* Un enlace a un ancla de la portada no marca sección: la portada no es una
+   sección de la navegación. */
+const activo = (href: string) => {
+  if (href.includes("#")) return false;
+  return ruta === href || ruta.startsWith(`${href}/`);
+};
 ---
 
 <header
   id="cabecera"
-  class="fixed inset-x-0 top-0 z-50 border-b border-transparent bg-transparent transition-[background-color,backdrop-filter,border-color] duration-300"
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,backdrop-filter,border-color] duration-300"
   style="padding-top: env(safe-area-inset-top)"
 >
   <div
     id="cabecera-barra"
-    class="container-brand flex h-20 items-center justify-between gap-4 transition-[height] duration-300 md:h-24"
+    class="container-brand flex h-18 items-center justify-between gap-6 transition-[height] duration-300 md:h-20"
   >
     <a
       href="/"
-      class="flex min-h-11 shrink-0 items-center text-fg transition-opacity hover:opacity-80"
+      class="flex shrink-0 items-center py-2 transition-opacity hover:opacity-70"
       aria-label={`${site.nombre} · Inicio`}
     >
-      <BrandLogo variante="horizontal" class="transition-transform duration-300" />
+      <BrandLogo class="h-7 sm:h-8" alt="" />
+      <span class="sr-only">{site.nombre}</span>
     </a>
 
     <nav aria-label="Navegación principal" class="hidden lg:block">
       <ul class="flex items-center gap-1">
         {
-          navPrincipal.map((enlace) => {
-            const activo = ruta === enlace.href || ruta.startsWith(`${enlace.href}/`);
-            return (
-              <li>
-                <a
-                  href={enlace.href}
-                  aria-current={activo ? "page" : undefined}
-                  class:list={[
-                    "relative flex min-h-11 items-center px-3.5 text-sm transition-colors",
-                    activo ? "text-fg" : "text-fg-muted/80 hover:text-fg",
-                  ]}
-                >
-                  {enlace.label}
-                  <span
-                    class:list={[
-                      "absolute inset-x-3.5 bottom-3 h-px origin-left bg-brand-blue transition-transform duration-300",
-                      activo ? "scale-x-100" : "scale-x-0",
-                    ]}
-                    aria-hidden="true"
-                  />
-                </a>
-              </li>
-            );
-          })
+          navPrincipal.map((enlace) => (
+            <li>
+              <a
+                href={enlace.href}
+                aria-current={activo(enlace.href) ? "page" : undefined}
+                class:list={[
+                  "flex min-h-11 items-center px-3.5 text-sm transition-colors",
+                  activo(enlace.href) ? "text-fg" : "text-fg-dim hover:text-fg",
+                ]}
+              >
+                {enlace.label}
+              </a>
+            </li>
+          ))
         }
       </ul>
     </nav>
 
     <div class="flex items-center gap-2">
-      {
-        telefono ? (
-          <a
-            href={hrefTelefono()}
-            class="hidden min-h-11 items-center gap-2 px-3 text-sm text-fg-muted transition-colors hover:text-fg md:inline-flex"
-          >
-            <Phone className="h-4 w-4" aria-hidden="true" />
-            {telefono}
-          </a>
-        ) : null
-      }
+      <a
+        href={hrefTelefono()}
+        class="hidden min-h-11 items-center gap-2 px-3 text-sm text-fg-muted transition-colors hover:text-fg md:inline-flex"
+      >
+        <Phone className="h-4 w-4" aria-hidden="true" />
+        {site.nap.telefono}
+      </a>
 
-      {/* El wrapper controla la visibilidad: aplicar `hidden` sobre el propio
-          botón no gana a su `inline-flex` de base. */}
+      {/* El envoltorio controla la visibilidad: `hidden` sobre el propio botón
+          no gana a su `inline-flex` de base. */}
       <span class="hidden sm:block">
-        <EnlaceBoton href="/contacto">Solicitar presupuesto</EnlaceBoton>
+        <EnlaceBoton href="/contacto">Presupuesto</EnlaceBoton>
       </span>
 
       <button
@@ -99,7 +86,7 @@ const telefono = telefonoVisible();
         aria-expanded="false"
         aria-controls="menu-movil"
         aria-label="Abrir menú"
-        class="inline-flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/20 text-fg transition-colors hover:border-white/50 lg:hidden"
+        class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg transition-colors hover:border-white/35 lg:hidden"
       >
         <Menu className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -109,22 +96,20 @@ const telefono = telefonoVisible();
 
 <div
   id="menu-movil"
-  class="menu-movil grano fixed inset-0 z-100 flex flex-col bg-bg lg:hidden"
+  class="menu-movil z-100 flex flex-col bg-bg lg:hidden"
   role="dialog"
   aria-modal="true"
   aria-label="Menú de navegación"
   inert
   style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom)"
 >
-  <div class="grid-plano absolute inset-0 opacity-40" aria-hidden="true"></div>
-
-  <div class="container-brand relative flex h-20 shrink-0 items-center justify-between">
-    <BrandLogo variante="horizontal" class="text-fg" />
+  <div class="container-brand flex h-18 shrink-0 items-center justify-between">
+    <BrandLogo class="h-7" alt="" />
     <button
       id="cerrar-menu"
       type="button"
       aria-label="Cerrar menú"
-      class="inline-flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/20 text-fg"
+      class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg"
     >
       <X className="h-5 w-5" aria-hidden="true" />
     </button>
@@ -132,22 +117,23 @@ const telefono = telefonoVisible();
 
   <nav
     aria-label="Navegación principal"
-    class="container-brand relative flex-1 overflow-y-auto py-6"
+    class="container-brand flex-1 overflow-y-auto py-4"
   >
     <ul class="flex flex-col">
       {
-        navPrincipal.map((enlace, i) => (
-          <li class="border-b border-white/10">
-            <a
-              href={enlace.href}
-              class="flex items-baseline gap-4 py-5 text-3xl text-fg"
-            >
-              <span class="num-seccion">{numeroSeccion(i)}</span>
-              <span class="font-display">{enlace.label}</span>
+        navPrincipal.map((enlace) => (
+          <li class="hairline-b">
+            <a href={enlace.href} class="flex items-center py-5 font-display text-3xl">
+              {enlace.label}
             </a>
           </li>
         ))
       }
+      <li class="hairline-b">
+        <a href="/contacto" class="flex items-center py-5 font-display text-3xl">
+          Contacto
+        </a>
+      </li>
     </ul>
 
     <div class="mt-8 flex flex-col gap-3">
@@ -162,35 +148,20 @@ const telefono = telefonoVisible();
       >
         Escribir por WhatsApp
       </EnlaceBoton>
+      <a
+        href={hrefTelefono()}
+        class="flex min-h-11 items-center justify-center gap-2 text-sm text-fg-muted"
+      >
+        <Phone className="h-4 w-4" aria-hidden="true" />
+        {site.nap.telefono}
+      </a>
     </div>
 
-    <div class="mt-8 flex flex-col gap-3 text-sm text-fg-muted">
-      {
-        telefono ? (
-          <a href={hrefTelefono()} class="flex min-h-11 items-center gap-3">
-            <Phone className="h-4 w-4 text-brand-blue" aria-hidden="true" />
-            {telefono}
-          </a>
-        ) : null
-      }
-      {
-        site.nap.email ? (
-          <a href={hrefEmail()} class="flex min-h-11 items-center gap-3">
-            <Mail className="h-4 w-4 text-brand-blue" aria-hidden="true" />
-            {site.nap.email}
-          </a>
-        ) : null
-      }
-    </div>
-
-    <ul class="mt-8 flex flex-wrap gap-x-5 gap-y-2 pb-6 text-xs text-fg-muted/60">
+    <ul class="mt-10 flex flex-wrap gap-x-5 pb-6 text-xs text-fg-dim">
       {
         navLegal.map((enlace) => (
           <li>
-            <a
-              href={enlace.href}
-              class="flex min-h-11 items-center transition-colors hover:text-fg"
-            >
+            <a href={enlace.href} class="flex min-h-11 items-center hover:text-fg">
               {enlace.label}
             </a>
           </li>
@@ -209,18 +180,18 @@ const telefono = telefonoVisible();
 
   /* --- Compactar la cabecera al bajar --- */
   if (cabecera && barra) {
-    const compactas = ["border-white/10", "bg-bg/85", "backdrop-blur-lg"];
+    const compactas = ["border-line", "bg-bg/85", "backdrop-blur-xl"];
     let compacto: boolean | null = null;
 
     const alScroll = () => {
-      const ahora = window.scrollY > 24;
+      const ahora = window.scrollY > 16;
       if (ahora === compacto) return;
       compacto = ahora;
       cabecera.classList.toggle("border-transparent", !ahora);
-      compactas.forEach((clase) => cabecera.classList.toggle(clase, ahora));
+      compactas.forEach((c) => cabecera.classList.toggle(c, ahora));
       barra.classList.toggle("h-16", ahora);
-      barra.classList.toggle("h-20", !ahora);
-      barra.classList.toggle("md:h-24", !ahora);
+      barra.classList.toggle("h-18", !ahora);
+      barra.classList.toggle("md:h-20", !ahora);
     };
 
     alScroll();
@@ -235,17 +206,12 @@ const telefono = telefonoVisible();
       ).filter((el) => el.offsetParent !== null);
 
     const alTeclado = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        cerrarMenu();
-        return;
-      }
+      if (e.key === "Escape") return cerrarMenu();
       if (e.key !== "Tab") return;
-
       const lista = focusables();
       if (lista.length === 0) return;
       const primero = lista[0];
       const ultimo = lista[lista.length - 1];
-
       if (e.shiftKey && document.activeElement === primero) {
         e.preventDefault();
         ultimo.focus();
@@ -275,5 +241,13 @@ const telefono = telefonoVisible();
 
     abrir.addEventListener("click", abrirMenu);
     cerrar.addEventListener("click", cerrarMenu);
+    /* Al tocar un enlace del menú, se cierra antes de navegar. */
+    menu.querySelectorAll("a[href]").forEach((a) =>
+      a.addEventListener("click", () => {
+        menu.setAttribute("inert", "");
+        delete menu.dataset.abierto;
+        document.body.style.overflow = "";
+      }),
+    );
   }
 </script>

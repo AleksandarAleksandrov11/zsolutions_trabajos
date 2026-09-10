@@ -1,0 +1,46 @@
+---
+import { Quote } from "lucide-react";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import { testimonios } from "@/content/testimonios";
+
+type Props = { numero?: string };
+const { numero = "05" } = Astro.props;
+
+/* Si algún día el array queda vacío, la sección desaparece sola. */
+---
+
+{
+  testimonios.length > 0 ? (
+    <section class="py-section" aria-labelledby="titulo-testimonios">
+      <div class="container-brand">
+        <SectionHeading
+          numero={numero}
+          eyebrow="Clientes"
+          tituloId="titulo-testimonios"
+          titulo="Lo que dicen quienes ya han trabajado conmigo"
+        />
+
+        <RevealGroup
+          as="ul"
+          class="mt-12 grid gap-4 sm:grid-cols-2"
+          stagger={0.07}
+        >
+          {testimonios.map((t) => (
+            <RevealItem as="li" class="tarjeta flex h-full flex-col p-6 sm:p-7">
+              <Quote className="h-5 w-5 shrink-0 text-brand-blue-soft" aria-hidden="true" />
+              <blockquote class="mt-4 flex-1 text-fg-muted">{t.texto}</blockquote>
+              <footer class="hairline-t mt-6 pt-4">
+                <p class="text-sm font-bold">{t.autor}</p>
+                <p class="mt-0.5 text-xs text-fg-dim">
+                  {t.trabajo} · {t.lugar}
+                </p>
+              </footer>
+            </RevealItem>
+          ))}
+        </RevealGroup>
+      </div>
+    </section>
+  ) : null
+}

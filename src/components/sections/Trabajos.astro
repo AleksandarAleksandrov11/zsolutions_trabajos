@@ -1,0 +1,138 @@
+---
+import { Expand, X } from "lucide-react";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import Foto from "@/components/ui/Foto.astro";
+import { trabajos } from "@/content/trabajos";
+import { fotos } from "@/content/fotos";
+
+type Props = { numero?: string };
+const { numero = "03" } = Astro.props;
+
+/* El visor usa el `<dialog>` nativo: accesible, cierra con Escape y bloquea el
+   fondo sin una línea de CSS extra. El script solo abre, cierra y navega. */
+---
+
+{
+  trabajos.length > 0 ? (
+    <section id="trabajos" class="py-section" aria-labelledby="titulo-trabajos">
+      <div class="container-brand">
+        <SectionHeading
+          numero={numero}
+          eyebrow="Trabajos"
+          tituloId="titulo-trabajos"
+          titulo="Lo que se ve cuando el trabajo está bien hecho"
+          descripcion="Cada tipo de intervención con lo que realmente incluye. Toca una imagen para verla completa."
+        />
+
+        <RevealGroup
+          as="ul"
+          class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          stagger={0.05}
+        >
+          {trabajos.map((trabajo, i) => (
+            <RevealItem as="li">
+              <button
+                type="button"
+                class="tarjeta group block w-full overflow-hidden p-0 text-left"
+                data-visor-abrir={i}
+                aria-label={`Ampliar: ${trabajo.titulo}`}
+              >
+                <span class="relative block">
+                  <Foto
+                    nombre={trabajo.foto}
+                    alt={trabajo.alt}
+                    ratio="4 / 3"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <span
+                    class="absolute right-3 bottom-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-bg/70 text-fg opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    aria-hidden="true"
+                  >
+                    <Expand className="h-4 w-4" />
+                  </span>
+                </span>
+                <span class="block p-6">
+                  <span class="block text-lg font-bold">{trabajo.titulo}</span>
+                  <span class="mt-2 block text-sm text-fg-muted">{trabajo.detalle}</span>
+                </span>
+              </button>
+            </RevealItem>
+          ))}
+        </RevealGroup>
+      </div>
+
+      <dialog id="visor-trabajos" class="visor" aria-label="Visor de imágenes">
+        <div class="flex h-full w-full flex-col">
+          <div class="container-brand flex h-16 shrink-0 items-center justify-between">
+            <p class="text-eyebrow text-fg-dim" data-visor-contador></p>
+            <button
+              type="button"
+              data-visor-cerrar
+              aria-label="Cerrar el visor"
+              class="hairline inline-flex h-11 w-11 items-center justify-center rounded-full text-fg"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+
+          <figure class="container-brand flex min-h-0 flex-1 flex-col items-center justify-center gap-5 pb-8">
+            <img
+              data-visor-img
+              alt=""
+              class="max-h-[62vh] w-auto max-w-full rounded-xl object-contain"
+            />
+            <figcaption class="max-w-xl text-center">
+              <span class="block text-lg font-bold" data-visor-titulo></span>
+              <span class="mt-1.5 block text-sm text-fg-muted" data-visor-detalle></span>
+            </figcaption>
+          </figure>
+        </div>
+      </dialog>
+    </section>
+  ) : null
+}
+
+<script is:inline define:vars={{ datos: trabajos.map((t) => ({ src: fotos[t.foto].src, alt: t.alt, titulo: t.titulo, detalle: t.detalle })) }}>
+  (() => {
+    const visor = document.getElementById("visor-trabajos");
+    if (!visor || !datos.length) return;
+
+    const img = visor.querySelector("[data-visor-img]");
+    const titulo = visor.querySelector("[data-visor-titulo]");
+    const detalle = visor.querySelector("[data-visor-detalle]");
+    const contador = visor.querySelector("[data-visor-contador]");
+    let indice = 0;
+
+    const pintar = () => {
+      const t = datos[indice];
+      img.src = t.src;
+      img.alt = t.alt;
+      titulo.textContent = t.titulo;
+      detalle.textContent = t.detalle;
+      contador.textContent = `${indice + 1} / ${datos.length}`;
+    };
+
+    document.querySelectorAll("[data-visor-abrir]").forEach((boton) => {
+      boton.addEventListener("click", () => {
+        indice = Number(boton.dataset.visorAbrir) || 0;
+        pintar();
+        visor.showModal();
+      });
+    });
+
+    visor.querySelector("[data-visor-cerrar]").addEventListener("click", () => visor.close());
+
+    /* Clic fuera de la figura: cerrar. */
+    visor.addEventListener("click", (e) => {
+      if (e.target === visor) visor.close();
+    });
+
+    visor.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      indice = (indice + (e.key === "ArrowRight" ? 1 : -1) + datos.length) % datos.length;
+      pintar();
+    });
+  })();
+</script>

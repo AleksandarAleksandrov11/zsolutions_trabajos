@@ -5,21 +5,15 @@ import { cn } from "@/lib/utils";
 type Props = {
   /** Clave de `src/content/fotos.ts`. */
   nombre: NombreFoto;
-  /** Texto alternativo real y descriptivo. Obligatorio. */
+  /** Texto alternativo real y descriptivo. */
   alt: string;
   class?: string;
   /** `sizes` correcto para no descargar de más en móvil. */
   sizes?: string;
-  /** Solo en el hero de la home. */
+  /** Solo para la imagen principal de la primera pantalla. */
   priority?: boolean;
-  /**
-   * Tratamiento fotográfico del manual (apartado 05):
-   * · "bn"    blanco y negro puro
-   * · "duo"   desaturada con capa azul corporativo sutil
-   * · "color" sin tratamiento, para galería
-   */
-  tratamiento?: "bn" | "duo" | "color";
   objectPosition?: string;
+  /** Proporción reservada, para que no haya salto de maquetación. */
   ratio?: string;
 };
 
@@ -29,7 +23,6 @@ const {
   class: clase,
   sizes = "(max-width: 768px) 100vw, 50vw",
   priority = false,
-  tratamiento = "duo",
   objectPosition,
   ratio,
 } = Astro.props;
@@ -38,16 +31,23 @@ const foto = fotos[nombre];
 const srcset = (lista: Variante[]) => lista.map((v) => `${v.src} ${v.ancho}w`).join(", ");
 
 /* La miniatura borrosa va de fondo del propio `img`: ocupa el hueco mientras
-   carga la foto real y desaparece sola al pintarse encima. Ni salto de
-   maquetación ni rectángulo vacío, y sin una línea de JavaScript. */
-const estiloImagen = [
+   carga la foto real y desaparece sola al pintarse encima. */
+const estilo = [
   objectPosition ? `object-position:${objectPosition}` : null,
   `background-image:url("${foto.blur}")`,
   "background-size:cover",
   `background-position:${objectPosition ?? "center"}`,
-].filter(Boolean).join(";");
+]
+  .filter(Boolean)
+  .join(";");
 ---
 
+{/* Las fotografías van sin ningún filtro: tal y como se tomaron.
+
+    `decoding` es siempre asíncrono. Con `sync`, el navegador descodifica la
+    imagen en el hilo principal y en una foto grande eso bloquea medio segundo
+    la interacción; la prioridad de descarga se pide con `fetchpriority`, que
+    no tiene ese coste. */}
 <div
   class={cn("relative overflow-hidden bg-surface", clase)}
   style={ratio ? `aspect-ratio:${ratio}` : undefined}
@@ -62,27 +62,10 @@ const estiloImagen = [
       height={foto.alto}
       sizes={sizes}
       loading={priority ? "eager" : "lazy"}
-      decoding={priority ? "sync" : "async"}
+      decoding="async"
       fetchpriority={priority ? "high" : undefined}
-      class={cn(
-        "h-full w-full object-cover",
-        tratamiento === "bn" && "grayscale",
-        tratamiento === "duo" && "grayscale-[0.72] contrast-[1.06]",
-      )}
-      style={estiloImagen}
+      class="h-full w-full object-cover"
+      style={estilo}
     />
   </picture>
-
-  {/* Capa de color corporativo. El manual la permite entre el 60 % y el 80 %
-      cuando encima va texto; aquí, sin texto, se usa muy contenida para
-      unificar la fotografía con la paleta. */}
-  {
-    tratamiento === "duo" ? (
-      <div
-        class="pointer-events-none absolute inset-0 mix-blend-color"
-        style="background-color:rgba(47,74,160,.42)"
-        aria-hidden="true"
-      />
-    ) : null
-  }
 </div>

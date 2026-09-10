@@ -8,22 +8,18 @@ import Reveal from "@/components/ui/Reveal.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
 import Foto from "@/components/ui/Foto.astro";
-import MediaPlaceholder from "@/components/ui/MediaPlaceholder.astro";
 import ProcesoSteps from "@/components/sections/ProcesoSteps.astro";
 import FAQ from "@/components/sections/FAQ.astro";
 import CTASection from "@/components/sections/CTASection.astro";
-import TarjetaProyecto from "@/components/sections/TarjetaProyecto.astro";
 import { ServiceIcon } from "@/components/ui/ServiceIcon";
 import { schemaFaq, schemaMigas, schemaServicio } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { servicios, type Servicio } from "@/content/servicios";
 import { getCertificaciones } from "@/content/certificaciones";
-import { proyectosPorServicio } from "@/content/proyectos";
-import { zonasDestacadas } from "@/content/zonas";
 import { hrefWhatsApp, site } from "@/content/site";
 
-/* Los slugs de servicio son un conjunto cerrado y conocido: se generan todas
-   sus páginas en la compilación y cualquier otra dirección da 404. */
+/* Conjunto cerrado de slugs: se generan todas sus páginas en la compilación y
+   cualquier otra dirección da 404. */
 export function getStaticPaths() {
   return servicios.map((servicio) => ({
     params: { slug: servicio.slug },
@@ -49,8 +45,6 @@ const acreditaciones = getCertificaciones(servicio.certificaciones);
 const relacionados = servicio.relacionados
   .map((s) => servicios.find((otro) => otro.slug === s))
   .filter((s): s is Servicio => Boolean(s));
-const trabajos = proyectosPorServicio(servicio.slug).slice(0, 3);
-const zonas = zonasDestacadas.slice(0, 4);
 const enMinusculas = servicio.nombre.toLowerCase();
 ---
 
@@ -58,91 +52,68 @@ const enMinusculas = servicio.nombre.toLowerCase();
   meta={meta}
   schema={[schemaServicio(servicio), schemaFaq(servicio.faq), schemaMigas(migas)]}
 >
-  {/* Hero del servicio */}
-  <header class="relative overflow-hidden pt-36 pb-16 md:pt-44 md:pb-24">
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="grid-plano absolute inset-0 opacity-70"></div>
-      <div
-        class="absolute inset-0"
-        style="background:radial-gradient(70% 60% at 80% 0%, rgba(35,54,111,.72) 0%, transparent 62%)"
-      >
-      </div>
-    </div>
-
+  <header class="pt-32 pb-12 sm:pt-40 sm:pb-16">
     <div class="container-brand">
       <Breadcrumbs migas={migas} />
 
-      <div class="mt-8 flex items-center gap-4">
-        <span
-          class="inline-flex h-14 w-14 items-center justify-center rounded-[2px] border border-brand-blue/50 bg-brand-blue/10 text-brand-blue"
-        >
-          <ServiceIcon nombre={servicio.icono} className="h-7 w-7" />
-        </span>
-        <p class="text-eyebrow text-brand-orange">{servicio.nombre}</p>
+      <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-center lg:gap-14">
+        <div>
+          <p class="text-eyebrow flex items-center gap-2.5 text-brand-blue-soft">
+            <ServiceIcon nombre={servicio.icono} className="h-4 w-4" />
+            {servicio.nombre}
+          </p>
+
+          <h1 class="mt-5 text-5xl">{servicio.h1}</h1>
+          <p class="mt-5 max-w-xl text-lg text-fg-muted">{servicio.claim}</p>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <EnlaceBoton href="/contacto" tamano="lg">Solicitar presupuesto</EnlaceBoton>
+            <EnlaceBoton
+              href={hrefWhatsApp(`Hola Alex, me interesa el servicio de ${enMinusculas}.`)}
+              variante="secundario"
+              tamano="lg"
+            >
+              WhatsApp
+            </EnlaceBoton>
+          </div>
+
+          <ul class="hairline-t mt-9 flex flex-wrap gap-x-5 gap-y-2 pt-5">
+            {
+              acreditaciones.slice(0, 5).map((a) => (
+                <li class="text-eyebrow flex items-center gap-2 text-fg-dim">
+                  <span class="h-1 w-1 rounded-full bg-brand-blue-soft" aria-hidden="true" />
+                  {a.siglas}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <Reveal>
+          <Foto
+            nombre={servicio.foto.nombre}
+            alt={servicio.foto.alt}
+            ratio="4 / 3"
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            class="rounded-2xl"
+          />
+        </Reveal>
       </div>
-
-      <h1 class="mt-7 max-w-4xl text-6xl">{servicio.h1}</h1>
-      <p class="mt-6 max-w-2xl text-xl text-fg-muted">{servicio.claim}</p>
-      <p class="mt-6 max-w-3xl text-lg text-fg-muted">{servicio.entradilla}</p>
-
-      <div class="mt-10 flex flex-col gap-3 sm:flex-row">
-        <EnlaceBoton href="/contacto" tamano="lg">Solicitar presupuesto</EnlaceBoton>
-        <EnlaceBoton
-          href={hrefWhatsApp(`Hola Alex, me interesa el servicio de ${enMinusculas}.`)}
-          variante="secundario"
-          tamano="lg"
-        >
-          WhatsApp
-        </EnlaceBoton>
-      </div>
-
-      <ul class="mt-10 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6">
-        {
-          acreditaciones.slice(0, 5).map((acreditacion) => (
-            <li class="text-eyebrow flex items-center gap-2.5 text-fg-muted/75">
-              <span class="h-1.5 w-1.5 bg-brand-blue" aria-hidden="true" />
-              {acreditacion.siglas}
-            </li>
-          ))
-        }
-      </ul>
     </div>
   </header>
 
   {/* Cuerpo editorial */}
   <section class="pb-section" aria-labelledby="titulo-detalle">
     <div class="container-brand">
-      <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)] lg:gap-16">
-        <Reveal>
-          <h2 id="titulo-detalle" class="sr-only">
-            En qué consiste el servicio de {enMinusculas}
-          </h2>
-          <div class="prosa max-w-2xl text-lg">
-            {servicio.cuerpo.map((parrafo) => <p>{parrafo}</p>)}
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.1} class="lg:pt-2">
-          {
-            servicio.foto ? (
-              <Foto
-                nombre={servicio.foto.nombre}
-                alt={servicio.foto.alt}
-                ratio="4 / 5"
-                sizes="(max-width: 1024px) 62vw, 420px"
-                objectPosition={servicio.foto.posicion}
-                class="rounded-[2px] border border-white/10"
-              />
-            ) : (
-              <MediaPlaceholder
-                descripcion={`Foto real de un trabajo de ${enMinusculas} ejecutado por Alex.`}
-                medidas="1200 × 1500 px · 4:5"
-                ratio="4 / 5"
-              />
-            )
-          }
-        </Reveal>
-      </div>
+      <Reveal>
+        <h2 id="titulo-detalle" class="sr-only">
+          En qué consiste el servicio de {enMinusculas}
+        </h2>
+        <p class="max-w-2xl text-xl text-fg-muted">{servicio.entradilla}</p>
+        <div class="prosa mt-8 max-w-2xl text-lg">
+          {servicio.cuerpo.map((parrafo) => <p>{parrafo}</p>)}
+        </div>
+      </Reveal>
     </div>
   </section>
 
@@ -156,16 +127,12 @@ const enMinusculas = servicio.nombre.toLowerCase();
         titulo="Trabajos concretos, no promesas"
       />
 
-      <RevealGroup
-        as="ul"
-        class="mt-14 grid gap-px overflow-hidden rounded-[2px] border border-white/10 bg-white/10 md:grid-cols-2"
-        stagger={0.05}
-      >
+      <RevealGroup as="ul" class="mt-12 grid gap-4 md:grid-cols-2" stagger={0.04}>
         {
           servicio.incluye.map((item) => (
-            <RevealItem as="li" class="bg-bg p-6 sm:p-7">
+            <RevealItem as="li" class="tarjeta p-6">
               <h3 class="flex items-start gap-3 font-sans text-lg font-bold">
-                <Check className="mt-1 h-4 w-4 shrink-0 text-brand-blue" aria-hidden="true" />
+                <Check className="mt-1 h-4 w-4 shrink-0 text-brand-blue-soft" aria-hidden="true" />
                 {item.titulo}
               </h3>
               <p class="mt-2 pl-7 text-sm text-fg-muted">{item.detalle}</p>
@@ -188,17 +155,14 @@ const enMinusculas = servicio.nombre.toLowerCase();
 
       <RevealGroup
         as="ul"
-        class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-        stagger={0.07}
+        class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        stagger={0.05}
       >
         {
           servicio.paraQuien.map((item) => (
-            <RevealItem
-              as="li"
-              class="barrido-z rounded-[2px] border border-white/10 bg-surface/50 p-6 transition-colors hover:border-brand-blue/60"
-            >
+            <RevealItem as="li" class="tarjeta p-6">
               <h3 class="text-xl">{item.titulo}</h3>
-              <p class="mt-3 text-sm text-fg-muted">{item.detalle}</p>
+              <p class="mt-2.5 text-sm text-fg-muted">{item.detalle}</p>
             </RevealItem>
           ))
         }
@@ -208,7 +172,7 @@ const enMinusculas = servicio.nombre.toLowerCase();
 
   <ProcesoSteps pasos={servicio.proceso} numero="03" />
 
-  {/* Certificaciones aplicables */}
+  {/* Acreditaciones aplicables */}
   <section class="py-section" aria-labelledby="titulo-acreditaciones">
     <div class="container-brand">
       <SectionHeading
@@ -220,20 +184,17 @@ const enMinusculas = servicio.nombre.toLowerCase();
 
       <RevealGroup
         as="ul"
-        class="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-        stagger={0.05}
+        class="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        stagger={0.04}
       >
         {
-          acreditaciones.map((acreditacion) => (
-            <RevealItem
-              as="li"
-              class="rounded-[2px] border border-white/10 bg-surface/40 p-6"
-            >
-              <span class="font-display text-xs tracking-wider text-brand-blue">
-                {acreditacion.siglas}
+          acreditaciones.map((a) => (
+            <RevealItem as="li" class="tarjeta p-5">
+              <span class="font-display text-xs tracking-wider text-brand-blue-soft">
+                {a.siglas}
               </span>
-              <h3 class="mt-2 font-sans text-lg font-bold">{acreditacion.nombre}</h3>
-              <p class="mt-2 text-sm text-fg-muted">{acreditacion.detalle}</p>
+              <h3 class="mt-1.5 font-sans text-base font-bold">{a.nombre}</h3>
+              <p class="mt-2 text-sm text-fg-muted">{a.detalle}</p>
             </RevealItem>
           ))
         }
@@ -241,125 +202,37 @@ const enMinusculas = servicio.nombre.toLowerCase();
     </div>
   </section>
 
-  {/* Trabajos de este servicio */}
-  <section class="py-section" aria-labelledby="titulo-trabajos">
-    <div class="container-brand">
-      <SectionHeading
-        numero="05"
-        eyebrow="Trabajos reales"
-        tituloId="titulo-trabajos"
-        titulo={`${servicio.nombre} ejecutada en obra`}
-      />
-
-      {
-        trabajos.length > 0 ? (
-          <RevealGroup class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {trabajos.map((proyecto) => (
-              <RevealItem>
-                <TarjetaProyecto proyecto={proyecto} />
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        ) : (
-          <Reveal class="mt-14">
-            <div class="rounded-[2px] border border-dashed border-white/15 bg-surface/40 p-8">
-              <p class="text-eyebrow text-brand-orange">Pendiente de contenido</p>
-              <p class="mt-3 max-w-2xl text-fg-muted">
-                Aquí van los trabajos de {enMinusculas} con su reto y su solución. No se
-                publican proyectos inventados: en cuanto haya fotos y datos reales,
-                aparecen automáticamente en esta sección y en la galería.
-              </p>
-              <EnlaceBoton href="/proyectos" variante="secundario" class="mt-6">
-                Ver la galería
-              </EnlaceBoton>
-            </div>
-          </Reveal>
-        )
-      }
-    </div>
-  </section>
-
   <FAQ
     preguntas={servicio.faq}
-    numero="06"
+    numero="05"
     titulo={`Preguntas sobre ${enMinusculas}`}
     eyebrow="Dudas habituales"
   />
 
-  {/* Enlazado interno */}
-  <section class="py-section" aria-labelledby="titulo-enlaces">
+  {/* Servicios relacionados */}
+  <section class="pb-section" aria-labelledby="titulo-relacionados">
     <div class="container-brand">
-      <h2 id="titulo-enlaces" class="sr-only">
-        Servicios relacionados y zonas de actuación
+      <h2 class="text-eyebrow hairline-b mb-6 pb-2 text-fg-dim" id="titulo-relacionados">
+        Servicios relacionados
       </h2>
-
-      <div class="grid gap-12 md:grid-cols-2 md:gap-16">
-        <div>
-          <h3 class="text-eyebrow mb-6 flex items-center gap-3 text-fg-muted/50">
-            Servicios relacionados
-            <span class="cota flex-1" aria-hidden="true"></span>
-          </h3>
-          <ul class="flex flex-col border-t border-white/10">
-            {
-              relacionados.map((otro) => (
-                <li class="border-b border-white/10">
-                  <a
-                    href={`/servicios/${otro.slug}`}
-                    class="group flex items-center justify-between gap-4 py-5"
-                  >
-                    <span>
-                      <span class="block font-display text-xl">{otro.nombre}</span>
-                      <span class="mt-1 block text-sm text-fg-muted">{otro.claim}</span>
-                    </span>
-                    <ArrowUpRight
-                      className="h-5 w-5 shrink-0 text-fg-muted/50 transition-all group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-brand-orange"
-                      aria-hidden="true"
-                    />
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-
-        <div>
-          <h3 class="text-eyebrow mb-6 flex items-center gap-3 text-fg-muted/50">
-            {servicio.nombre} por zona
-            <span class="cota flex-1" aria-hidden="true"></span>
-          </h3>
-          <ul class="flex flex-col border-t border-white/10">
-            {
-              zonas.map((zona) => (
-                <li class="border-b border-white/10">
-                  <a
-                    href={`/zonas/${zona.slug}`}
-                    class="group flex items-center justify-between gap-4 py-5"
-                  >
-                    <span>
-                      <span class="block font-display text-xl">
-                        {servicio.nombreCorto} en {zona.ciudad}
-                      </span>
-                      <span class="mt-1 block text-sm text-fg-muted">{zona.comarca}</span>
-                    </span>
-                    <ArrowUpRight
-                      className="h-5 w-5 shrink-0 text-fg-muted/50 transition-all group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-brand-orange"
-                      aria-hidden="true"
-                    />
-                  </a>
-                </li>
-              ))
-            }
+      <ul class="grid gap-4 sm:grid-cols-3">
+        {
+          relacionados.map((otro) => (
             <li>
-              <a
-                href="/zonas"
-                class="inline-flex min-h-11 items-center py-5 text-sm text-fg-muted hover:text-brand-orange"
-              >
-                Ver todas las zonas de actuación
+              <a href={`/servicios/${otro.slug}`} class="tarjeta group flex h-full flex-col p-6">
+                <span class="flex items-start justify-between gap-4">
+                  <span class="font-display text-xl">{otro.nombre}</span>
+                  <ArrowUpRight
+                    className="h-4 w-4 shrink-0 text-fg-dim transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-fg"
+                    aria-hidden="true"
+                  />
+                </span>
+                <span class="mt-2 block text-sm text-fg-muted">{otro.claim}</span>
               </a>
             </li>
-          </ul>
-        </div>
-      </div>
+          ))
+        }
+      </ul>
     </div>
   </section>
 

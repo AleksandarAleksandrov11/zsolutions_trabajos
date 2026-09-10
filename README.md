@@ -8,11 +8,15 @@ No es un portfolio: es una máquina de captar solicitudes de presupuesto en
 Barcelona, el área metropolitana y Cataluña.
 
 **Stack:** Astro 7 en estático · TypeScript estricto · Tailwind CSS v4 · React 19
-solo en las dos islas que lo necesitan · Zod · Resend · Vercel.
+solo en el formulario · Zod · Resend · Vercel.
 
-La web entera se compila a HTML: 38 páginas que Vercel sirve desde la CDN sin
+La web entera se compila a HTML: 15 páginas que Vercel sirve desde la CDN sin
 ejecutar nada. La única parte dinámica es el envío del formulario, que vive en
 `api/presupuesto.ts` como función independiente, fuera del build del framework.
+
+**Datos de la empresa:** CLIMVOLT ZSOLUTIONS 1996, S.L. · NIF B75892554 ·
+Carrer de Rocafort 240, Entlo 3a, 08029 Barcelona · +34 668 53 27 86 ·
+info@zsolutions.es (comercial) · gestion@zsolutions.es (administración y RGPD).
 
 ---
 
@@ -95,12 +99,12 @@ en un componente.** Todo vive en `src/content/`, en archivos TypeScript tipados.
 |---|---|
 | `site.ts` | Nombre, NAP, teléfono, WhatsApp, email, redes, navegación |
 | `servicios.ts` | Los 6 servicios completos: textos, FAQ, proceso, palabras clave |
-| `zonas.ts` | Las 21 zonas con su contenido propio |
-| `proyectos.ts` | Galería de trabajos (**vacía a propósito**, ver §5) |
+| `zonas.ts` | Las 21 zonas, con su comarca y su punto en el mapa |
+| `trabajos.ts` | Galería de tipos de intervención |
+| `testimonios.ts` | Opiniones de clientes (**hay que sustituirlas**, ver §5) |
 | `certificaciones.ts` | Las 19 acreditaciones agrupadas |
 | `trayectoria.ts` | Bio y timeline 2012 → 2024 |
 | `faq.ts` | Preguntas frecuentes de la home |
-| `formacion.ts` | Página de formación |
 | `legal.ts` | Datos fiscales y los tres textos legales |
 | `redirecciones.ts` | Direcciones antiguas y adónde llevan |
 | `fotos.ts` | **Generado**, no editar a mano (ver §6) |
@@ -110,32 +114,30 @@ schema, enlaces internos y menús salen de aquí.
 
 ### Añadir una zona
 
-En `src/content/zonas.ts`, añade un objeto al array `zonas`. La página, la ruta
-estática, el sitemap, el mapa de la home y los enlaces del pie aparecen solos.
+En `src/content/zonas.ts`, añade un objeto al array `zonas` con su comarca, su
+frase y sus coordenadas en el mapa. Aparece sola en la portada, en la página de
+zonas, en el mapa y en el `areaServed` del schema.
 
-**Aviso importante de SEO:** una zona nueva necesita **contenido diferenciado
-real** (mínimo 500 palabras): parque edificado de ese municipio, servicios que
-allí se piden de verdad, barrios que cubre y tiempo de desplazamiento. Si te
-limitas a cambiar el nombre de la ciudad, Google lo trata como contenido
-duplicado o *doorway page* y **penaliza el dominio entero**. Prefiere ocho
-páginas buenas a veintidós vacías.
+Las coordenadas se calculan proyectando la latitud y la longitud reales sobre
+el mismo lienzo que el contorno; el bloque de cabecera de `zonas.ts` explica
+cómo. `pnpm auditar:contenido` avisa si una zona se sale del lienzo.
 
-`pnpm auditar:contenido` comprueba automáticamente ese mínimo y avisa si una
-zona se queda corta o si repites un `title` o una `description`.
+**No hay una página por municipio, y es deliberado.** Veintiuna páginas casi
+iguales compiten entre ellas por las mismas búsquedas, y Google las trata como
+contenido duplicado o *doorway pages*. Si algún día quieres recuperar el texto
+largo que tenía cada una, está en el historial de git.
 
-### Añadir un proyecto
+### Añadir un trabajo a la galería
 
-1. Deja las imágenes en `public/images/proyectos/`.
-2. Añade un objeto al array `proyectos` de `src/content/proyectos.ts` con el
-   servicio, la zona, el año, el reto y la solución.
+1. Deja la foto en `public/images/` y ejecuta `pnpm variantes`.
+2. Añade un objeto al array `trabajos` de `src/content/trabajos.ts`.
 
-La galería, los filtros, el visor con teclado y los bloques "trabajos reales"
-de la página de servicio y de la de zona lo recogen automáticamente.
+La retícula y el visor con teclado lo recogen automáticamente.
 
 ### Añadir un servicio
 
-Añade un objeto a `servicios.ts` (mínimo 800 palabras de texto útil) y un icono
-nuevo en `src/components/ui/ServiceIcon.tsx`.
+Añade un objeto a `servicios.ts` (mínimo 800 palabras de texto útil), un icono
+nuevo en `src/components/ui/ServiceIcon.tsx` y una foto en `public/images`.
 
 ### Añadir una redirección
 
@@ -156,26 +158,46 @@ src/
   layouts/         Base (cabecera, pie, <head> y el script global) y Legal
   components/
     layout/        Header, Footer, CookieBanner, WhatsAppFloat
-    sections/      Hero, ServicesGrid, WhyUs, ZonesMap, Certifications, Timeline, FAQ…
-    forms/         QuoteWizard, FormField, ProgressBar  (React, se ejecutan en el navegador)
-    ui/            botones, Badge, SectionHeading, Reveal, BrandLogo, ServiceIcon…
+    sections/      Hero, ServicesGrid, Metodo, Trabajos, SobreAlex, Testimonios,
+                   Certifications, Zonas, MapaZonas, FAQ, CTASection…
+    forms/         QuoteWizard, FormField, ProgressBar  (React, en el navegador)
+    ui/            botones, BrandLogo, Foto, SectionHeading, Reveal…
     seo/           JsonLd
   content/         todos los textos y datos
   lib/             seo, schema, validation, mail, rate-limit, cookies, boton, utils
-  styles/          global.css: sistema de diseño, utilidades de marca y animaciones
-scripts/           generación de imágenes e iconos y auditorías automáticas
+  styles/          global.css: sistema de diseño y utilidades de marca
+public/
+  logo/            logotipo oficial en SVG, a color y a una tinta blanca
+  images/          fotografías y sus variantes AVIF y WebP
+  fonts/           Righteous autoalojada
+scripts/           generación de imágenes, iconos y miniatura, y auditorías
 ```
+
+### Las quince páginas
+
+| Ruta | Qué es |
+|---|---|
+| `/` | Portada: servicios, método, trabajos, Alex, testimonios, zonas y FAQ |
+| `/servicios` | Índice de los seis servicios |
+| `/servicios/<slug>` | Seis páginas, una por oficio. Es el núcleo del SEO |
+| `/zonas` | Mapa real de Cataluña y las 21 zonas por comarca |
+| `/sobre-alex` | Trayectoria y acreditaciones completas |
+| `/contacto` | Formulario de presupuesto |
+| Tres páginas legales y el 404 | |
+
+No hay página por municipio ni página de formación: se quitaron a propósito
+para que la navegación no compita consigo misma. Las direcciones antiguas
+siguen funcionando con un 301 (ver §3).
 
 ### Qué se ejecuta en el navegador
 
 Casi nada, y es a propósito:
 
-- **Dos islas React:** el formulario de presupuesto (`/contacto`) y la galería
-  con su visor (`/proyectos`). Solo se cargan en esas dos páginas.
-- **Un script global** de unas ochenta líneas sin dependencias, en `Base.astro`:
-  el revelado al hacer scroll, los contadores y el parallax del hero.
-- **Tres scripts pequeños** de la cabecera, el aviso de cookies y el botón
-  flotante de WhatsApp.
+- **Una isla React:** el formulario de presupuesto, solo en `/contacto`.
+- **Un script global** de unas sesenta líneas sin dependencias, en `Base.astro`:
+  el revelado al hacer scroll y los contadores.
+- **Cuatro scripts pequeños** de la cabecera, el aviso de cookies, el botón
+  flotante de WhatsApp y el visor de la galería, que usa el `<dialog>` nativo.
 
 El resto de la web es HTML y CSS. El revelado al hacer scroll parte de
 **contenido visible**: si el JavaScript falla o tarda, la página se lee igual,
@@ -184,15 +206,25 @@ sin bloques en blanco. Y todas las animaciones respetan
 
 ---
 
-## 5. Lo que hay pendiente de contenido
+## 5. Lo único que queda por sustituir
 
-La galería de proyectos está **montada y vacía a propósito**. El sistema
-funciona (filtros, retícula, visor accesible), pero no se publican trabajos
-inventados. Lo mismo aplica a testimonios, número de clientes y años de
-garantía: no hay ninguno porque no se inventan.
+La web no tiene huecos ni avisos de «pendiente»: todos los datos de la empresa
+son los reales. Quedan dos cosas por cambiar antes de abrirla a Google, y las
+dos están señaladas con un aviso en su fichero:
 
-Los huecos de foto que faltan se muestran como una composición gráfica con la
-cota de lo que hay que aportar, en lugar de con una imagen de banco.
+1. **Los testimonios de `src/content/testimonios.ts` son ejemplos de formato,
+   no opiniones reales.** Sustitúyelos por reseñas de clientes de verdad, por
+   ejemplo copiando las del Perfil de Empresa de Google. Publicar reseñas
+   inventadas es publicidad engañosa (Ley 3/1991 de Competencia Desleal y el
+   texto refundido de la Ley General para la Defensa de Consumidores y
+   Usuarios) y expone a sanción. Si vacías el array, la sección desaparece
+   sola de la web.
+2. **Las fotos de obra de `public/images/obra-*.jpg` son imágenes de banco.**
+   Están elegidas para mostrar el tipo de trabajo, no para hacerlas pasar por
+   obra tuya: no sale tu cara ni la de tus clientes, y los pies describen la
+   clase de intervención, no un encargo concreto. Cuando tengas reportaje
+   propio, sustituye los archivos con el mismo nombre y ejecuta
+   `pnpm variantes`. Las fotos `alex-*` sí son tuyas.
 
 ---
 
@@ -211,7 +243,8 @@ justamente para que no entre en el build. Se instala cuando hace falta:
 pnpm imagenes:instalar                        # pnpm add -D sharp
 pnpm fotos ./ruta/a/las/fotos/originales      # JPEG base + variantes + fotos.ts
 pnpm variantes                                # solo variantes, si ya hay JPEG
-pnpm iconos                                   # todo el paquete de iconos
+pnpm iconos                                   # favicon, PWA y pestaña anclada
+pnpm og                                       # public/og.png, la miniatura social
 ```
 
 `pnpm variantes` reescribe `src/content/fotos.ts` con los anchos, la miniatura
@@ -220,8 +253,8 @@ a mano.
 
 `pnpm iconos` produce `public/favicon.ico` (16/32/48), `public/icons/icon.svg`,
 `apple-icon.png` (180), `icon-192.png`, `icon-512.png`, `maskable-512.png` y la
-versión monocroma para la pestaña anclada de Safari. El manifiesto PWA se genera
-en `src/pages/manifest.webmanifest.ts`.
+versión monocroma para la pestaña anclada de Safari, todos a partir del isotipo
+oficial. El manifiesto PWA se genera en `src/pages/manifest.webmanifest.ts`.
 
 La tipografía Righteous está **autoalojada** en `public/fonts`. No hay ninguna
 petición a un servidor de fuentes externo: una dependencia menos y una conexión
@@ -233,18 +266,24 @@ menos antes del primer pintado.
 
 El sistema visual sigue el *Manual Básico de Identidad Visual Corporativa*.
 
-- **Azul = acción · naranja = atención · blanco = información.** El naranja no
-  pasa del 5 % de la superficie.
+- **Dos tintas, como manda el manual:** azul corporativo (#2F4AA0, derivado del
+  #23366F del manual) y negro. El naranja queda como único acento de atención y
+  aparece en un par de sitios contados, nunca como color de superficie.
 - El logotipo **nunca** en naranja: azul corporativo, blanco o negro.
 - Righteous para titulares, Arial para el cuerpo. Righteous nunca en párrafos.
-- Fotografía real de obra, desaturada, con capa de color corporativo entre el
-  60 % y el 80 % cuando lleva texto encima.
+- Fotografía **sin filtros**: se usa tal y como se tomó. Solo el hero lleva un
+  degradado encima, y está para que el texto se lea, no para teñir la imagen.
 
-> **Pendiente:** `BrandLogo` y `ServiceIcon` son una construcción fiel a lo que
-> describe el manual, pero **no son los archivos originales**. Cuando Alex
-> facilite los SVG oficiales del logotipo, el isotipo y los cuatro iconos
-> identificativos, basta con sustituir el contenido de esos dos componentes: no
-> hay que tocar ninguna página.
+El **logotipo es el oficial**: los SVG de `public/logo` están extraídos del
+manual sin redibujar, son las curvas originales. Sobre el fondo oscuro se usa
+la versión a una tinta blanca, que es la que prescribe el propio manual cuando
+el fondo no deja leer la versión a color. Los iconos del favicon y de la PWA
+salen del mismo isotipo con `pnpm iconos`.
+
+> **Pendiente:** los seis `ServiceIcon` sí están dibujados siguiendo el
+> lenguaje del manual, pero no son los cuatro iconos identificativos
+> originales del apartado 07. Cuando Alex los facilite, se sustituye el
+> contenido de ese componente y no hay que tocar ninguna página.
 
 ---
 
@@ -252,10 +291,11 @@ El sistema visual sigue el *Manual Básico de Identidad Visual Corporativa*.
 
 - `title` y `description` únicos en cada página, con canonical, Open Graph y
   Twitter Card, generados desde `crearMetadata()` en `src/lib/seo.ts`.
-- Miniatura social: imagen estática de marca en `public/og.png`.
+- Miniatura social: `public/og.png`, generada con `pnpm og` a partir del
+  logotipo oficial y de la foto de portada.
 - JSON-LD: `LocalBusiness` (`Electrician` + `HVACBusiness` + `Plumber`),
   `Person`, `WebSite`, `Service`, `FAQPage` y `BreadcrumbList`.
-- `sitemap.xml` y `robots.txt` generados en la compilación con las 37 rutas
+- `sitemap.xml` y `robots.txt` generados en la compilación con las 14 rutas
   indexables.
 - URLs limpias en español, sin barra final, breadcrumbs visibles y enlazado
   interno denso.
@@ -286,7 +326,10 @@ El sistema visual sigue el *Manual Básico de Identidad Visual Corporativa*.
 
 ## 9. Legal y cookies
 
-Las tres páginas legales están redactadas y enlazadas en el pie.
+Las tres páginas legales están redactadas, con los datos fiscales reales, y
+enlazadas en el pie. El aviso naranja de «nota para Alex» que salía encima de
+cada una ha desaparecido: era un recordatorio interno, no algo que deba ver un
+cliente.
 
 > **Estos textos son una base sólida redactada para este proyecto y deben ser
 > revisados por un asesor antes de publicar. No son asesoramiento jurídico.**
@@ -315,7 +358,7 @@ pnpm auditar:contenido                       # mínimos de palabras, metadatos y
 pnpm build && pnpm preview                   # en una terminal
 pnpm auditar:web                             # consola, responsive, a11y, JSON-LD, redirecciones
 pnpm auditar:teclado                         # foco, menú móvil, cookies, áreas táctiles
-pnpm auditar:lighthouse http://127.0.0.1:4321 / /servicios/electricidad
+pnpm auditar:lighthouse http://127.0.0.1:4321 / /servicios/electricidad /contacto
 
 pnpm dev                                     # el formulario necesita el endpoint
 pnpm auditar:formulario http://127.0.0.1:4322
@@ -336,9 +379,9 @@ pnpm auditar:instalar
 
 Si el Chromium de tu máquina está en otra ruta, exporta `CHROMIUM_PATH`.
 
-Estado actual con el dominio definido, en Lighthouse móvil:
-**rendimiento 100 · accesibilidad 100 · buenas prácticas 100 · SEO 100**,
-con LCP 1,5 s, CLS 0 y TBT 0 ms.
+Estado actual con el dominio definido, en Lighthouse móvil sobre portada,
+servicio, zonas, sobre Alex y contacto: **rendimiento 99-100 · accesibilidad
+100 · buenas prácticas 100 · SEO 100**, con LCP entre 1,1 y 1,8 s y CLS 0.
 
 ---
 
@@ -354,7 +397,6 @@ con LCP 1,5 s, CLS 0 y TBT 0 ms.
 
 ### Antes de abrirla a Google
 
-- [ ] Datos fiscales y NAP rellenos (`site.ts` y `legal.ts`)
 - [ ] Textos legales revisados por un asesor
 - [ ] Dominio verificado en Resend (SPF y DKIM)
 - [ ] Prueba real de envío del formulario, con autorespuesta incluida
@@ -362,9 +404,8 @@ con LCP 1,5 s, CLS 0 y TBT 0 ms.
 - [ ] Redirección 301 de `contacto.zsolutions.es` a `/contacto`
 - [ ] Google Search Console verificado y sitemap enviado
 - [ ] Perfil de Empresa de Google creado u optimizado, con el mismo NAP
-- [ ] SVG oficiales del logotipo y de los iconos sustituidos
-- [ ] Fotos reales de los servicios que aún tienen hueco
-- [ ] Primeros proyectos publicados en la galería
+- [ ] Testimonios reales en lugar de los de ejemplo
+- [ ] Fotos de obra propias en lugar de las de banco
 - [ ] `pnpm auditar` en verde
 
 ---
@@ -386,8 +427,8 @@ con LCP 1,5 s, CLS 0 y TBT 0 ms.
 
 ### Qué sube exactamente a Vercel
 
-- **`dist/`**, con 38 páginas HTML, el CSS, las fuentes, las imágenes y unos
-  pocos kilobytes de JavaScript. Se sirve desde la CDN.
+- **`dist/`**, con 15 páginas HTML, el CSS, las fuentes, el logotipo, las
+  imágenes y unos pocos kilobytes de JavaScript. Se sirve desde la CDN.
 - **`api/presupuesto.ts`**, la única función. Vercel la detecta por estar en el
   directorio `api/` de la raíz, no a través del framework.
 

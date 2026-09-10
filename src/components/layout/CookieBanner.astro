@@ -28,10 +28,8 @@ const compacto = "px-2 text-[0.625rem] leading-tight sm:px-5 sm:text-xs";
 >
   <div class="container-brand !px-0">
     <div
-      class="relative overflow-hidden rounded-[2px] border border-white/15 bg-surface/95 shadow-2xl backdrop-blur-lg"
+      class="relative overflow-hidden rounded-2xl border border-line bg-surface/95 shadow-2xl shadow-black/50 backdrop-blur-xl"
     >
-      <div class="rayas-z absolute inset-x-0 top-0 h-1 opacity-70" aria-hidden="true"></div>
-
       <div class="p-4 sm:p-5">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-8">
           <div class="flex min-w-0 items-start gap-3 lg:flex-1">
@@ -47,7 +45,7 @@ const compacto = "px-2 text-[0.625rem] leading-tight sm:px-5 sm:text-xs";
                 </span>{" "}
                 <a
                   href="/politica-de-cookies"
-                  class="text-fg underline underline-offset-4 hover:text-brand-orange"
+                  class="text-fg underline underline-offset-4 hover:text-brand-blue-soft"
                 >
                   Política de cookies
                 </a>.
@@ -81,12 +79,12 @@ const compacto = "px-2 text-[0.625rem] leading-tight sm:px-5 sm:text-xs";
 
         <ul
           data-panel-cookies
-          class="mt-5 flex max-h-[45vh] flex-col gap-3 overflow-y-auto border-t border-white/10 pt-5"
+          class="hairline-t mt-5 flex max-h-[45vh] flex-col gap-3 overflow-y-auto pt-5"
           hidden
         >
           {
             categoriasCookies.map((categoria) => (
-              <li class="rounded-[2px] border border-white/10 bg-white/[0.02] p-4">
+              <li class="rounded-xl border border-line bg-white/[0.02] p-4">
                 <label class="flex cursor-pointer items-start gap-3">
                   <input
                     type="checkbox"
@@ -99,12 +97,12 @@ const compacto = "px-2 text-[0.625rem] leading-tight sm:px-5 sm:text-xs";
                     <span class="block text-sm font-bold text-fg">
                       {categoria.titulo}
                       {categoria.siempreActiva ? (
-                        <span class="ml-2 text-2xs font-normal text-fg-muted/60">
+                        <span class="ml-2 text-2xs font-normal text-fg-dim">
                           Siempre activas
                         </span>
                       ) : null}
                     </span>
-                    <span class="mt-1 block text-xs text-fg-muted">
+                    <span class="mt-1 block text-xs text-fg-dim">
                       {categoria.descripcion}
                     </span>
                   </span>

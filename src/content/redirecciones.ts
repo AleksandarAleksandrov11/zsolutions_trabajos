@@ -19,5 +19,7 @@ export const redirecciones: Redireccion[] = [
   { desde: "/servicios/lampista", hacia: "/servicios/lampisteria" },
   { desde: "/servicios/aire-acondicionado", hacia: "/servicios/climatizacion" },
   { desde: "/servicios/trabajos-en-altura", hacia: "/servicios/trabajos-verticales" },
-  { desde: "/zonas/hospitalet", hacia: "/zonas/hospitalet-de-llobregat" },
+  /* La galería de trabajos y la formación dejaron de tener página propia. */
+  { desde: "/proyectos", hacia: "/#trabajos" },
+  { desde: "/formacion", hacia: "/sobre-alex" },
 ];

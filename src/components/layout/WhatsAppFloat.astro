@@ -1,22 +1,20 @@
 ---
 import { MessageCircle } from "lucide-react";
-import { hrefWhatsApp, mensajeWhatsApp, site } from "@/content/site";
+import { hrefWhatsApp, mensajeWhatsApp } from "@/content/site";
 
 /**
- * Botón flotante discreto. Aparece tras el primer scroll para no tapar el
- * hero, y nunca se anima de forma que retrase el acceso al contacto.
+ * Botón flotante. Aparece tras el primer scroll para no tapar el hero, y en
+ * móvil se aparta del formulario cuando este ocupa la pantalla.
  */
-const destino = hrefWhatsApp(mensajeWhatsApp);
-const esWhatsApp = Boolean(site.nap.whatsapp);
 ---
 
 <a
   id="whatsapp-flotante"
-  href={destino}
-  target={esWhatsApp ? "_blank" : undefined}
-  rel={esWhatsApp ? "noopener noreferrer" : undefined}
-  aria-label={esWhatsApp ? "Escribir por WhatsApp" : "Ir al formulario de presupuesto"}
-  class="pointer-events-none fixed right-4 z-80 inline-flex h-13 w-13 translate-y-3 items-center justify-center rounded-full bg-brand-blue text-white opacity-0 shadow-lg transition-[opacity,transform,background-color] duration-300 hover:bg-brand-blue-hover"
+  href={hrefWhatsApp(mensajeWhatsApp)}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Escribir por WhatsApp"
+  class="pointer-events-none fixed right-4 z-80 inline-flex h-13 w-13 translate-y-2 items-center justify-center rounded-full bg-brand-blue text-white opacity-0 shadow-lg shadow-black/40 transition-[opacity,transform,background-color] duration-300 hover:bg-brand-blue-hover"
   style="bottom: max(1rem, env(safe-area-inset-bottom))"
 >
   <MessageCircle className="h-6 w-6" aria-hidden="true" />
@@ -27,12 +25,12 @@ const esWhatsApp = Boolean(site.nap.whatsapp);
   if (boton) {
     let visible: boolean | null = null;
     const alScroll = () => {
-      const ahora = window.scrollY > 400;
+      const ahora = window.scrollY > 500;
       if (ahora === visible) return;
       visible = ahora;
       boton.classList.toggle("pointer-events-none", !ahora);
       boton.classList.toggle("opacity-0", !ahora);
-      boton.classList.toggle("translate-y-3", !ahora);
+      boton.classList.toggle("translate-y-2", !ahora);
     };
     alScroll();
     window.addEventListener("scroll", alScroll, { passive: true });

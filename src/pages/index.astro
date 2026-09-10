@@ -2,11 +2,11 @@
 import Base from "@/layouts/Base.astro";
 import Hero from "@/components/sections/Hero.astro";
 import ServicesGrid from "@/components/sections/ServicesGrid.astro";
-import WhyUs from "@/components/sections/WhyUs.astro";
-import ZonesMap from "@/components/sections/ZonesMap.astro";
-import ProjectsSection from "@/components/sections/ProjectsSection.astro";
-import AboutTeaser from "@/components/sections/AboutTeaser.astro";
-import Certifications from "@/components/sections/Certifications.astro";
+import Metodo from "@/components/sections/Metodo.astro";
+import Trabajos from "@/components/sections/Trabajos.astro";
+import SobreAlex from "@/components/sections/SobreAlex.astro";
+import Testimonios from "@/components/sections/Testimonios.astro";
+import Zonas from "@/components/sections/Zonas.astro";
 import FAQ from "@/components/sections/FAQ.astro";
 import CTASection from "@/components/sections/CTASection.astro";
 import { schemaFaq } from "@/lib/schema";
@@ -23,20 +23,25 @@ const meta = crearMetadata({
 
 <Base meta={meta} schema={schemaFaq(faqHome)}>
   <Hero
-    completo
+    portada
     conBarraConfianza
-    eyebrow="Instalador certificado · Barcelona y Cataluña"
-    lineas={["Instalaciones", "certificadas", "en Barcelona"]}
+    eyebrow="Instalador certificado en Barcelona"
+    titulo="Instalaciones certificadas en Barcelona"
     descripcion="Electricidad, fontanería, climatización, aerotermia y trabajos verticales. Ejecutado y firmado por un instalador con carnet, no vendido por un intermediario que subcontrata la obra."
-    foto={{ nombre: "alex-cubierta-barcelona", alt: "", posicion: "68% 28%" }}
+    foto={{
+      nombre: "alex-cubierta-barcelona",
+      alt: "",
+      posicionMovil: "62% 18%",
+      posicion: "70% 25%",
+    }}
   />
 
   <ServicesGrid numero="01" />
-  <WhyUs numero="02" />
-  <ZonesMap numero="03" />
-  <ProjectsSection numero="04" />
-  <AboutTeaser numero="05" />
-  <Certifications numero="06" />
+  <Metodo numero="02" />
+  <Trabajos numero="03" />
+  <SobreAlex numero="04" />
+  <Testimonios numero="05" />
+  <Zonas numero="06" conEnlace />
   <FAQ preguntas={faqHome} numero="07" />
   <CTASection />
 </Base>

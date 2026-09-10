@@ -5,7 +5,6 @@ import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import { crearMetadata } from "@/lib/seo";
 import { navPrincipal } from "@/content/site";
 import { servicios } from "@/content/servicios";
-import { zonasDestacadas } from "@/content/zonas";
 
 const meta = crearMetadata({
   title: "Página no encontrada | ZSolutions",
@@ -16,36 +15,28 @@ const meta = crearMetadata({
 ---
 
 <Base meta={meta}>
-  <section class="relative flex min-h-dvh flex-col justify-center overflow-hidden py-32">
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="grid-plano absolute inset-0 opacity-70"></div>
-      <div
-        class="absolute inset-0"
-        style="background:radial-gradient(60% 55% at 75% 10%, rgba(35,54,111,.6) 0%, transparent 62%)"
-      >
-      </div>
-      <div class="rayas-z absolute -left-20 bottom-24 h-40 w-96 opacity-25"></div>
-    </div>
+  <section class="relative flex min-h-[80svh] flex-col justify-center overflow-hidden py-28">
+    <div class="plano absolute inset-0 -z-10 opacity-50" aria-hidden="true"></div>
 
     <div class="container-brand">
-      <p class="text-eyebrow mb-5 text-brand-orange">Error 404</p>
-      <h1 class="max-w-3xl text-7xl">Aquí no hay nada instalado</h1>
-      <p class="mt-7 max-w-xl text-lg text-fg-muted">
+      <p class="text-eyebrow text-brand-blue-soft">Error 404</p>
+      <h1 class="mt-5 max-w-2xl text-5xl">Aquí no hay nada instalado</h1>
+      <p class="mt-5 max-w-lg text-lg text-fg-muted">
         La página que buscas no existe o ha cambiado de dirección. Estos son los caminos
         más cortos para llegar a lo que necesitas.
       </p>
 
-      <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
         <EnlaceBoton href="/" tamano="lg">Volver al inicio</EnlaceBoton>
         <EnlaceBoton href="/contacto" variante="secundario" tamano="lg">
           Solicitar presupuesto
         </EnlaceBoton>
       </div>
 
-      <div class="mt-16 grid gap-10 border-t border-white/10 pt-10 sm:grid-cols-3">
+      <div class="hairline-t mt-14 grid gap-8 pt-10 sm:grid-cols-2">
         <nav aria-label="Servicios">
-          <h2 class="text-eyebrow mb-4 text-fg-muted/50">Servicios</h2>
-          <ul class="flex flex-col gap-2.5 text-sm">
+          <h2 class="text-eyebrow mb-3 text-fg-dim">Servicios</h2>
+          <ul class="flex flex-col gap-2 text-sm">
             {
               servicios.map((servicio) => (
                 <li>
@@ -62,33 +53,11 @@ const meta = crearMetadata({
           </ul>
         </nav>
 
-        <nav aria-label="Zonas principales">
-          <h2 class="text-eyebrow mb-4 text-fg-muted/50">Zonas principales</h2>
-          <ul class="flex flex-col gap-2.5 text-sm">
-            {
-              zonasDestacadas.map((zona) => (
-                <li>
-                  <a
-                    href={`/zonas/${zona.slug}`}
-                    class="inline-flex items-center gap-1.5 text-fg-muted transition-colors hover:text-fg"
-                  >
-                    {zona.ciudad}
-                    <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-                  </a>
-                </li>
-              ))
-            }
-            <li>
-              <a href="/zonas" class="text-fg hover:text-brand-orange">Ver todas</a>
-            </li>
-          </ul>
-        </nav>
-
         <nav aria-label="Secciones de la web">
-          <h2 class="text-eyebrow mb-4 text-fg-muted/50">La web</h2>
-          <ul class="flex flex-col gap-2.5 text-sm">
+          <h2 class="text-eyebrow mb-3 text-fg-dim">La web</h2>
+          <ul class="flex flex-col gap-2 text-sm">
             {
-              navPrincipal.map((enlace) => (
+              [...navPrincipal, { label: "Contacto", href: "/contacto" }].map((enlace) => (
                 <li>
                   <a
                     href={enlace.href}

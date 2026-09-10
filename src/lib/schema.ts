@@ -1,7 +1,7 @@
 import { site } from "@/content/site";
 import { certificaciones } from "@/content/certificaciones";
 import { servicios, type Servicio } from "@/content/servicios";
-import { zonas, type Zona } from "@/content/zonas";
+import { zonas } from "@/content/zonas";
 import type { ParFaq } from "@/content/servicios";
 import { BASE_URL } from "@/lib/seo";
 
@@ -51,14 +51,7 @@ export function schemaNegocioLocal(): JsonLdObjeto {
     priceRange: site.priceRange,
     currenciesAccepted: "EUR",
     address: direccion,
-    geo: site.nap.geo
-      ? {
-          "@type": "GeoCoordinates",
-          latitude: site.nap.geo.lat,
-          longitude: site.nap.geo.lng,
-        }
-      : undefined,
-    openingHours: site.nap.horario,
+    openingHours: site.nap.horarioSchema,
     founder: { "@id": ID_PERSONA },
     employee: { "@id": ID_PERSONA },
     areaServed: zonas.map((zona) => ({
@@ -139,22 +132,6 @@ export function schemaServicio(servicio: Servicio): JsonLdObjeto {
         "@type": "Offer",
         itemOffered: { "@type": "Service", name: item.titulo, description: item.detalle },
       })),
-    },
-  };
-}
-
-export function schemaZona(zona: Zona): JsonLdObjeto {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: `Instalaciones en ${zona.ciudad}`,
-    description: zona.descriptionSeo,
-    url: `${BASE_URL}/zonas/${zona.slug}`,
-    provider: { "@id": ID_NEGOCIO },
-    areaServed: {
-      "@type": "City",
-      name: zona.ciudad,
-      containedInPlace: { "@type": "AdministrativeArea", name: zona.comarca },
     },
   };
 }

@@ -24,25 +24,43 @@ for (const s of servicios) {
   console.log(`${ok ? "✓" : "✗"} ${s.slug.padEnd(22)} ${String(total).padStart(5)} palabras · FAQ ${s.faq.length}`);
 }
 
-console.log("\n=== ZONAS (mínimo 500 palabras) ===");
-for (const z of zonas) {
-  const total =
-    palabras(z.entradilla) +
-    z.cuerpo.reduce((a, p) => a + palabras(p), 0) +
-    z.serviciosDemandados.reduce((a, i) => a + palabras(i.motivo), 0) +
-    palabras(z.desplazamiento) +
-    (z.barrios ?? []).reduce((a, b) => a + palabras(b.nombre) + palabras(b.detalle), 0) +
-    z.faq.reduce((a, f) => a + palabras(f.p) + palabras(f.r), 0);
-  const ok = total >= 500;
-  if (!ok) fallos++;
-  console.log(`${ok ? "✓" : "✗"} ${z.slug.padEnd(30)} ${String(total).padStart(5)} palabras`);
+console.log("\n=== ZONAS ===");
+{
+  /* Ya no hay una página por municipio, así que aquí no se miden palabras: se
+     comprueba que cada zona esté completa y que las coordenadas del mapa caigan
+     dentro del lienzo, que es lo que puede romperse al añadir una nueva. */
+  const { siluetaCataluna } = await import("../src/content/zonas.ts");
+  const slugs = new Set();
+  let correctas = 0;
+  for (const z of zonas) {
+    const problemas = [];
+    if (slugs.has(z.slug)) problemas.push("slug duplicado");
+    slugs.add(z.slug);
+    if (!z.ciudad || !z.comarca || !z.claim) problemas.push("faltan campos");
+    if (palabras(z.claim) < 5) problemas.push("claim demasiado corto");
+    const { x, y } = z.mapa ?? {};
+    if (typeof x !== "number" || typeof y !== "number") {
+      problemas.push("sin coordenadas de mapa");
+    } else if (x < 0 || y < 0 || x > siluetaCataluna.ancho || y > siluetaCataluna.alto) {
+      problemas.push(`coordenadas fuera del lienzo (${x}, ${y})`);
+    }
+
+    if (problemas.length) {
+      console.log(`✗ ${z.slug.padEnd(30)} ${problemas.join(" · ")}`);
+      fallos += problemas.length;
+    } else {
+      correctas++;
+    }
+  }
+  if (correctas === zonas.length) {
+    console.log(`✓ ${zonas.length} zonas completas y dentro del mapa`);
+  }
 }
 
 console.log("\n=== METADATOS ===");
 const titles = [];
 const descs = [];
 for (const s of servicios) { titles.push([s.slug, s.titleSeo]); descs.push([s.slug, s.descriptionSeo]); }
-for (const z of zonas) { titles.push([z.slug, z.titleSeo]); descs.push([z.slug, z.descriptionSeo]); }
 
 for (const [slug, t] of titles) {
   if (t.length >= 60) { console.log(`✗ title largo (${t.length}) en ${slug}: ${t}`); fallos++; }
@@ -58,18 +76,11 @@ if (!dupT.length && !dupD.length) console.log("✓ Sin títulos ni descripciones
 
 console.log("\n=== ENLACES INTERNOS ===");
 const slugsServicio = new Set(servicios.map((s) => s.slug));
-const slugsZona = new Set(zonas.map((z) => z.slug));
 for (const s of servicios) {
   for (const r of s.relacionados) {
     if (!slugsServicio.has(r)) { console.log(`✗ ${s.slug} enlaza a servicio inexistente: ${r}`); fallos++; }
   }
 }
-for (const z of zonas) {
-  for (const d of z.serviciosDemandados) {
-    if (!slugsServicio.has(d.slug)) { console.log(`✗ ${z.slug} enlaza a servicio inexistente: ${d.slug}`); fallos++; }
-  }
-}
-if (slugsZona.size !== zonas.length) { console.log("✗ slugs de zona duplicados"); fallos++; }
 console.log(`✓ ${servicios.length} servicios · ${zonas.length} zonas comprobadas`);
 
 console.log("\n=== REDIRECCIONES ===");
@@ -78,7 +89,11 @@ console.log("\n=== REDIRECCIONES ===");
      que sigue diciendo exactamente lo mismo que `src/content/redirecciones.ts`.
      Sin esto, tocar una sola de las dos pasaría inadvertido hasta producción. */
   const vercel = JSON.parse(await readFile("vercel.json", "utf8"));
+  /* Las reglas con patrón (`/zonas/:ciudad`) solo existen en `vercel.json`:
+     Astro no las puede generar como página estática y quedan fuera de la
+     comparación a propósito. */
   const enVercel = (vercel.redirects ?? [])
+    .filter((r) => !r.source.includes(":"))
     .map((r) => `${r.source} → ${r.destination} ${r.permanent ? "301" : "302"}`)
     .sort();
   const esperadas = redirecciones
