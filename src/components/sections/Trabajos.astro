@@ -26,20 +26,23 @@ const { numero = "03" } = Astro.props;
           descripcion="Cada tipo de intervención con lo que realmente incluye. Toca una imagen para verla completa."
         />
 
+        {/* `auto-rows-fr` iguala la altura de todas las filas, no solo la de
+            los hermanos de una misma fila. Sin esto, en móvil (una sola
+            columna) cada tarjeta medía según lo largo que fuese su pie. */}
         <RevealGroup
           as="ul"
-          class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          class="mt-12 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3"
           stagger={0.05}
         >
           {trabajos.map((trabajo, i) => (
-            <RevealItem as="li">
+            <RevealItem as="li" class="h-full">
               <button
                 type="button"
-                class="tarjeta group block w-full overflow-hidden p-0 text-left"
+                class="tarjeta group flex h-full w-full flex-col overflow-hidden p-0 text-left"
                 data-visor-abrir={i}
                 aria-label={`Ampliar: ${trabajo.titulo}`}
               >
-                <span class="relative block">
+                <span class="relative block shrink-0">
                   <Foto
                     nombre={trabajo.foto}
                     alt={trabajo.alt}
@@ -53,7 +56,7 @@ const { numero = "03" } = Astro.props;
                     <Expand className="h-4 w-4" />
                   </span>
                 </span>
-                <span class="block p-6">
+                <span class="flex flex-1 flex-col p-6">
                   <span class="block text-lg font-bold">{trabajo.titulo}</span>
                   <span class="mt-2 block text-sm text-fg-muted">{trabajo.detalle}</span>
                 </span>
