@@ -5,8 +5,20 @@ import RevealItem from "@/components/ui/RevealItem.astro";
 import {
   certificacionesPorGrupo,
   gruposCertificacion,
+  type GrupoCertificacion,
 } from "@/content/certificaciones";
 import { secciones } from "@/content/secciones";
+import { CertIcon } from "@/components/ui/CertIcon";
+
+/* Alterna azul y naranja por grupo, no por certificado suelto: así cada
+   bloque se lee como una unidad de color y el conjunto no queda moteado. */
+const colorPorGrupo: Record<GrupoCertificacion, "azul" | "naranja"> = {
+  oficiales: "azul",
+  tecnica: "naranja",
+  seguridad: "azul",
+  verticales: "naranja",
+  maquinaria: "azul",
+};
 
 type Props = {
   numero?: string;
@@ -51,9 +63,17 @@ const {
               {certificacionesPorGrupo(grupo.id).map((c) => (
                 <RevealItem
                   as="li"
-                  class="tarjeta group/carnet flex flex-col gap-1.5 p-5"
+                  class="tarjeta group/carnet flex flex-col gap-3 p-5"
                   tabindex={detallado ? undefined : 0}
                 >
+                  <span
+                    class:list={[
+                      "chip-icono h-10 w-10",
+                      colorPorGrupo[grupo.id] === "naranja" && "chip-icono-naranja",
+                    ]}
+                  >
+                    <CertIcon nombre={c.icono} className="h-5 w-5" />
+                  </span>
                   <span class="font-display text-xs tracking-wider text-fg">
                     {c.siglas}
                   </span>

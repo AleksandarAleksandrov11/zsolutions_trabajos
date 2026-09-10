@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { ServiceIcon, type NombreIcono } from "@/components/ui/ServiceIcon";
 import { SocialIcon, type RedSocial } from "@/components/ui/SocialIcon";
 import { ProgressBar } from "@/components/forms/ProgressBar";
+import { CampoUbicacion } from "@/components/forms/CampoUbicacion";
 import {
   CampoArea,
   CampoTexto,
@@ -410,17 +411,14 @@ export function QuoteWizard() {
             })}
           </GrupoOpciones>
 
-          <CampoTexto
+          <CampoUbicacion
             className="mt-8"
             etiqueta="¿Dónde está?"
-            nombre="ui-ubicacion"
             valor={datos.ubicacion}
             onChange={(v) => actualizar("ubicacion", v)}
             error={errores.ubicacion}
-            ayuda="Con la población y el barrio me sobra para orientarme. No hace falta la dirección exacta."
             requerido
             placeholder="Barcelona, Eixample"
-            autoComplete="address-level2"
           />
         </Panel>
 

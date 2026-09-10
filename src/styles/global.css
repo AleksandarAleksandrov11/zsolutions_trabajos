@@ -352,9 +352,6 @@
     background-image: var(--foto);
     background-size: cover;
     background-position: var(--foto-posicion, center);
-    /* Fijo en escritorio para que la sección se sienta como una ventana.
-       En móvil `fixed` va mal en varios navegadores, así que se desactiva. */
-    background-attachment: var(--foto-anclaje, scroll);
   }
 
   .seccion-foto::after {
@@ -376,10 +373,6 @@
       color-mix(in srgb, var(--color-brand-blue-deep) 94%, transparent),
       color-mix(in srgb, var(--color-brand-blue-deep) 80%, transparent)
     );
-  }
-
-  @media (width >= 64rem) and (prefers-reduced-motion: no-preference) {
-    .seccion-foto { --foto-anclaje: fixed; }
   }
 
   /* Textura de retícula técnica, muy tenue, para romper los planos lisos. */
@@ -452,6 +445,37 @@
     .rejilla-igual { gap: 1.25rem; }
   }
 
+  /* Desplegable del autocompletado de ubicación. Igual que el detalle de
+     los carnets: colapsado con `grid-template-rows`, que es lo único que
+     anima una altura desconocida sin fijarla a mano. */
+  .desplegable-ubicacion {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-rows: 0fr;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background-color: var(--color-surface-2);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      grid-template-rows 0.22s var(--ease-brand),
+      opacity 0.18s var(--ease-brand),
+      transform 0.22s var(--ease-brand),
+      border-color 0.22s var(--ease-brand);
+  }
+
+  .desplegable-ubicacion.abierto {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: none;
+    border-color: var(--color-line);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.35);
+  }
+
   /* Comparador antes / después.
      El recorte lo hace `clip-path` sobre la cara de «antes»; el control es un
      `<input type="range">` invisible estirado sobre toda la caja, que es lo
@@ -501,6 +525,29 @@
 
   .comparador-etiqueta-antes { left: 1rem; }
   .comparador-etiqueta-despues { right: 1rem; }
+
+  /* Insignia de crédito: mucho más discreta que un párrafo debajo de la
+     imagen. El texto legal completo (licencia y autoría) va en el `title`,
+     que aparece al pasar el ratón, y en un span solo para lectores de
+     pantalla, así que sigue siendo accesible y cumple la licencia CC BY-SA
+     sin ocupar espacio visual. */
+  .comparador-credito {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    translate: -50% 0;
+    z-index: 2;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--color-n-950) 65%, transparent);
+    color: var(--color-n-0);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+    cursor: help;
+  }
 
   .comparador-linea {
     position: absolute;
@@ -648,163 +695,141 @@
     .boton-selector-secundario:hover { border-color: var(--color-fg-dim); }
   }
 
-  /* Carrusel.
-     El desplazamiento y el encaje los hace el navegador con `scroll-snap`;
-     el script solo añade botones e indicadores. Sin JavaScript sigue siendo
-     una tira deslizable con los ocho testimonios accesibles. */
-  .carrusel {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 86%;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0;
-    /* La barra de desplazamiento se oculta: los mandos y el arrastre ya
-       indican que hay más. */
-    scrollbar-width: none;
-    padding-bottom: 0.25rem;
+  /* Cinta de testimonios. Mismo mecanismo que `.cinta`: el contenido va
+     duplicado y la pista se desplaza justo un 100 %, así que el final
+     enlaza con el principio sin que se note el salto. Las tarjetas miden un
+     ancho fijo en vez de `%`, porque aquí el contenido no es un texto corto
+     sino una tarjeta completa con cita y pie. */
+  .cinta-testimonios {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
   }
 
-  .carrusel::-webkit-scrollbar {
-    display: none;
+  .cinta-testimonios-pista {
+    display: flex;
+    gap: 1.25rem;
+    padding-inline: var(--spacing-gutter);
+    animation: cinta-desplaza var(--cinta-duracion, 55s) linear infinite;
   }
 
-  @media (width >= 48rem) {
-    .carrusel { grid-auto-columns: calc(50% - 0.5rem); }
+  .cinta-testimonios:hover .cinta-testimonios-pista,
+  .cinta-testimonios:focus-within .cinta-testimonios-pista {
+    animation-play-state: paused;
   }
 
-  @media (width >= 72rem) {
-    .carrusel { grid-auto-columns: calc(33.333% - 0.667rem); }
+  /* Desplegable de filtro (galería de trabajos). No es un `<select>`
+     nativo: es un botón con la selección actual más una flecha, y un panel
+     propio debajo con la misma técnica de `grid-template-rows` que el
+     desplegable de ubicación y el detalle de los carnets. Dos de estos en
+     línea sustituyen a las dos filas de chips que había antes. */
+  .menu-filtro {
+    position: relative;
   }
 
-  .carrusel-diapo {
-    scroll-snap-align: start;
-    height: 100%;
-  }
-
-  .boton-carrusel {
+  .menu-filtro-boton {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
     border: 1px solid var(--color-line);
     border-radius: 999px;
+    font-size: var(--text-xs);
+    font-weight: 700;
     color: var(--color-fg);
+    background-color: transparent;
     cursor: pointer;
     transition:
       border-color 0.2s var(--ease-brand),
       background-color 0.2s var(--ease-brand);
   }
 
+  .menu-filtro-flecha {
+    color: var(--color-fg-dim);
+    transition: transform 0.22s var(--ease-brand);
+  }
+
+  .menu-filtro-boton[aria-expanded="true"] {
+    border-color: var(--color-brand-blue);
+    background-color: var(--color-surface-2);
+  }
+
+  .menu-filtro-boton[aria-expanded="true"] .menu-filtro-flecha {
+    color: var(--color-brand-blue);
+    transform: rotate(180deg);
+  }
+
   @media (hover: hover) {
-    .boton-carrusel:hover {
-      border-color: var(--color-brand-blue);
-      background-color: color-mix(in srgb, var(--color-fg) 6%, transparent);
+    .menu-filtro-boton:hover {
+      border-color: var(--color-fg-dim);
     }
   }
 
-  /* Un solo botón para pausar y reanudar: se enseña el icono que toca. */
-  .boton-carrusel .icono-play { display: none; }
-  .boton-carrusel[aria-pressed="false"] .icono-pausa { display: none; }
-  .boton-carrusel[aria-pressed="false"] .icono-play { display: block; }
-
-  /* Indicadores. El activo es el acento naranja; sobre claro pasa a azul,
-     porque el naranja sobre #F4F4F5 se queda en 2,4:1. */
-  .punto-carrusel {
-    /* 44 px de lado: ocho caben en 352 px, así que entran en la pantalla más
-       estrecha que se contempla (360 px) sin separación entre ellos. */
-    width: 2.75rem;
-    height: 2.75rem;
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-    position: relative;
-  }
-
-  .punto-carrusel::after {
-    content: "";
+  .menu-filtro-panel {
     position: absolute;
-    inset-inline: 0.5rem;
-    top: 50%;
-    height: 3px;
-    border-radius: 3px;
-    translate: 0 -50%;
-    background-color: var(--color-line);
-    transition: background-color 0.25s var(--ease-brand);
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-rows: 0fr;
+    min-width: 12rem;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background-color: var(--color-surface-2);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      grid-template-rows 0.22s var(--ease-brand),
+      opacity 0.18s var(--ease-brand),
+      transform 0.22s var(--ease-brand),
+      border-color 0.22s var(--ease-brand);
   }
 
-  .punto-carrusel[aria-current="true"]::after {
-    background-color: var(--color-brand-orange);
+  .menu-filtro-panel.abierto {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: none;
+    border-color: var(--color-line);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.35);
   }
 
-  .seccion-clara .punto-carrusel[aria-current="true"]::after {
-    background-color: var(--color-brand-blue);
+  .menu-filtro-panel > ul {
+    overflow: hidden;
+    padding: 0.4rem;
+    list-style: none;
   }
 
-  /* Chip de filtro. El activo va en azul relleno, que es el papel del azul
-     en este sistema: superficie, no color de texto sobre oscuro. */
-  .chip-filtro {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    padding-inline: 0.9rem;
-    border: 1px solid var(--color-line);
-    border-radius: 999px;
-    font-size: var(--text-xs);
-    font-weight: 700;
+  .menu-filtro-panel [role="option"] {
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: var(--text-sm);
+    font-weight: 600;
     color: var(--color-fg-muted);
-    background-color: transparent;
+    white-space: nowrap;
     cursor: pointer;
     transition:
-      background-color 0.2s var(--ease-brand),
-      border-color 0.2s var(--ease-brand),
-      color 0.2s var(--ease-brand);
+      background-color 0.15s var(--ease-brand),
+      color 0.15s var(--ease-brand);
   }
 
-  .chip-filtro[aria-pressed="true"] {
-    background-color: var(--color-brand-blue);
-    border-color: var(--color-brand-blue);
-    color: var(--color-n-0);
+  .menu-filtro-panel [role="option"][aria-selected="true"] {
+    color: var(--color-brand-blue);
+    background-color: color-mix(in srgb, var(--color-brand-blue) 12%, transparent);
   }
 
   @media (hover: hover) {
-    .chip-filtro:hover {
-      border-color: var(--color-fg-dim);
+    .menu-filtro-panel [role="option"]:hover {
+      background-color: var(--color-surface);
       color: var(--color-fg);
     }
-
-    .chip-filtro[aria-pressed="true"]:hover {
-      background-color: var(--color-brand-blue-hover);
-      border-color: var(--color-brand-blue-hover);
-      color: var(--color-n-0);
-    }
   }
 
-  /* Galería en mampostería.
-     `columns` reparte las tarjetas por altura real sin JavaScript, que es lo
-     que hace que un mosaico se vea mosaico. `break-inside: avoid` impide que
-     una tarjeta se parta entre dos columnas. */
-  .galeria-trabajos {
-    columns: 1;
-    column-gap: 1rem;
-  }
-
-  @media (width >= 40rem) {
-    .galeria-trabajos { columns: 2; }
-  }
-
-  @media (width >= 64rem) {
-    .galeria-trabajos { columns: 3; }
-  }
-
+  /* Galería de trabajos.
+     Rejilla normal con `auto-rows-fr` (vía `.rejilla-igual`): todas las
+     tarjetas del mismo alto y las filas alineadas. Antes era mampostería con
+     `columns`, y ahí cada tarjeta medía según lo largo que fuese su pie: la
+     rejilla quedaba escalonada y las tarjetas, desiguales. */
   .galeria-item {
-    break-inside: avoid;
-    margin-bottom: 1rem;
-    /* La transición de entrada y salida al filtrar. La posición la recoloca
-       el propio `columns`, así que aquí solo hay que suavizar la aparición. */
     transition:
       opacity 0.28s var(--ease-brand),
       transform 0.28s var(--ease-brand);
@@ -931,6 +956,14 @@
     background-color: var(--color-brand-blue);
     color: var(--color-n-0);
     transition: background-color 0.25s var(--ease-brand);
+  }
+
+  /* Variante naranja: mismo chip, para dar color alterno a listas largas
+     (por ejemplo, el muro de certificaciones) sin salirse de las dos tintas
+     de marca. Texto oscuro, porque el blanco sobre naranja da 2,6:1. */
+  .chip-icono-naranja {
+    background-color: var(--color-brand-orange);
+    color: var(--color-n-950);
   }
 
   .prosa p {
@@ -1186,6 +1219,7 @@
   .cortina { display: none; }
   .js .contenido-entra { animation: none; }
   .cinta-pista { animation: none; }
+  .cinta-testimonios-pista { animation: none; }
 
   /* Con movimiento reducido el contenido no se oculta ni espera al
      observador: aparece ya visible y no hay nada que revelar. */

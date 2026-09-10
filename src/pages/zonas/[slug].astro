@@ -1,5 +1,5 @@
 ---
-import { ArrowUpRight, Check, MapPin } from "lucide-react";
+import { ArrowUpRight, MapPin } from "lucide-react";
 import Base from "@/layouts/Base.astro";
 import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
@@ -55,8 +55,14 @@ const municipios = agrupacion.municipios
   .map((slug) => zonas.find((z) => z.slug === slug))
   .filter((z): z is (typeof zonas)[number] => Boolean(z));
 
-const otras = agrupaciones.filter((a) => a.publicada && a.slug !== agrupacion.slug);
 const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
+
+/* Numeración secuencial de las secciones numeradas de la página. Como
+   algunas son condicionales (los distritos solo salen en Barcelona ciudad,
+   el listado de municipios solo si hay más de uno), se lleva con un
+   contador en vez de escribir la posición a mano en cada `numero`. */
+let contadorSeccion = 0;
+const numero = () => String(++contadorSeccion).padStart(2, "0");
 ---
 
 <Base meta={meta} schema={[schemaFaq(preguntas), schemaMigas(migas)]}>
@@ -97,12 +103,15 @@ const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
   </header>
 
   {/* Cuerpo editorial: por qué el trabajo es distinto aquí */}
-  <section class="pb-section" aria-labelledby="titulo-contexto">
+  <section class="py-section" aria-labelledby="titulo-contexto">
     <div class="container-brand">
-      <Reveal>
-        <h2 id="titulo-contexto" class="sr-only">
-          Cómo es trabajar en {agrupacion.nombre}
-        </h2>
+      <SectionHeading
+        numero={numero()}
+        eyebrow="La zona"
+        tituloId="titulo-contexto"
+        titulo={`Cómo es trabajar en ${agrupacion.nombre}`}
+      />
+      <Reveal class="mt-8">
         <div class="prosa max-w-2xl text-lg">
           {agrupacion.cuerpo.map((parrafo) => <p>{parrafo}</p>)}
         </div>
@@ -112,10 +121,10 @@ const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
 
   {
     agrupacion.distritos ? (
-      <section class="seccion-alterna py-section" aria-labelledby="titulo-distritos">
+      <section class="seccion-clara py-section" aria-labelledby="titulo-distritos">
         <div class="container-brand">
           <SectionHeading
-            numero="01"
+            numero={numero()}
             eyebrow="Cobertura"
             tituloId="titulo-distritos"
             titulo="Los diez distritos"
@@ -134,35 +143,6 @@ const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
     ) : null
   }
 
-  {/* Casos típicos de la zona */}
-  <section class="seccion-clara py-section" aria-labelledby="titulo-casos">
-    <div class="container-brand">
-      <SectionHeading
-        numero={agrupacion.distritos ? "02" : "01"}
-        eyebrow="Lo que más sale aquí"
-        tituloId="titulo-casos"
-        titulo="Los casos que se repiten en la zona"
-        descripcion="No son encargos concretos: son el tipo de trabajo que aparece una y otra vez por cómo está construida la zona."
-      />
-
-      <RevealGroup as="ul" class="mt-12 grid gap-4 md:grid-cols-2" stagger={0.05}>
-        {
-          agrupacion.casos.map((caso) => (
-            <RevealItem as="li" class="tarjeta p-6">
-              <h3 class="flex items-start gap-3 font-sans text-lg font-bold">
-                <span class="chip-icono mt-0.5 h-6 w-6" aria-hidden="true">
-                  <Check className="h-3.5 w-3.5" />
-                </span>
-                {caso.titulo}
-              </h3>
-              <p class="mt-2 pl-9 text-sm text-fg-muted">{caso.detalle}</p>
-            </RevealItem>
-          ))
-        }
-      </RevealGroup>
-    </div>
-  </section>
-
   {/* Municipio a municipio: cada uno con lo que lo caracteriza, que ya está
       escrito en `zonas.ts` y aquí es donde de verdad se lee. */}
   {
@@ -170,7 +150,7 @@ const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
       <section class="py-section" aria-labelledby="titulo-municipios">
         <div class="container-brand">
           <SectionHeading
-            numero={agrupacion.distritos ? "03" : "02"}
+            numero={numero()}
             eyebrow="Municipio a municipio"
             tituloId="titulo-municipios"
             titulo={`Qué tiene de particular cada municipio`}
@@ -195,7 +175,7 @@ const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
   <section class="py-section" aria-labelledby="titulo-servicios-zona">
     <div class="container-brand">
       <SectionHeading
-        numero={agrupacion.distritos ? "04" : "03"}
+        numero={numero()}
         eyebrow="Servicios"
         tituloId="titulo-servicios-zona"
         titulo={`Qué se puede resolver en ${agrupacion.nombre}`}
@@ -227,39 +207,9 @@ const preguntas = agrupacion.faq.map((f) => ({ p: f.p, r: f.r }));
 
   <FAQ
     preguntas={preguntas}
-    numero={agrupacion.distritos ? "05" : "04"}
+    numero={numero()}
     titulo={`Preguntas sobre ${agrupacion.nombre}`}
   />
-
-  {
-    otras.length > 0 ? (
-      <section class="pb-section" aria-labelledby="titulo-otras-zonas">
-        <div class="container-brand">
-          <h2 id="titulo-otras-zonas" class="text-eyebrow hairline-b pb-3 text-fg-dim">
-            Otras zonas
-          </h2>
-          <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {otras.map((o) => (
-              <li>
-                <a href={`/zonas/${o.slug}`} class="tarjeta block p-5">
-                  <span class="block text-lg font-bold">{o.nombre}</span>
-                  <span class="mt-1.5 block text-sm text-fg-muted">{o.entradilla}</span>
-                </a>
-              </li>
-            ))}
-            <li>
-              <a href="/zonas" class="tarjeta block p-5">
-                <span class="block text-lg font-bold">Todas las zonas</span>
-                <span class="mt-1.5 block text-sm text-fg-muted">
-                  El mapa y los {zonas.length} municipios donde trabajo.
-                </span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-    ) : null
-  }
 
   <CTASection titulo={`¿Necesitas un instalador en ${agrupacion.nombre}?`} />
 </Base>

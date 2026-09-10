@@ -1,5 +1,5 @@
 ---
-import { ChevronLeft, ChevronRight, Pause, Play, Quote } from "lucide-react";
+import { Quote } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/ui/Reveal.astro";
 import { testimonios } from "@/content/testimonios";
@@ -9,19 +9,17 @@ type Props = { numero?: string };
 const { numero = "05" } = Astro.props;
 
 /*
- * Carrusel de testimonios.
+ * Cinta de testimonios.
  *
- * El desplazamiento lo hace `scroll-snap`, no JavaScript: arrastrar con el
- * dedo, girar la rueda y tabular funcionan solos, y sin scripts la sección
- * sigue siendo una lista deslizable con todo el contenido a la vista.
- *
- * El script solo añade lo que el navegador no da: los botones de anterior y
- * siguiente, los indicadores, y un avance automático que se para al pasar por
- * encima, al enfocar dentro, al arrastrar y con `prefers-reduced-motion`.
+ * Se mueve sola, igual que la cinta de confianza del héroe: mismo mecanismo
+ * de CSS (contenido duplicado, la pista se desplaza un 100 % y vuelve a
+ * empezar sin que se note el salto), sin botones de pausa ni flechas. Se
+ * para al pasar el ratón por encima o al enfocar dentro con el teclado, y
+ * con `prefers-reduced-motion` se queda quieta.
  *
  * Es una de las dos secciones claras de la web: corta el bloque oscuro
- * continuo justo donde el contenido cambia de registro, de lo que cuenta Alex
- * a lo que cuentan sus clientes.
+ * continuo justo donde el contenido cambia de registro, de lo que cuenta
+ * Alex a lo que cuentan sus clientes.
  *
  * ⚠️ Los textos son de ejemplo (ver `src/content/testimonios.ts`). Por eso NO
  * se emite `Review` ni `AggregateRating` en el JSON-LD de ninguna página.
@@ -35,213 +33,48 @@ const inicial = (autor: string) => autor.trim().charAt(0).toUpperCase();
   testimonios.length > 0 ? (
     <section class="seccion-clara py-section" aria-labelledby="titulo-testimonios">
       <div class="container-brand">
-        <div class="flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading
-            numero={numero}
-            eyebrow={secciones.testimonios.eyebrow}
-            tituloId="titulo-testimonios"
-            titulo={secciones.testimonios.titulo}
-            class="max-w-xl"
-          />
+        <SectionHeading
+          numero={numero}
+          eyebrow={secciones.testimonios.eyebrow}
+          tituloId="titulo-testimonios"
+          titulo={secciones.testimonios.titulo}
+          class="max-w-xl"
+        />
+      </div>
 
-          <div class="flex items-center gap-2" data-carrusel-mandos>
-            <button
-              type="button"
-              class="boton-carrusel"
-              data-carrusel-auto
-              aria-label="Pausar el avance automático"
-              aria-pressed="true"
-            >
-              <Pause className="h-4 w-4 icono-pausa" aria-hidden="true" />
-              <Play className="h-4 w-4 icono-play" aria-hidden="true" />
-            </button>
-            <button type="button" class="boton-carrusel" data-carrusel-anterior aria-label="Testimonio anterior">
-              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <button type="button" class="boton-carrusel" data-carrusel-siguiente aria-label="Testimonio siguiente">
-              <ChevronRight className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+      <Reveal class="mt-12">
+        <div
+          class="cinta-testimonios"
+          style="--cinta-duracion: 55s"
+          role="group"
+          aria-label="Testimonios de clientes"
+        >
+          {[0, 1].map((copia) => (
+            <div class="cinta-testimonios-pista" aria-hidden={copia === 1 ? "true" : undefined}>
+              {testimonios.map((t) => (
+                <article class="tarjeta flex w-[19rem] shrink-0 flex-col p-6 sm:w-[21rem] sm:p-7">
+                  <div class="flex items-center gap-3">
+                    <span class="chip-icono h-11 w-11 font-display text-lg" aria-hidden="true">
+                      {inicial(t.autor)}
+                    </span>
+                    <span>
+                      <span class="block text-sm font-bold">{t.autor}</span>
+                      <span class="block text-xs text-fg-dim">{t.lugar}</span>
+                    </span>
+                  </div>
 
-        <Reveal class="mt-12">
-          <div
-            class="carrusel"
-            data-carrusel
-            role="group"
-            aria-roledescription="carrusel"
-            aria-label="Testimonios de clientes"
-            tabindex="0"
-          >
-            {testimonios.map((t, i) => (
-              <article
-                class="carrusel-diapo tarjeta flex flex-col p-6 sm:p-7"
-                role="group"
-                aria-roledescription="testimonio"
-                aria-label={`${i + 1} de ${testimonios.length}`}
-              >
-                <div class="flex items-center gap-3">
-                  <span class="chip-icono h-11 w-11 font-display text-lg" aria-hidden="true">
-                    {inicial(t.autor)}
-                  </span>
-                  <span>
-                    <span class="block text-sm font-bold">{t.autor}</span>
-                    <span class="block text-xs text-fg-dim">{t.lugar}</span>
-                  </span>
-                </div>
+                  <Quote className="mt-6 h-5 w-5 shrink-0 text-brand-blue" aria-hidden="true" />
+                  <blockquote class="mt-3 flex-1 text-fg-muted">{t.texto}</blockquote>
 
-                <Quote className="mt-6 h-5 w-5 shrink-0 text-brand-blue" aria-hidden="true" />
-                <blockquote class="mt-3 flex-1 text-fg-muted">{t.texto}</blockquote>
-
-                <footer class="hairline-t mt-6 pt-4">
-                  <p class="text-eyebrow text-fg-dim">{t.trabajo}</p>
-                </footer>
-              </article>
-            ))}
-          </div>
-        </Reveal>
-
-        <div class="mt-6 flex flex-wrap items-center justify-center" data-carrusel-puntos>
-          {testimonios.map((t, i) => (
-            <button
-              type="button"
-              class="punto-carrusel"
-              data-indice={i}
-              aria-label={`Ir al testimonio ${i + 1}: ${t.autor}`}
-              aria-current={i === 0 ? "true" : "false"}
-            />
+                  <footer class="hairline-t mt-6 pt-4">
+                    <p class="text-eyebrow text-fg-dim">{t.trabajo}</p>
+                  </footer>
+                </article>
+              ))}
+            </div>
           ))}
         </div>
-
-        <p class="sr-only" role="status" data-carrusel-estado />
-      </div>
+      </Reveal>
     </section>
   ) : null
 }
-
-<script>
-  const carrusel = document.querySelector<HTMLElement>("[data-carrusel]");
-  const mandos = document.querySelector<HTMLElement>("[data-carrusel-mandos]");
-  const puntos = document.querySelector<HTMLElement>("[data-carrusel-puntos]");
-  const estado = document.querySelector<HTMLElement>("[data-carrusel-estado]");
-
-  if (carrusel && mandos && puntos) {
-    const diapos = [...carrusel.querySelectorAll<HTMLElement>(".carrusel-diapo")];
-    const botonAuto = mandos.querySelector<HTMLButtonElement>("[data-carrusel-auto]")!;
-    const menosMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    let actual = 0;
-    let temporizador: number | undefined;
-    /* Con movimiento reducido no hay avance automático, ni al empezar ni al
-       volver de una pausa. El botón lo refleja. */
-    let automatico = !menosMovimiento;
-
-    const irA = (i: number, suave = true) => {
-      const destino = diapos[Math.max(0, Math.min(i, diapos.length - 1))];
-      carrusel.scrollTo({
-        left: destino.offsetLeft - carrusel.offsetLeft,
-        behavior: suave && !menosMovimiento ? "smooth" : "auto",
-      });
-    };
-
-    const pintar = () => {
-      for (const [i, p] of [...puntos.children].entries()) {
-        p.setAttribute("aria-current", String(i === actual));
-      }
-      if (estado) estado.textContent = `Testimonio ${actual + 1} de ${diapos.length}`;
-    };
-
-    /* Cuál está a la vista se deduce del desplazamiento real, no de una
-       cuenta nuestra: así arrastrar con el dedo también mueve los
-       indicadores, y no hay dos fuentes de verdad que se contradigan. */
-    const recalcular = () => {
-      const x = carrusel.scrollLeft;
-      let cerca = 0;
-      let minimo = Infinity;
-      for (const [i, d] of diapos.entries()) {
-        const distancia = Math.abs(d.offsetLeft - carrusel.offsetLeft - x);
-        if (distancia < minimo) {
-          minimo = distancia;
-          cerca = i;
-        }
-      }
-      if (cerca !== actual) {
-        actual = cerca;
-        pintar();
-      }
-    };
-
-    let pendiente = false;
-    carrusel.addEventListener(
-      "scroll",
-      () => {
-        if (pendiente) return;
-        pendiente = true;
-        requestAnimationFrame(() => {
-          pendiente = false;
-          recalcular();
-        });
-      },
-      { passive: true },
-    );
-
-    const arrancar = () => {
-      if (!automatico || temporizador) return;
-      temporizador = window.setInterval(() => irA((actual + 1) % diapos.length), 6000);
-    };
-
-    const parar = () => {
-      if (!temporizador) return;
-      window.clearInterval(temporizador);
-      temporizador = undefined;
-    };
-
-    botonAuto.setAttribute("aria-pressed", String(automatico));
-    botonAuto.setAttribute(
-      "aria-label",
-      automatico ? "Pausar el avance automático" : "Reanudar el avance automático",
-    );
-    botonAuto.addEventListener("click", () => {
-      automatico = !automatico;
-      botonAuto.setAttribute("aria-pressed", String(automatico));
-      botonAuto.setAttribute(
-        "aria-label",
-        automatico ? "Pausar el avance automático" : "Reanudar el avance automático",
-      );
-      automatico ? arrancar() : parar();
-    });
-
-    mandos
-      .querySelector("[data-carrusel-anterior]")!
-      .addEventListener("click", () => irA(actual - 1 < 0 ? diapos.length - 1 : actual - 1));
-    mandos
-      .querySelector("[data-carrusel-siguiente]")!
-      .addEventListener("click", () => irA((actual + 1) % diapos.length));
-
-    puntos.addEventListener("click", (e) => {
-      const boton = (e.target as Element).closest<HTMLElement>("[data-indice]");
-      if (boton) irA(Number(boton.dataset.indice));
-    });
-
-    carrusel.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight") { e.preventDefault(); irA((actual + 1) % diapos.length); }
-      else if (e.key === "ArrowLeft") { e.preventDefault(); irA(actual - 1 < 0 ? diapos.length - 1 : actual - 1); }
-    });
-
-    /* Se para en cuanto alguien está mirando o tocando, y se reanuda al salir. */
-    for (const ev of ["pointerenter", "focusin", "pointerdown"] as const) {
-      carrusel.addEventListener(ev, parar);
-      mandos.addEventListener(ev, parar);
-    }
-    for (const ev of ["pointerleave", "focusout"] as const) {
-      carrusel.addEventListener(ev, arrancar);
-      mandos.addEventListener(ev, arrancar);
-    }
-    document.addEventListener("visibilitychange", () =>
-      document.hidden ? parar() : arrancar(),
-    );
-
-    pintar();
-    arrancar();
-  }
-</script>
