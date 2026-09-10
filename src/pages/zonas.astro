@@ -56,15 +56,18 @@ const meta = crearMetadata({
     </div>
   </header>
 
-  <section class="pb-section" aria-label="Mapa y listado de zonas">
+  <section class="py-section" aria-labelledby="titulo-mapa-zonas">
     <div class="container-brand">
-      <div class="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:items-start lg:gap-16">
+      <SectionHeading
+        numero="01"
+        eyebrow="Cobertura"
+        tituloId="titulo-mapa-zonas"
+        titulo="El mapa y el listado completo"
+      />
+
+      <div class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:items-start lg:gap-16">
         <Reveal class="tarjeta p-5 sm:p-7 lg:sticky lg:top-28">
           <MapaZonas />
-          <p class="mt-4 text-xs text-fg-dim">
-            Contorno real de Cataluña. Cada punto está en las coordenadas de su municipio
-            y lleva a su zona.
-          </p>
         </Reveal>
 
         <RevealGroup class="flex flex-col gap-10">
@@ -109,7 +112,7 @@ const meta = crearMetadata({
   <section class="seccion-alterna py-section" aria-labelledby="titulo-agrupaciones">
     <div class="container-brand">
       <SectionHeading
-        numero="01"
+        numero="02"
         eyebrow="Por zona"
         tituloId="titulo-agrupaciones"
         titulo="Las zonas con más trabajo, en detalle"
