@@ -172,6 +172,48 @@ export const fotos = {
       ],
     },
   },
+  "fondo-bloques": {
+    src: "/images/fondo-bloques.jpg",
+    ancho: 1600,
+    alto: 900,
+    blur:
+      "data:image/webp;base64,UklGRjQAAABXRUJQVlA4ICgAAACwAQCdASoQAAkABABoJaQAAli77QYAAPfbTjbz80IDZRXA9pkAAAAA",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/fondo-bloques-420.avif" },
+        { ancho: 720, src: "/images/fondo-bloques-720.avif" },
+        { ancho: 1080, src: "/images/fondo-bloques-1080.avif" },
+        { ancho: 1600, src: "/images/fondo-bloques-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/fondo-bloques-420.webp" },
+        { ancho: 720, src: "/images/fondo-bloques-720.webp" },
+        { ancho: 1080, src: "/images/fondo-bloques-1080.webp" },
+        { ancho: 1600, src: "/images/fondo-bloques-1600.webp" },
+      ],
+    },
+  },
+  "fondo-fachadas": {
+    src: "/images/fondo-fachadas.jpg",
+    ancho: 1600,
+    alto: 900,
+    blur:
+      "data:image/webp;base64,UklGRjIAAABXRUJQVlA4ICYAAACQAQCdASoQAAkABABoJZwAAuZoP1gA/uGl1HroVNFQYMzb6aCgAA==",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/fondo-fachadas-420.avif" },
+        { ancho: 720, src: "/images/fondo-fachadas-720.avif" },
+        { ancho: 1080, src: "/images/fondo-fachadas-1080.avif" },
+        { ancho: 1600, src: "/images/fondo-fachadas-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/fondo-fachadas-420.webp" },
+        { ancho: 720, src: "/images/fondo-fachadas-720.webp" },
+        { ancho: 1080, src: "/images/fondo-fachadas-1080.webp" },
+        { ancho: 1600, src: "/images/fondo-fachadas-1600.webp" },
+      ],
+    },
+  },
   "obra-aerotermia": {
     src: "/images/obra-aerotermia.jpg",
     ancho: 1600,
@@ -400,6 +442,132 @@ export const fotos = {
         { ancho: 720, src: "/images/obra-verticales-720.webp" },
         { ancho: 1080, src: "/images/obra-verticales-1080.webp" },
         { ancho: 1600, src: "/images/obra-verticales-1600.webp" },
+      ],
+    },
+  },
+  "sector-comunidad": {
+    src: "/images/sector-comunidad.jpg",
+    ancho: 1600,
+    alto: 1067,
+    blur:
+      "data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAACwAQCdASoQAAsABABoJYgCdAEMHOAAAPh+jbsVr9f3BQrFEx6NMibsDAAAAA==",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/sector-comunidad-420.avif" },
+        { ancho: 720, src: "/images/sector-comunidad-720.avif" },
+        { ancho: 1080, src: "/images/sector-comunidad-1080.avif" },
+        { ancho: 1600, src: "/images/sector-comunidad-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/sector-comunidad-420.webp" },
+        { ancho: 720, src: "/images/sector-comunidad-720.webp" },
+        { ancho: 1080, src: "/images/sector-comunidad-1080.webp" },
+        { ancho: 1600, src: "/images/sector-comunidad-1600.webp" },
+      ],
+    },
+  },
+  "sector-nave": {
+    src: "/images/sector-nave.jpg",
+    ancho: 1600,
+    alto: 1067,
+    blur:
+      "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACQAQCdASoQAAsABABoJZwAAbnXzIAA/vSf2dXtTbysUYECufi5rpwuxN6rHetxjSkcYDZQAfpMUoDwAAA=",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/sector-nave-420.avif" },
+        { ancho: 720, src: "/images/sector-nave-720.avif" },
+        { ancho: 1080, src: "/images/sector-nave-1080.avif" },
+        { ancho: 1600, src: "/images/sector-nave-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/sector-nave-420.webp" },
+        { ancho: 720, src: "/images/sector-nave-720.webp" },
+        { ancho: 1080, src: "/images/sector-nave-1080.webp" },
+        { ancho: 1600, src: "/images/sector-nave-1600.webp" },
+      ],
+    },
+  },
+  "sector-oficina": {
+    src: "/images/sector-oficina.jpg",
+    ancho: 1600,
+    alto: 1067,
+    blur:
+      "data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAADwAQCdASoQAAsABABoJZwAAt0JhyQbYYAA/vHbDfPEZ/q180ijW3HwpfGJIEAA",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/sector-oficina-420.avif" },
+        { ancho: 720, src: "/images/sector-oficina-720.avif" },
+        { ancho: 1080, src: "/images/sector-oficina-1080.avif" },
+        { ancho: 1600, src: "/images/sector-oficina-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/sector-oficina-420.webp" },
+        { ancho: 720, src: "/images/sector-oficina-720.webp" },
+        { ancho: 1080, src: "/images/sector-oficina-1080.webp" },
+        { ancho: 1600, src: "/images/sector-oficina-1600.webp" },
+      ],
+    },
+  },
+  "sector-restauracion": {
+    src: "/images/sector-restauracion.jpg",
+    ancho: 1600,
+    alto: 1067,
+    blur:
+      "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAADQAQCdASoQAAsABABoJaAC7AEOw4YOAAD+5pdSRp89WyJd8WWf7byKzAm3Ee4tTsAAAA==",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/sector-restauracion-420.avif" },
+        { ancho: 720, src: "/images/sector-restauracion-720.avif" },
+        { ancho: 1080, src: "/images/sector-restauracion-1080.avif" },
+        { ancho: 1600, src: "/images/sector-restauracion-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/sector-restauracion-420.webp" },
+        { ancho: 720, src: "/images/sector-restauracion-720.webp" },
+        { ancho: 1080, src: "/images/sector-restauracion-1080.webp" },
+        { ancho: 1600, src: "/images/sector-restauracion-1600.webp" },
+      ],
+    },
+  },
+  "sector-vivienda": {
+    src: "/images/sector-vivienda.jpg",
+    ancho: 1600,
+    alto: 1067,
+    blur:
+      "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAAAwAgCdASoQAAsABABoJYgCsH8AFBJLKvABaAD+7gu2XSoGI0DdnVvO1oM8rw3Y65UUqdD2W/5wZ8tYAAA=",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/sector-vivienda-420.avif" },
+        { ancho: 720, src: "/images/sector-vivienda-720.avif" },
+        { ancho: 1080, src: "/images/sector-vivienda-1080.avif" },
+        { ancho: 1600, src: "/images/sector-vivienda-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/sector-vivienda-420.webp" },
+        { ancho: 720, src: "/images/sector-vivienda-720.webp" },
+        { ancho: 1080, src: "/images/sector-vivienda-1080.webp" },
+        { ancho: 1600, src: "/images/sector-vivienda-1600.webp" },
+      ],
+    },
+  },
+  "textura-hormigon": {
+    src: "/images/textura-hormigon.jpg",
+    ancho: 1600,
+    alto: 900,
+    blur:
+      "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAABwAQCdASoQAAkABABoJZQCw7F1AAD+1tn7J+qP6kdM+JAA",
+    variantes: {
+      avif: [
+        { ancho: 420, src: "/images/textura-hormigon-420.avif" },
+        { ancho: 720, src: "/images/textura-hormigon-720.avif" },
+        { ancho: 1080, src: "/images/textura-hormigon-1080.avif" },
+        { ancho: 1600, src: "/images/textura-hormigon-1600.avif" },
+      ],
+      webp: [
+        { ancho: 420, src: "/images/textura-hormigon-420.webp" },
+        { ancho: 720, src: "/images/textura-hormigon-720.webp" },
+        { ancho: 1080, src: "/images/textura-hormigon-1080.webp" },
+        { ancho: 1600, src: "/images/textura-hormigon-1600.webp" },
       ],
     },
   },

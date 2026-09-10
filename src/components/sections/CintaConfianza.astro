@@ -1,0 +1,53 @@
+---
+import { cintaConfianza, marcasHabituales } from "@/content/confianza";
+
+type Props = {
+  /** `frases` para la cinta de argumentos, `marcas` para la de fabricantes. */
+  tipo?: "frases" | "marcas";
+  class?: string;
+};
+
+const { tipo = "frases", class: clase } = Astro.props;
+
+const elementos = tipo === "frases" ? [...cintaConfianza] : [...marcasHabituales];
+const duracion = tipo === "frases" ? "48s" : "38s";
+
+/*
+ * Cinta en movimiento.
+ *
+ * El contenido va DOS veces en el marcado y la pista se desplaza justo un
+ * 100 %: al terminar vuelve al principio y el salto no se ve. La segunda
+ * copia es decorativa y va `aria-hidden`, así que un lector de pantalla lee
+ * la lista una sola vez.
+ *
+ * Se para al pasar por encima y al enfocar dentro, y con
+ * `prefers-reduced-motion` no se mueve: queda como una tira estática.
+ */
+---
+
+<div
+  class:list={["cinta py-4", clase]}
+  style={`--cinta-duracion: ${duracion}`}
+  role="group"
+  aria-label={tipo === "frases" ? "Cómo se trabaja" : "Marcas que se instalan y mantienen"}
+>
+  {
+    [0, 1].map((copia) => (
+      <ul class="cinta-pista" aria-hidden={copia === 1 ? "true" : undefined}>
+        {elementos.map((texto) => (
+          <li
+            class:list={[
+              "flex shrink-0 items-center gap-3 whitespace-nowrap",
+              tipo === "frases"
+                ? "text-eyebrow text-fg-muted"
+                : "font-display text-xl text-fg-dim",
+            ]}
+          >
+            {texto}
+            <span class="h-1 w-1 shrink-0 rounded-full bg-brand-orange" aria-hidden="true"></span>
+          </li>
+        ))}
+      </ul>
+    ))
+  }
+</div>

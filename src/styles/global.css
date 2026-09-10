@@ -238,6 +238,11 @@
   border-bottom: 1px solid var(--color-line);
 }
 
+@utility hairline-y {
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+}
+
 /* ============================================================
    Componentes recurrentes
    ============================================================ */
@@ -325,6 +330,126 @@
      y el naranja se queda para el titular de la sección. */
   .seccion-azul .tarjeta .num-seccion {
     color: var(--color-n-0);
+  }
+
+  /* ------------------------------------------------------------
+     Secciones con fondo de imagen y textura
+     ------------------------------------------------------------ */
+
+  /* Sección con foto de fondo. La foto va en `--foto` y encima cae un velo
+     que garantiza el contraste del texto pase lo que pase con la imagen. */
+  .seccion-foto {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--color-n-950);
+  }
+
+  .seccion-foto::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: var(--foto);
+    background-size: cover;
+    background-position: var(--foto-posicion, center);
+    /* Fijo en escritorio para que la sección se sienta como una ventana.
+       En móvil `fixed` va mal en varios navegadores, así que se desactiva. */
+    background-attachment: var(--foto-anclaje, scroll);
+  }
+
+  .seccion-foto::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-n-950) 92%, transparent),
+      color-mix(in srgb, var(--color-n-950) 82%, transparent)
+    );
+  }
+
+  /* Variante de marca: el mismo fondo, teñido de azul corporativo. */
+  .seccion-foto-azul::after {
+    background: linear-gradient(
+      to bottom right,
+      color-mix(in srgb, var(--color-brand-blue-deep) 94%, transparent),
+      color-mix(in srgb, var(--color-brand-blue-deep) 80%, transparent)
+    );
+  }
+
+  @media (width >= 64rem) and (prefers-reduced-motion: no-preference) {
+    .seccion-foto { --foto-anclaje: fixed; }
+  }
+
+  /* Textura de retícula técnica, muy tenue, para romper los planos lisos. */
+  .textura-plano {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .textura-plano::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, var(--color-fg) 3%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--color-fg) 3%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  }
+
+  /* ------------------------------------------------------------
+     Cinta en movimiento
+     ------------------------------------------------------------ */
+
+  /* El contenido se duplica en el marcado y la cinta se desplaza justo la
+     mitad: al terminar vuelve al principio y el salto no se ve. */
+  .cinta {
+    display: flex;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 6rem, #000 calc(100% - 6rem), transparent);
+    user-select: none;
+  }
+
+  .cinta-pista {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--cinta-hueco, 3rem);
+    padding-right: var(--cinta-hueco, 3rem);
+    min-width: 100%;
+    animation: cinta-desplaza var(--cinta-duracion, 40s) linear infinite;
+  }
+
+  .cinta:hover .cinta-pista,
+  .cinta:focus-within .cinta-pista {
+    animation-play-state: paused;
+  }
+
+  @keyframes cinta-desplaza {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+
+  /* ------------------------------------------------------------
+     Tarjetas de tamaño igual
+     ------------------------------------------------------------ */
+
+  /* `auto-rows-fr` iguala la altura de todas las filas, y el `h-full` del
+     hijo hace que la tarjeta ocupe la celda entera. Sin las dos cosas, una
+     tarjeta con el pie más corto queda más baja que su vecina. */
+  .rejilla-igual {
+    display: grid;
+    grid-auto-rows: 1fr;
+    gap: 1rem;
+  }
+
+  .rejilla-igual > * { height: 100%; }
+
+  @media (width >= 40rem) {
+    .rejilla-igual { gap: 1.25rem; }
   }
 
   /* Comparador antes / después.
@@ -949,6 +1074,76 @@
 }
 
 /* ============================================================
+   Cortina de entrada
+   ------------------------------------------------------------
+   Se pinta encima de todo mientras carga la primera vista y se retira sola.
+   Empieza en el CSS, no en el JavaScript: si el script tardase, la cortina
+   se va igual al terminar su propia animación. Y si el visitante prefiere no
+   ver movimiento, no llega a aparecer.
+   ============================================================ */
+
+.cortina {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  background-color: var(--color-n-950);
+  animation: cortina-sale 0.5s var(--ease-brand) 0.75s both;
+}
+
+.cortina-marca {
+  width: min(15rem, 46vw);
+  animation: cortina-marca-entra 0.65s var(--ease-brand) both;
+}
+
+/* El rayo de la Z se dibuja solo, y después se rellena. */
+.cortina-rayo {
+  stroke-dasharray: 96;
+  stroke-dashoffset: 96;
+  animation:
+    cortina-traza 0.7s var(--ease-brand) 0.15s forwards,
+    cortina-rellena 0.35s var(--ease-brand) 0.7s forwards;
+}
+
+.cortina-linea {
+  transform-origin: center;
+  scale: 0 1;
+  animation: cortina-linea 0.5s var(--ease-brand) 0.55s forwards;
+}
+
+@keyframes cortina-marca-entra {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes cortina-traza {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes cortina-rellena {
+  to { fill-opacity: 1; }
+}
+
+@keyframes cortina-linea {
+  to { scale: 1 1; }
+}
+
+@keyframes cortina-sale {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* El contenido entra justo cuando la cortina se va. */
+.js .contenido-entra {
+  animation: contenido-entra 0.6s var(--ease-brand) 0.9s both;
+}
+
+@keyframes contenido-entra {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ============================================================
    Revelado al entrar en pantalla
    ------------------------------------------------------------
    CSS más un IntersectionObserver de unas líneas (ver `Base.astro`). Lo
@@ -986,6 +1181,11 @@
     transition-duration: 0.15s !important;
     scroll-behavior: auto !important;
   }
+
+  /* Ni cortina de entrada ni animación de contenido: la página aparece y ya. */
+  .cortina { display: none; }
+  .js .contenido-entra { animation: none; }
+  .cinta-pista { animation: none; }
 
   /* Con movimiento reducido el contenido no se oculta ni espera al
      observador: aparece ya visible y no hay nada que revelar. */

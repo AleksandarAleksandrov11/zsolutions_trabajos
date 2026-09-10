@@ -13,6 +13,7 @@ export const GET: APIRoute = () => {
     { url: "/servicios", frecuencia: "monthly", prioridad: 0.9 },
     { url: "/zonas", frecuencia: "monthly", prioridad: 0.8 },
     { url: "/proyectos", frecuencia: "monthly", prioridad: 0.8 },
+    { url: "/testimonios", frecuencia: "monthly", prioridad: 0.7 },
     { url: "/sobre-alex", frecuencia: "yearly", prioridad: 0.7 },
     { url: "/contacto", frecuencia: "yearly", prioridad: 0.9 },
     { url: "/aviso-legal", frecuencia: "yearly", prioridad: 0.2 },

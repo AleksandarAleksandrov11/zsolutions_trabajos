@@ -35,3 +35,36 @@ export const faqHome: ParFaq[] = [
     r: "Sí. Desde 2024 comparto lo que he aprendido en obra con profesionales que quieren elevar su nivel. Es un proyecto aparte del servicio de instalación y se organiza desde alexzsurzs.com; si te interesa, escríbeme y te cuento.",
   },
 ];
+
+/**
+ * Dudas de la página de contacto.
+ *
+ * Son las que aparecen justo antes de escribir, no las del oficio: cuánto
+ * cuesta preguntar, qué pasa con los datos y cuándo se responde.
+ */
+export const faqContacto: ParFaq[] = [
+  {
+    p: "¿Cuánto tarda la respuesta?",
+    r: "Menos de 24 horas de lunes a viernes. Si escribes un viernes por la tarde, la respuesta suele salir el lunes por la mañana.",
+  },
+  {
+    p: "¿La visita para presupuestar se cobra?",
+    r: "No. La visita para valorar el trabajo y pasar el presupuesto no tiene coste ni compromiso. Lo que se cobra es la intervención, y siempre después de que la hayas aceptado.",
+  },
+  {
+    p: "¿Tengo que saber qué servicio necesito?",
+    r: "No. Describe lo que pasa con tus palabras y ya lo clasifico yo. En el formulario hay una opción para decir precisamente que no lo sabes.",
+  },
+  {
+    p: "¿Qué pasa con mis datos?",
+    r: "Se usan solo para responderte y preparar el presupuesto. No se ceden a terceros ni se usan para enviarte publicidad. Está detallado en la política de privacidad.",
+  },
+  {
+    p: "¿Puedo mandar fotos?",
+    r: "Sí, y ayuda mucho. Por WhatsApp es lo más cómodo: una foto del cuadro, de la avería o del espacio ahorra media visita.",
+  },
+  {
+    p: "¿Trabajas con comunidades y administradores de fincas?",
+    r: "Sí. El presupuesto va desglosado por partidas para que se pueda llevar a junta sin traducirlo, y con la documentación que después se necesita.",
+  },
+];

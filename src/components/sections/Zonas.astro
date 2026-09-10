@@ -1,59 +1,73 @@
 ---
+import { ArrowRight, MapPin } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
 import Reveal from "@/components/ui/Reveal.astro";
 import RevealGroup from "@/components/ui/RevealGroup.astro";
 import RevealItem from "@/components/ui/RevealItem.astro";
-import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
-import { zonas, zonasPorComarca } from "@/content/zonas";
+import MapaZonas from "@/components/sections/MapaZonas.astro";
+import { agrupaciones, zonas } from "@/content/zonas";
+import { fotos } from "@/content/fotos";
 import { secciones } from "@/content/secciones";
 
-type Props = { numero?: string; conEnlace?: boolean };
-const { numero = "06", conEnlace = false } = Astro.props;
+type Props = { numero?: string };
+const { numero = "06" } = Astro.props;
 
-/* Aquí solo va el listado. El mapa está en `/zonas`, que es donde tiene
-   sitio para leerse; repetirlo en la portada solo alargaba la página. */
-
-const porComarca = zonasPorComarca();
+const publicadas = agrupaciones.filter((a) => a.publicada);
+const fondo = fotos["fondo-fachadas"];
 ---
 
-<section class="py-section" aria-labelledby="titulo-zonas">
+<section
+  class="seccion-foto py-section"
+  style={`--foto: url("${fondo.src}"); --foto-posicion: center bottom`}
+  aria-labelledby="titulo-zonas"
+>
   <div class="container-brand">
     <SectionHeading
       numero={numero}
       eyebrow={secciones.zonas.eyebrow}
       tituloId="titulo-zonas"
       titulo={secciones.zonas.titulo}
-      descripcion={`${zonas.length} municipios con salida habitual. Si el tuyo no está, pregúntame igualmente: lo que no hago es cobrarte un desplazamiento que no te aporta nada.`}
+      descripcion={`Base en ${zonas[0].ciudad} y salida habitual a ${zonas.length} municipios. Si el tuyo no está, pregunta igualmente.`}
     />
 
-    <div class="mt-12">
-      <RevealGroup class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {
-          porComarca.map((grupo) => (
-            <RevealItem>
-              <h3 class="text-eyebrow mb-3 text-fg-dim">{grupo.comarca}</h3>
-              <ul class="flex flex-wrap gap-2">
-                {grupo.zonas.map((zona) => (
-                  <li class="hairline inline-flex min-h-9 items-center rounded-full px-3.5 text-sm text-fg-muted">
-                    {zona.ciudad}
-                  </li>
-                ))}
-              </ul>
-            </RevealItem>
-          ))
-        }
+    <div class="mt-12 grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:items-center lg:gap-16">
+      <Reveal class="tarjeta p-5 sm:p-7">
+        <MapaZonas />
+        <p class="mt-4 text-xs text-fg-dim">
+          Contorno real de Cataluña. Cada punto está en las coordenadas de su
+          municipio y lleva a su zona.
+        </p>
+      </Reveal>
 
-      </RevealGroup>
+      <div>
+        <RevealGroup as="ul" class="rejilla-igual sm:grid-cols-2" stagger={0.05}>
+          {
+            publicadas.map((grupo) => (
+              <RevealItem as="li">
+                <a href={`/zonas/${grupo.slug}`} class="tarjeta group flex h-full flex-col p-5">
+                  <span class="flex items-center gap-2.5">
+                    <MapPin className="h-4 w-4 shrink-0 text-brand-orange" aria-hidden="true" />
+                    <span class="text-lg font-bold">{grupo.nombre}</span>
+                  </span>
+                  <span class="mt-2 block text-sm text-fg-muted">{grupo.entradilla}</span>
+                  <span class="text-eyebrow mt-auto block pt-4 text-fg-dim transition-colors group-hover:text-fg">
+                    {grupo.municipios.length}
+                    {grupo.municipios.length === 1 ? " municipio" : " municipios"}
+                  </span>
+                </a>
+              </RevealItem>
+            ))
+          }
+        </RevealGroup>
 
-      {
-        conEnlace ? (
-          <Reveal class="mt-10">
-            <EnlaceBoton href="/zonas" variante="secundario">
-              Ver el mapa y todas las zonas
-            </EnlaceBoton>
-          </Reveal>
-        ) : null
-      }
+        <div class="mt-8">
+          <EnlaceBoton href="/zonas" variante="secundario">
+            Ver el mapa y los {zonas.length} municipios
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </EnlaceBoton>
+        </div>
+      </div>
     </div>
   </div>
 </section>

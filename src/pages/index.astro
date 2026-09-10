@@ -1,54 +1,72 @@
 ---
 import Base from "@/layouts/Base.astro";
+import Cortina from "@/components/layout/Cortina.astro";
 import Hero from "@/components/sections/Hero.astro";
-import SelectorServicio from "@/components/sections/SelectorServicio.astro";
-import Metodo from "@/components/sections/Metodo.astro";
+import CintaConfianza from "@/components/sections/CintaConfianza.astro";
+import Servicios from "@/components/sections/Servicios.astro";
+import Sectores from "@/components/sections/Sectores.astro";
+import PorQue from "@/components/sections/PorQue.astro";
+import ProcesoSteps from "@/components/sections/ProcesoSteps.astro";
 import Trabajos from "@/components/sections/Trabajos.astro";
 import SobreAlex from "@/components/sections/SobreAlex.astro";
 import Testimonios from "@/components/sections/Testimonios.astro";
 import Zonas from "@/components/sections/Zonas.astro";
+import Certifications from "@/components/sections/Certifications.astro";
 import FAQ from "@/components/sections/FAQ.astro";
 import CTASection from "@/components/sections/CTASection.astro";
 import BandaContacto from "@/components/sections/BandaContacto.astro";
-import Comparador from "@/components/sections/Comparador.astro";
 import { schemaFaq } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { faqHome } from "@/content/faq";
-import { comparativaPortada } from "@/content/comparativas";
+import { procesoGeneral } from "@/content/proceso";
 
 const meta = crearMetadata({
   title: "Electricista y lampista en Barcelona | ZSolutions",
   description:
-    "Instalador certificado en Barcelona: electricidad, fontanería, climatización, aerotermia y trabajos verticales. Presupuesto en menos de 24 horas.",
+    "Instalador certificado en Barcelona: electricidad, fontanería, climatización, aerotermia, lampistería y trabajos verticales. Vivienda, comunidad, local y nave. Presupuesto en menos de 24 horas.",
   path: "/",
 });
 ---
 
 <Base meta={meta} schema={schemaFaq(faqHome)}>
+  <Cortina />
+
   <Hero
     portada
-    conBarraConfianza
-    eyebrow="Instalador certificado en Barcelona"
-    titulo="Instalaciones certificadas en Barcelona"
-    descripcion="Electricidad, fontanería, climatización, aerotermia y trabajos verticales. Ejecutado y firmado por un instalador con carnet, no vendido por un intermediario que subcontrata la obra."
-    foto={{
-      nombre: "alex-cubierta-barcelona",
-      alt: "",
-      posicionMovil: "62% 18%",
-      posicion: "70% 25%",
-    }}
+    titulo="Electricidad, agua y clima"
+    destacado="con un solo responsable"
+    entradilla="Instalador certificado en Barcelona. Vivienda, comunidad de vecinos, local y nave: quien te visita, quien presupuesta y quien firma la instalación es la misma persona."
+    altFoto="Alex Zsurzs, instalador de ZSolutions, con arnés y casco en la cubierta de un edificio de Barcelona"
   />
 
-  <SelectorServicio numero="01" />
+  <div class="hairline-b bg-surface">
+    <CintaConfianza tipo="frases" />
+  </div>
+
+  <Servicios numero="01" />
+  <Sectores numero="02" />
+
   <BandaContacto claim="¿Ya sabes lo que necesitas? Cuéntamelo en un minuto por teléfono o WhatsApp." />
-  <Metodo numero="02" />
-  <Trabajos numero="03" />
-  <Comparador comparativa={comparativaPortada} numero="04" />
-  <BandaContacto />
-  <SobreAlex numero="05" />
-  <Testimonios numero="06" />
+
+  <PorQue numero="03" />
+  <ProcesoSteps pasos={procesoGeneral} numero="04" titulo="Cómo funciona, paso a paso" />
+  <Trabajos numero="05" />
+
+  <div class="hairline-y bg-surface">
+    <p class="container-brand pt-8 text-center text-xs text-fg-dim">
+      Marcas que instalo y mantengo a diario. No implica distribución oficial
+      ni acuerdo comercial con ninguna de ellas.
+    </p>
+    <CintaConfianza tipo="marcas" class="pb-8" />
+  </div>
+
+  <SobreAlex numero="06" />
+  <Testimonios numero="07" />
+
   <BandaContacto claim="¿Tu zona no está en la lista? Pregúntame igualmente: casi siempre llego." />
-  <Zonas numero="07" conEnlace />
-  <FAQ preguntas={faqHome} numero="08" />
+
+  <Zonas numero="08" />
+  <Certifications numero="09" />
+  <FAQ preguntas={faqHome} numero="10" />
   <CTASection />
 </Base>

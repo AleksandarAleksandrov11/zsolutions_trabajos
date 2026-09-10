@@ -10,6 +10,7 @@ import { schemaMigas } from "@/lib/schema";
 import { crearMetadata } from "@/lib/seo";
 import { comparativas } from "@/content/comparativas";
 import { trabajos } from "@/content/trabajos";
+import { fotos } from "@/content/fotos";
 
 /*
  * Galería de trabajos con página propia.
@@ -31,12 +32,15 @@ const meta = crearMetadata({
 ---
 
 <Base meta={meta} schema={schemaMigas(migas)}>
-  <header class="pt-32 pb-4 sm:pt-40">
+  <header
+    class="seccion-foto pt-32 pb-14 sm:pt-40 sm:pb-16"
+    style={`--foto: url("${fotos["obra-electricidad"].src}")`}
+  >
     <div class="container-brand">
       <Breadcrumbs migas={migas} />
 
-      <p class="text-eyebrow mt-7 flex items-center gap-2.5 text-brand-orange">
-        <span class="regla-acento w-6" aria-hidden="true"></span>
+      <p class="text-eyebrow mt-7 flex items-center gap-3 text-brand-orange">
+        <span class="regla-acento w-8" aria-hidden="true"></span>
         Trabajos
       </p>
       <h1 class="mt-5 max-w-3xl text-5xl">Lo que se ve cuando el trabajo está bien hecho</h1>

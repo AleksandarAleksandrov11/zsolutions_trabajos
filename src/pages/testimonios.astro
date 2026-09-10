@@ -1,0 +1,124 @@
+---
+import { Quote, Star } from "lucide-react";
+import Base from "@/layouts/Base.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import Contadores from "@/components/sections/Contadores.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import BandaContacto from "@/components/sections/BandaContacto.astro";
+import CTASection from "@/components/sections/CTASection.astro";
+import { schemaMigas } from "@/lib/schema";
+import { crearMetadata } from "@/lib/seo";
+import { testimonios } from "@/content/testimonios";
+import { fotos } from "@/content/fotos";
+
+/*
+ * Página de opiniones.
+ *
+ * Todas juntas y a rejilla, no en carrusel: en la portada el carrusel obliga
+ * a elegir cuáles caben, y aquí caben todas.
+ *
+ * ⚠️ Los textos son de ejemplo mientras no haya reseñas reales, y por eso
+ * esta página NO emite `Review` ni `AggregateRating`. Ver
+ * `src/content/testimonios.ts`.
+ */
+const migas = [{ label: "Opiniones", href: "/testimonios" }];
+
+const meta = crearMetadata({
+  title: "Opiniones de clientes | ZSolutions Barcelona",
+  description:
+    "Lo que dicen quienes ya han trabajado con ZSolutions: instalaciones de electricidad, fontanería, climatización y trabajos verticales en Barcelona y área metropolitana.",
+  path: "/testimonios",
+  og: "/og/sobre-alex.jpg",
+});
+
+const inicial = (autor: string) => autor.trim().charAt(0).toUpperCase();
+const fondo = fotos["fondo-bloques"];
+---
+
+<Base meta={meta} schema={schemaMigas(migas)}>
+  <header
+    class="seccion-foto pt-32 pb-16 sm:pt-40 sm:pb-20"
+    style={`--foto: url("${fondo.src}")`}
+  >
+    <div class="container-brand">
+      <Breadcrumbs migas={migas} />
+
+      <p class="text-eyebrow mt-7 flex items-center gap-3 text-brand-orange">
+        <span class="regla-acento w-8" aria-hidden="true"></span>
+        Opiniones
+      </p>
+      <h1 class="mt-5 max-w-3xl text-5xl">Lo que dicen quienes ya han trabajado conmigo</h1>
+      <p class="mt-6 max-w-2xl text-xl text-fg-muted">
+        Particulares, comunidades de vecinos y administradores de fincas de
+        Barcelona y del área metropolitana. Sin recortar y sin retocar.
+      </p>
+
+      <div class="mt-9 flex flex-wrap gap-3">
+        <EnlaceBoton href="/contacto" tamano="lg" data-evento="presupuesto_cta">
+          Pedir presupuesto
+        </EnlaceBoton>
+        <EnlaceBoton href="/proyectos" variante="secundario" tamano="lg">
+          Ver trabajos
+        </EnlaceBoton>
+      </div>
+    </div>
+  </header>
+
+  <section class="seccion-clara py-section" aria-labelledby="titulo-opiniones">
+    <div class="container-brand">
+      <h2 id="titulo-opiniones" class="sr-only">Opiniones de clientes</h2>
+
+      <RevealGroup as="ul" class="rejilla-igual sm:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
+        {
+          testimonios.map((t) => (
+            <RevealItem as="li">
+              <article class="tarjeta flex h-full flex-col p-6 sm:p-7">
+                <div class="flex items-center gap-3">
+                  <span class="chip-icono h-11 w-11 font-display text-lg" aria-hidden="true">
+                    {inicial(t.autor)}
+                  </span>
+                  <span>
+                    <span class="block text-sm font-bold">{t.autor}</span>
+                    <span class="block text-xs text-fg-dim">{t.lugar}</span>
+                  </span>
+                </div>
+
+                <div class="mt-5 flex gap-0.5" aria-label="Valoración de cinco sobre cinco">
+                  {[0, 1, 2, 3, 4].map(() => (
+                    <Star className="h-4 w-4 fill-brand-orange text-brand-orange" aria-hidden="true" />
+                  ))}
+                </div>
+
+                <Quote className="mt-5 h-5 w-5 shrink-0 text-brand-blue" aria-hidden="true" />
+                <blockquote class="mt-3 flex-1 text-fg-muted">{t.texto}</blockquote>
+
+                <footer class="hairline-t mt-6 pt-4">
+                  <p class="text-eyebrow text-fg-dim">{t.trabajo}</p>
+                </footer>
+              </article>
+            </RevealItem>
+          ))
+        }
+      </RevealGroup>
+    </div>
+  </section>
+
+  <BandaContacto claim="¿Quieres hablar con alguno de ellos antes de decidir? Pídemelo y lo pregunto." />
+
+  <section class="py-section" aria-labelledby="titulo-cifras-opiniones">
+    <div class="container-brand">
+      <SectionHeading
+        numero="01"
+        eyebrow="En números"
+        tituloId="titulo-cifras-opiniones"
+        titulo="La trayectoria detrás de esas opiniones"
+      />
+      <Contadores class="mt-12" />
+    </div>
+  </section>
+
+  <CTASection titulo="¿Quieres ser el siguiente?" />
+</Base>

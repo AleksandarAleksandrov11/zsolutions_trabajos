@@ -1,0 +1,80 @@
+---
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import RevealGroup from "@/components/ui/RevealGroup.astro";
+import RevealItem from "@/components/ui/RevealItem.astro";
+import EnlaceBoton from "@/components/ui/EnlaceBoton.astro";
+import { ArrowRight } from "lucide-react";
+import { fotos } from "@/content/fotos";
+import { secciones } from "@/content/secciones";
+
+type Props = { numero?: string };
+const { numero = "03" } = Astro.props;
+
+const razones = [
+  {
+    titulo: "Quien presupuesta es quien sube",
+    detalle:
+      "No hay comercial que venda y equipo que ejecute. Quien te visita, quien pasa el precio y quien firma la instalación es la misma persona.",
+  },
+  {
+    titulo: "Presupuesto cerrado en menos de 24 horas",
+    detalle:
+      "Con materiales y plazos, sin partidas abiertas. Si aparece algo que no estaba a la vista, se comunica antes de ejecutarlo, no en la factura.",
+  },
+  {
+    titulo: "Se entrega documentado",
+    detalle:
+      "Boletín, certificado de instalación, esquema del cuadro y registro de la carga de gas cuando toca. Te queda por escrito qué se ha hecho.",
+  },
+  {
+    titulo: "Seis oficios, un solo interlocutor",
+    detalle:
+      "Cuando un trabajo toca electricidad y agua a la vez, no hay que coordinar a dos empresas ni esperar a que se pongan de acuerdo.",
+  },
+];
+
+const fondo = fotos["textura-hormigon"];
+---
+
+<section
+  class="seccion-foto py-section"
+  style={`--foto: url("${fondo.src}"); --foto-posicion: center`}
+  aria-labelledby="titulo-porque"
+>
+  <div class="container-brand">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-20">
+      <div class="lg:sticky lg:top-28 lg:self-start">
+        <SectionHeading
+          numero={numero}
+          eyebrow={secciones.metodo.eyebrow}
+          tituloId="titulo-porque"
+          titulo={secciones.metodo.titulo}
+        />
+        <p class="mt-6 max-w-md text-lg text-fg-muted">
+          Cuatro cosas que suenan obvias y que casi nunca se cumplen. Son las
+          que hacen que un trabajo se pueda dar por cerrado.
+        </p>
+        <div class="mt-8">
+          <EnlaceBoton href="/sobre-alex" variante="secundario">
+            Quién está detrás
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </EnlaceBoton>
+        </div>
+      </div>
+
+      <RevealGroup as="ol" class="rejilla-igual sm:grid-cols-2" stagger={0.06}>
+        {
+          razones.map((razon, i) => (
+            <RevealItem as="li">
+              <article class="tarjeta flex h-full flex-col p-6">
+                <span class="num-seccion text-2xl">{String(i + 1).padStart(2, "0")}</span>
+                <h3 class="mt-4 text-xl">{razon.titulo}</h3>
+                <p class="mt-2.5 text-sm text-fg-muted">{razon.detalle}</p>
+              </article>
+            </RevealItem>
+          ))
+        }
+      </RevealGroup>
+    </div>
+  </div>
+</section>

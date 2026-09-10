@@ -14,6 +14,8 @@ import sharp from "sharp";
 import { mkdir, writeFile } from "node:fs/promises";
 
 const AZUL = "#2F4AA0";
+const AZUL_HONDO = "#23366F";
+const NARANJA = "#FF7A1A";
 const BLANCO = "#FFFFFF";
 
 /* Isotipo oficial, extraído del manual de identidad. Dos trazados: la Z con
@@ -26,33 +28,57 @@ const ISOTIPO = {
 };
 
 /**
- * A tamaños pequeños las tres líneas de fuga se emborronan, así que el icono
- * las conserva pero el conjunto se escala con margen. El manual permite el
- * isotipo suelto y a una tinta.
+ * El icono es el RAYO, no el isotipo entero.
+ *
+ * A 16 px, que es como se ve un favicon en una pestaña, la Z con sus tres
+ * líneas de fuga se convierte en una mancha gris: son trazos de dos píxeles
+ * separados por uno. Un favicon tiene una sola oportunidad de decir de quién
+ * es, y aquí la forma que aguanta el tamaño y que además es propia de la
+ * marca es el rayo.
+ *
+ * Va en naranja sobre el azul corporativo: las dos tintas de la marca en una
+ * sola figura, y con 7,3:1 de contraste entre ellas se distingue en cualquier
+ * pantalla y en modo oscuro.
  */
-function svgIcono({ fondo, tinta, rayo, margen = 0.14, radio = 0 }) {
+function svgIcono({ fondo, tinta, margen = 0.2, radio = 0, conZ = false }) {
   const lienzo = 512;
   const util = lienzo * (1 - margen * 2);
-  const escala = Math.min(util / ISOTIPO.ancho, util / ISOTIPO.alto);
-  const tx = (lienzo - ISOTIPO.ancho * escala) / 2;
-  const ty = (lienzo - ISOTIPO.alto * escala) / 2;
+
+  /* Caja real del rayo dentro del isotipo, medida sobre su trazado. */
+  const RAYO = { x: 62.09, y: 23.14, ancho: 54.11, alto: 104.83 };
+  const escala = Math.min(util / RAYO.ancho, util / RAYO.alto);
+  const tx = (lienzo - RAYO.ancho * escala) / 2 - RAYO.x * escala;
+  const ty = (lienzo - RAYO.alto * escala) / 2 - RAYO.y * escala;
+
+  /* Solo la versión grande lleva la Z de fondo, muy tenue: a 192 px o más sí
+     se lee y da profundidad; por debajo estorba. */
+  const escalaZ = Math.min(lienzo * 0.86 / ISOTIPO.ancho, lienzo * 0.86 / ISOTIPO.alto);
+  const zx = (lienzo - ISOTIPO.ancho * escalaZ) / 2;
+  const zy = (lienzo - ISOTIPO.alto * escalaZ) / 2;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${lienzo} ${lienzo}" width="${lienzo}" height="${lienzo}">
   ${fondo ? `<rect width="${lienzo}" height="${lienzo}" rx="${radio}" fill="${fondo}"/>` : ""}
+  ${
+    conZ
+      ? `<g opacity="0.14" transform="translate(${zx.toFixed(2)} ${zy.toFixed(2)}) scale(${escalaZ.toFixed(4)})"><path fill="${BLANCO}" fill-rule="evenodd" d="${ISOTIPO.z}"/></g>`
+      : ""
+  }
   <g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${escala.toFixed(4)})">
-    <path fill="${tinta}" fill-rule="evenodd" d="${ISOTIPO.z}"/>
-    <path fill="${rayo ?? tinta}" fill-rule="evenodd" d="${ISOTIPO.rayo}"/>
+    <path fill="${tinta}" fill-rule="evenodd" d="${ISOTIPO.rayo}"/>
   </g>
 </svg>`;
 }
 
-/* Sobre azul corporativo, todo a blanco: es la variante a una tinta que
-   prescribe el manual cuando el fondo no deja leer la versión a color. */
-const iconoPrincipal = svgIcono({ fondo: AZUL, tinta: BLANCO });
-/* Maskable: Android recorta hasta un 20 %, así que el isotipo va más pequeño. */
-const iconoMaskable = svgIcono({ fondo: AZUL, tinta: BLANCO, margen: 0.26 });
+/* Favicon y PWA: rayo naranja sobre azul, con la Z insinuada detrás. */
+const iconoPrincipal = svgIcono({ fondo: AZUL_HONDO, tinta: NARANJA, radio: 96, margen: 0.14, conZ: true });
+/* En la pestaña, sin esquinas redondeadas: el navegador ya recorta. */
+/* Margen muy corto: el rayo es alto y estrecho, así que ajustado a la altura
+   del lienzo aún deja aire a los lados. A 16 px cada píxel cuenta. */
+const iconoPestana = svgIcono({ fondo: AZUL_HONDO, tinta: NARANJA, radio: 0, margen: 0.06 });
+/* Maskable: Android recorta hasta un 20 %, así que el rayo va más pequeño. */
+const iconoMaskable = svgIcono({ fondo: AZUL_HONDO, tinta: NARANJA, margen: 0.32, conZ: true });
 /* Pestaña anclada de Safari: una sola tinta, sin fondo. */
-const iconoMonocromo = svgIcono({ fondo: null, tinta: "#000000" });
+const iconoMonocromo = svgIcono({ fondo: null, tinta: "#000000", margen: 0.12 });
 
 await mkdir("public/icons", { recursive: true });
 
@@ -96,13 +122,13 @@ async function ico(svg, tamanos, destino) {
   console.log(`✓ ${destino}  (${tamanos.join(" · ")} px)`);
 }
 
-await writeFile("public/icons/icon.svg", iconoPrincipal);
+await writeFile("public/icons/icon.svg", iconoPestana);
 console.log("✓ public/icons/icon.svg");
 
 await writeFile("public/icons/icon-monocromo.svg", iconoMonocromo);
 console.log("✓ public/icons/icon-monocromo.svg");
 
-await ico(iconoPrincipal, [16, 32, 48], "public/favicon.ico");
+await ico(iconoPestana, [16, 32, 48], "public/favicon.ico");
 await png(iconoPrincipal, 180, "public/icons/apple-icon.png");
 await png(iconoPrincipal, 192, "public/icons/icon-192.png");
 await png(iconoPrincipal, 512, "public/icons/icon-512.png");

@@ -91,6 +91,7 @@ export const navPrincipal: EnlaceNav[] = [
   { label: "Servicios", href: "/servicios" },
   { label: "Trabajos", href: "/proyectos" },
   { label: "Zonas", href: "/zonas" },
+  { label: "Opiniones", href: "/testimonios" },
   { label: "Sobre Alex", href: "/sobre-alex" },
 ];
 
