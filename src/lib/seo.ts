@@ -7,6 +7,15 @@ function env(clave: string): string | undefined {
 }
 
 /**
+ * Entorno de despliegue, tal y como lo declara Vercel:
+ * `production`, `preview` o `development`. Fuera de Vercel no existe.
+ */
+const ENTORNO = env("VERCEL_ENV");
+
+/** Dominio definitivo, si ya se ha declarado a mano. */
+const DOMINIO_DECLARADO = env("PUBLIC_SITE_URL");
+
+/**
  * URL base del sitio.
  *
  * Se resuelve en tiempo de compilación, que es cuando se generan las rutas
@@ -19,55 +28,72 @@ function env(clave: string): string | undefined {
  *
  * Orden de prioridad:
  *  1. `PUBLIC_SITE_URL`, el dominio definitivo cuando ya esté apuntado.
- *     Se acepta también `NEXT_PUBLIC_SITE_URL` por compatibilidad con la
- *     configuración que ya pueda existir en el proyecto de Vercel.
  *  2. El dominio de producción del proyecto en Vercel.
  *  3. La URL única de la previsualización, para que cada preview se autodescriba.
  *  4. `localhost` en desarrollo.
  */
-function resolverBaseUrl(): string {
+function resolverBaseUrl(): { url: string; conocida: boolean } {
   const limpiar = (valor: string) =>
     (valor.startsWith("http") ? valor : `https://${valor}`).replace(/\/+$/, "");
 
-  const declarada = env("PUBLIC_SITE_URL") ?? env("NEXT_PUBLIC_SITE_URL");
-  if (declarada) return limpiar(declarada);
+  if (DOMINIO_DECLARADO) return { url: limpiar(DOMINIO_DECLARADO), conocida: true };
 
-  if (env("VERCEL_ENV") === "production" && env("VERCEL_PROJECT_PRODUCTION_URL")) {
-    return limpiar(env("VERCEL_PROJECT_PRODUCTION_URL") as string);
+  if (ENTORNO === "production" && env("VERCEL_PROJECT_PRODUCTION_URL")) {
+    return { url: limpiar(env("VERCEL_PROJECT_PRODUCTION_URL") as string), conocida: true };
   }
 
   const url = env("VERCEL_URL");
-  if (url) return limpiar(url);
+  if (url) return { url: limpiar(url), conocida: true };
 
-  return "http://localhost:4321";
+  return { url: "http://localhost:4321", conocida: false };
 }
 
-export const BASE_URL = resolverBaseUrl();
+const base = resolverBaseUrl();
+
+export const BASE_URL = base.url;
 
 /** El dominio en el que está servida la web, sin protocolo. */
 export const DOMINIO_ACTUAL = BASE_URL.replace(/^https?:\/\//, "");
 
 /**
+ * Si no se ha podido averiguar en qué dirección se sirve la web, las canónicas
+ * y el sitemap apuntarían a `localhost`. Indexar eso no tendría sentido.
+ */
+const SIN_DIRECCION = !base.conocida;
+
+/**
+ * Interruptor manual de indexación. Tres estados:
+ *  · `true`  → indexar aunque el automatismo diga que no.
+ *  · `false` → no indexar aunque el automatismo diga que sí (interruptor de
+ *              emergencia, por si hace falta sacar la web del índice sin
+ *              tocar código).
+ *  · sin definir → decide el automatismo de abajo.
+ */
+const FORZADO = env("PUBLIC_PERMITIR_INDEXACION");
+
+/**
  * Si la web se abre o no a los buscadores.
  *
- * Por defecto solo se indexa cuando está en su dominio definitivo. Indexar una
- * dirección provisional de Vercel tiene un coste real: cuando llegue el
- * dominio bueno, Google ya tendrá una copia compitiendo con él por las mismas
- * búsquedas, y hay que deshacerlo a base de redirecciones y reindexación.
+ * La regla es automática a propósito: un despliegue de producción se indexa
+ * solo, sin que nadie tenga que acordarse de definir una variable. Antes hacía
+ * falta declarar `PUBLIC_SITE_URL` para que la web dejase de salir en
+ * `noindex`, y eso significaba que un despliegue perfectamente correcto podía
+ * quedarse invisible para Google sin que nada avisara.
  *
- * Se activa de dos formas:
- *  · Definiendo `PUBLIC_SITE_URL`, que es lo que harás al apuntar el dominio.
- *    Es el camino recomendado.
- *  · Forzándolo con `PUBLIC_PERMITIR_INDEXACION=true`, si prefieres que la
- *    dirección provisional entre en Google desde ya, asumiendo lo anterior.
- *
- * Las previsualizaciones nunca se indexan, se ponga lo que se ponga.
+ * Lo que nunca se indexa, se ponga lo que se ponga:
+ *  · Las previsualizaciones de Vercel. Indexarlas deja copias compitiendo con
+ *    el dominio bueno por las mismas búsquedas.
+ *  · Los builds sin dirección conocida, cuyas canónicas dirían `localhost`.
  */
-export const ES_INDEXABLE =
-  (Boolean(env("PUBLIC_SITE_URL") ?? env("NEXT_PUBLIC_SITE_URL")) ||
-    (env("PUBLIC_PERMITIR_INDEXACION") ?? env("NEXT_PUBLIC_PERMITIR_INDEXACION")) ===
-      "true") &&
-  env("VERCEL_ENV") !== "preview";
+export const ES_INDEXABLE = (() => {
+  if (ENTORNO === "preview") return false;
+  if (SIN_DIRECCION) return false;
+  if (FORZADO === "true") return true;
+  if (FORZADO === "false") return false;
+  if (ENTORNO === "production") return true;
+  /* Otro alojamiento: se indexa si el dominio está declarado. */
+  return Boolean(DOMINIO_DECLARADO);
+})();
 
 /**
  * Miniatura para redes sociales.

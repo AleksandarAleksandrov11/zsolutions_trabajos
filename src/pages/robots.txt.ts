@@ -2,9 +2,10 @@ import type { APIRoute } from "astro";
 import { BASE_URL, ES_INDEXABLE } from "@/lib/seo";
 
 /**
- * Sin dominio definitivo, la dirección es provisional y no debe indexarse:
- * dejar una copia en el índice de Google obliga después a limpiarla a base de
- * redirecciones. Se abre solo al definir `PUBLIC_SITE_URL`.
+ * Se abre a los buscadores en cuanto el despliegue es de producción; ver la
+ * regla completa en `src/lib/seo.ts`. Las previsualizaciones y los builds
+ * locales siguen cerrados: dejar una copia provisional en el índice de Google
+ * obliga después a limpiarla a base de redirecciones.
  */
 export const GET: APIRoute = () => {
   const cuerpo = ES_INDEXABLE
