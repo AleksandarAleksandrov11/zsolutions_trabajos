@@ -56,10 +56,26 @@ const pruebas = [
       class="absolute inset-0 h-full w-full"
       objectPosition={posicionFoto}
     />
-    {/* Velos: legibilidad del texto sin tocar la foto. En pantalla ancha el
-        oscurecido va de izquierda a derecha; en móvil, de abajo arriba. */}
-    <div class="absolute inset-0 bg-gradient-to-t from-bg from-28% via-bg/90 via-64% to-bg/30 lg:hidden"></div>
-    <div class="absolute inset-0 hidden bg-gradient-to-r from-bg from-14% via-bg/85 via-56% to-bg/15 lg:block"></div>
+    {/* Velos: legibilidad del texto sin tapar la foto. En pantalla ancha el
+        oscurecido va de izquierda a derecha; en móvil, de abajo arriba. Con
+        menos texto en el héroe de portada, el velo tiene que cubrir menos:
+        Alex se ve, no se adivina. */}
+    <div
+      class:list={[
+        "absolute inset-0 bg-gradient-to-t lg:hidden",
+        portada
+          ? "from-bg from-14% via-bg/78 via-44% to-transparent"
+          : "from-bg from-28% via-bg/90 via-64% to-bg/30",
+      ]}
+    ></div>
+    <div
+      class:list={[
+        "absolute inset-0 hidden bg-gradient-to-r lg:block",
+        portada
+          ? "from-bg from-6% via-bg/68 via-38% to-transparent"
+          : "from-bg from-14% via-bg/85 via-56% to-bg/15",
+      ]}
+    ></div>
     <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-bg/90 to-transparent"></div>
     <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-bg to-transparent"></div>
   </div>
@@ -75,31 +91,51 @@ const pruebas = [
     <h1
       class:list={[
         "mt-6 max-w-4xl",
-        portada ? "text-6xl" : "text-5xl",
+        portada ? "text-4xl sm:text-5xl lg:text-6xl" : "text-5xl",
       ]}
     >
       {titulo}
       {destacado ? <><br /><span class="text-brand-orange">{destacado}</span></> : null}
     </h1>
 
-    <p class="mt-6 max-w-2xl text-xl text-fg-muted">{entradilla}</p>
+    {/* La entradilla larga se queda fuera del héroe de portada: con la foto
+        de Alex de fondo, cuanto menos texto haga falta tapar, mejor se ve.
+        El resto de la web ya cuenta el detalle. */}
+    {!portada && <p class="mt-6 max-w-2xl text-xl text-fg-muted">{entradilla}</p>}
 
-    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+    <div class="mt-8 flex flex-wrap items-center gap-3">
       <EnlaceBoton href="/contacto" tamano="lg" data-evento="presupuesto_cta" data-evento-origen="hero">
         Pedir presupuesto
         <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </EnlaceBoton>
-      <EnlaceBoton href={hrefTelefono()} variante="secundario" tamano="lg">
-        <Phone className="h-4 w-4" aria-hidden="true" />
-        {site.nap.telefono}
-      </EnlaceBoton>
-      <EnlaceBoton href={hrefWhatsApp(mensajeWhatsApp)} variante="fantasma" tamano="lg">
-        <MessageCircle className="h-4 w-4" aria-hidden="true" />
-        WhatsApp
-      </EnlaceBoton>
+
+      {/* Teléfono y WhatsApp, solo icono: el número y la etiqueta ya no
+          hacen falta para que la acción se entienda, y así el bloque de
+          texto sobre la foto es mucho más corto. Van en su propio grupo
+          para que, si el ancho no da, los dos bajen juntos a la línea
+          siguiente en vez de partirse uno de cada lado. */}
+      <div class="flex items-center gap-3">
+        <a
+          href={hrefTelefono()}
+          aria-label={`Llamar al ${site.nap.telefono}`}
+          title={site.nap.telefono}
+          class="hairline inline-flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full text-fg transition-colors hover:border-fg/35 hover:bg-fg/[0.06]"
+        >
+          <Phone className="h-5 w-5" aria-hidden="true" />
+        </a>
+        <a
+          href={hrefWhatsApp(mensajeWhatsApp)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Escribir por WhatsApp"
+          class="hairline inline-flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full text-fg transition-colors hover:border-fg/35 hover:bg-fg/[0.06]"
+        >
+          <MessageCircle className="h-5 w-5" aria-hidden="true" />
+        </a>
+      </div>
     </div>
 
-    <ul class="hairline-t mt-10 flex flex-wrap gap-x-8 gap-y-3 pt-6">
+    <ul class="hairline-t mt-8 flex flex-wrap gap-x-8 gap-y-3 pt-6">
       {
         pruebas.map((prueba) => (
           <li class="text-eyebrow flex items-center gap-2.5 text-fg-muted">
