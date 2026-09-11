@@ -40,7 +40,7 @@ const activo = (href: string) => {
       class="flex shrink-0 items-center py-2 transition-opacity hover:opacity-70"
       aria-label={`${site.nombre} · Inicio`}
     >
-      <BrandLogo class="h-7 sm:h-8" alt="" />
+      <BrandLogo class="h-8 sm:h-9" alt="" />
       <span class="sr-only">{site.nombre}</span>
     </a>
 
@@ -53,7 +53,7 @@ const activo = (href: string) => {
                 href={enlace.href}
                 aria-current={activo(enlace.href) ? "page" : undefined}
                 class:list={[
-                  "flex min-h-11 items-center px-3.5 text-sm transition-colors",
+                  "enlace-nav flex min-h-11 items-center px-4 text-sm font-semibold transition-colors",
                   /* `--n-300` y no `--n-400`: la cabecera es transparente y se
                      apoya sobre lo que haya debajo, que puede ser la franja
                      azul de `/contacto`. Sobre #23366F el tono tenue se queda
@@ -70,12 +70,16 @@ const activo = (href: string) => {
     </nav>
 
     <div class="flex items-center gap-2">
+      {/* Sin el número a la vista: es una cabecera, no la ficha de contacto.
+          El icono llama igual, y quien quiera leer el número lo tiene en el
+          menú, en el pie o en la propia página de contacto. */}
       <a
         href={hrefTelefono()}
-        class="hidden min-h-11 items-center gap-2 px-3 text-sm text-fg-muted transition-colors hover:text-fg md:inline-flex"
+        aria-label={`Llamar al ${site.nap.telefono}`}
+        title={site.nap.telefono}
+        class="hairline hidden h-11 w-11 items-center justify-center rounded-full text-fg-muted transition-colors hover:border-fg/35 hover:text-fg md:inline-flex"
       >
         <Phone className="h-4 w-4" aria-hidden="true" />
-        {site.nap.telefono}
       </a>
 
       {/* El envoltorio controla la visibilidad: `hidden` sobre el propio botón
@@ -123,6 +127,8 @@ const activo = (href: string) => {
     aria-label="Navegación principal"
     class="container-brand flex-1 overflow-y-auto py-4"
   >
+    {/* Sin un «Contacto» aparte: repetiría lo que ya hacen los dos botones
+        de debajo, y aquí cada línea de más se paga en tamaño de letra. */}
     <ul class="flex flex-col">
       {
         navPrincipal.map((enlace) => (
@@ -133,11 +139,6 @@ const activo = (href: string) => {
           </li>
         ))
       }
-      <li class="hairline-b">
-        <a href="/contacto" data-evento="presupuesto_cta" class="flex items-center py-5 font-display text-3xl">
-          Contacto
-        </a>
-      </li>
     </ul>
 
     <div class="mt-8 flex flex-col gap-3">
