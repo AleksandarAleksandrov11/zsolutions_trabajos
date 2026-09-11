@@ -1074,6 +1074,40 @@
 }
 
 /* ============================================================
+   Cabecera: enlace de la navegación principal
+   ------------------------------------------------------------
+   El mismo filete naranja que marca la sección activa en el resto de la
+   web, aplicado a un enlace suelto: crece desde el centro al pasar el
+   ratón, y se queda puesto en la página en la que se está.
+   ============================================================ */
+
+.enlace-nav {
+  position: relative;
+}
+
+.enlace-nav::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  bottom: 0.375rem;
+  left: 1rem;
+  height: 2px;
+  background-color: var(--color-brand-orange);
+  transform: scaleX(0);
+  transition: transform 0.25s var(--ease-brand);
+}
+
+.enlace-nav[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) {
+  .enlace-nav:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ============================================================
    Capas superpuestas: menú móvil, aviso de cookies y visor
    ============================================================ */
 
